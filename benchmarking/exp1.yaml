@@ -1,0 +1,32 @@
+metadata:
+  name: exp1
+  date: 06/03/2025
+
+model: 
+  name: LSTM_Autoencoder
+  description: An LSTM architecture that classifies timeseries into categorical classes.
+  url: .....
+
+  parameters: 
+    id: lstm_ae
+    num_feats: 2
+    latent_seq_len: 1 
+    latent_num_feats: 8 
+    hidden_size: 4
+    num_layers: 1
+    dropout: 0.05
+
+inference:
+  parameters:
+    batch_size: 512
+    seq_len: 240
+    epochs: 1000
+    loss: CrossEntropyLoss
+
+  dataset: https://users.iit.demokritos.gr/~nataliakoliou/datasets/bitbrain.csv
+  
+metrics:
+  - accuracy
+  - f1_score
+  - precision
+  - recall
