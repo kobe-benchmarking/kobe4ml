@@ -1,14 +1,14 @@
 metadata:
-  name: exp2
+  name: exp1
   date: 06/03/2025
 
 model: 
-  name: ConvLSTM_Autoencoder
-  description: A Convolutional LSTM architecture that classifies timeseries into categorical classes.
-  url: ....
+  name: LSTM_Autoencoder
+  description: An LSTM architecture that classifies timeseries into categorical classes.
+  url: s3://manolo-data/models/lstm_ae.pth
 
-  parameters: 
-    id: conv_lstm_ae
+  parameters:
+    id: lstm_ae
     num_feats: 2
     latent_seq_len: 1 
     latent_num_feats: 8 
@@ -23,7 +23,7 @@ inference:
     epochs: 1000
     loss: CrossEntropyLoss
 
-  dataset: https://users.iit.demokritos.gr/~nataliakoliou/datasets/bitbrain.csv
+  dataset: s3://manolo-data/datasets/bitbrain-ds/
   
 metrics:
   - accuracy
