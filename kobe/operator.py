@@ -40,7 +40,7 @@ def load_module(experiment, method):
     params.update(model_params)
     params.update(process_params)
 
-    module_name = f"{model_params['id']}.{method}"
+    module_name = f"algorithms.{model_params['id']}.{method}"
     module = importlib.import_module(module_name)
 
     return module, params

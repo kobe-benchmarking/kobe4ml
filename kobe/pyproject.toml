@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "kobe4ml"
+version = "0.1"
+description = "Kobe: Benchmarking for Machine Learning"
+authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
+	    "Stasinos Konstantopoulos <konstant@iit.demokritos.gr>" ]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.13"
+s3fs = "^2023.1.0"
+boto3 = "^1.26" 
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

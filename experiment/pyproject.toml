@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "kobe4ml"
+name = "exp"
 version = "0.1"
 packages = [
-    { include = "benchmarking" },
-    { include = "benchmarking/kobe" }
+    { include = "kobe" },
+    { include = "algorithms" }
 ]
-description = "Kobe: Benchmarking for Machine Learning"
+description = "Experiment: ML Benchmarking"
 authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
 	    "Stasinos Konstantopoulos <konstant@iit.demokritos.gr>" ]
 readme = "README.md"
@@ -31,4 +31,4 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-benchmark = "benchmarking.main:main"
+benchmark = "main:main"
