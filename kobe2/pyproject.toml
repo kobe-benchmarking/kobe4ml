@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "kobe4ml"
+name = "kobe2"
 version = "0.1"
 packages = [
     { include = "src" }
 ]
-description = "Kobe: Benchmarking for Machine Learning"
+description = "Kobe2: Benchmarking for Machine Learning"
 authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
 	    "Stasinos Konstantopoulos <konstant@iit.demokritos.gr>" ]
 readme = "README.md"
