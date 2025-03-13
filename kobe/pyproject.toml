@@ -2,7 +2,7 @@
 name = "kobe4ml"
 version = "0.1"
 packages = [
-    { include = "kobe" }
+    { include = "src" }
 ]
 description = "Kobe: Benchmarking for Machine Learning"
 authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",

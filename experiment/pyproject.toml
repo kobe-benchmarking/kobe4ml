@@ -2,7 +2,7 @@
 name = "exp"
 version = "0.1"
 packages = [
-    { include = "experiment" }
+    { include = "src" }
 ]
 description = "Experiment: ML Benchmarking"
 authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
