@@ -2,8 +2,7 @@
 name = "exp"
 version = "0.1"
 packages = [
-    { include = "kobe" },
-    { include = "algorithms" }
+    { include = "experiment" }
 ]
 description = "Experiment: ML Benchmarking"
 authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
@@ -24,11 +23,15 @@ torch = "^2.0.1"
 seaborn = "^0.13.2"
 tqdm = "^4.66.2"
 s3fs = "^2023.1.0"
-boto3 = "^1.26" 
+boto3 = "^1.26"
+
+kobe4ml = { path = "../kobe", develop = true }
+lstm_ae = { path = "../algorithms/lstm_ae", develop = true }
+conv_lstm_ae = { path = "../algorithms/conv_lstm_ae", develop = true }
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-benchmark = "main:main"
+benchmark = "experiment.main:main"

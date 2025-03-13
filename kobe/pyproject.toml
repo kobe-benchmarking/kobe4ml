@@ -1,6 +1,9 @@
 [tool.poetry]
 name = "kobe4ml"
 version = "0.1"
+packages = [
+    { include = "kobe" }
+]
 description = "Kobe: Benchmarking for Machine Learning"
 authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
 	    "Stasinos Konstantopoulos <konstant@iit.demokritos.gr>" ]
