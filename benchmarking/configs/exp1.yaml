@@ -16,12 +16,13 @@ model:
     num_layers: 1
     dropout: 0.05
 
-inference:
+process:
+  name: inference
+  
   parameters:
     batch_size: 512
     seq_len: 240
-    epochs: 1000
-    loss: CrossEntropyLoss
+    loss: BlendedLoss
 
   dataset: s3://manolo-data/datasets/bitbrain-ds/
   

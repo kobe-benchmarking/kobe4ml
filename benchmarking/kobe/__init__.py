@@ -1,6 +1,11 @@
-from .operator import run
+from .operator import run as operate
+# from .evaluator import run as evaluate
 
-def __call__(config_path):
-    return run(config_path)
+def kobe(input, output):
+    """
+    Run the operator first, then the evaluator.
+    """
+    operate(input, output)
+    # evaluate(input, output)
 
-__all__ = ["run"]
+__all__ = ["kobe"]

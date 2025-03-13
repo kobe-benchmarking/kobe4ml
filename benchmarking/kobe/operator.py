@@ -1,5 +1,9 @@
 import os
+import importlib
+
 from . import utils
+
+logger = utils.get_logger(level='INFO')
 
 def gather_configs(dir):
     configs = []
@@ -11,8 +15,45 @@ def gather_configs(dir):
 
     return configs
 
+def create_exp_dir(config, dir):
+    metadata = config['metadata']
+    name = metadata['name']
+    date = metadata['date']
+
+    exp_dir_name = f"{name}_{date}"
+    exp_dir = os.path.join(dir, exp_dir_name)
+
+    os.makedirs(exp_dir, exist_ok=True)
+    logger.info(f"Created directory: {exp_dir}")
+
+    return exp_dir
+    
+def load_module(experiment, method):
+    model_name = experiment['model']['name']
+    model_url = experiment['model']['url']
+    ds_url = experiment['process']['dataset']
+
+    model_params = experiment['model']['parameters']
+    process_params = experiment['process']['parameters']
+
+    params = {'name': model_name, 'pth': model_url, 'ds': ds_url}
+    params.update(model_params)
+    params.update(process_params)
+
+    module_name = f"{model_params['id']}.{method}"
+    module = importlib.import_module(module_name)
+
+    return module, params
+
 def run(input_dir, output_dir):
     experiments = gather_configs(input_dir)
 
     for exp in experiments:
-        .....
+        exp_dir = create_exp_dir(config=exp, dir=output_dir)
+
+        process = exp['process']['name']
+        method = "test" if process == 'inference' else "train"
+        
+        module, params = load_module(experiment=exp, method=method)
+
+        module.main(**params)
