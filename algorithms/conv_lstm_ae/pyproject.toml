@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "exp"
+name = "conv_lstm_ae"
 version = "0.1"
 packages = [
     { include = "src" }
 ]
-description = "Experiment: ML Benchmarking"
+description = "Convolutional LSTM Autoencoder"
 authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
 	    "Stasinos Konstantopoulos <konstant@iit.demokritos.gr>" ]
 readme = "README.md"
@@ -23,15 +23,11 @@ torch = "^2.0.1"
 seaborn = "^0.13.2"
 tqdm = "^4.66.2"
 s3fs = "^2023.1.0"
-boto3 = "^1.26"
-
-kobe4ml = { path = "../kobe", develop = true }
-lstm_ae = { path = "../algorithms/lstm_ae", develop = true }
-conv_lstm_ae = { path = "../algorithms/conv_lstm_ae", develop = true }
+boto3 = "^1.26" 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-benchmark = "src.main:main"
+benchmark = "main:main"

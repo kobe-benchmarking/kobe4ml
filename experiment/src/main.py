@@ -1,7 +1,7 @@
-from benchmarking.kobe import kobe
+import kobe4ml
 
 def main():
-    kobe(input='benchmarking/configs', output='benchmarking/experiments')
+    kobe4ml(input='benchmarking/configs', output='benchmarking/experiments')
 
 if __name__ == "__main__":
     main()
