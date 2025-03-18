@@ -9,6 +9,7 @@
 
 import torch
 from tqdm import tqdm
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 import warnings
 
 from . import utils
@@ -19,6 +20,26 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 logger.info(f'Device is {device}')
 
 warnings.filterwarnings("ignore", category=FutureWarning)
+
+def accuracy(y_true, y_pred):
+    y_true = y_true.cpu().numpy()
+    y_pred = y_pred.cpu().numpy()
+    return accuracy_score(y_true, y_pred)
+
+def precision(y_true, y_pred):
+    y_true = y_true.cpu().numpy()
+    y_pred = y_pred.cpu().numpy()
+    return precision_score(y_true, y_pred, average='macro')
+
+def recall(y_true, y_pred):
+    y_true = y_true.cpu().numpy()
+    y_pred = y_pred.cpu().numpy()
+    return recall_score(y_true, y_pred, average='macro')
+
+def f1(y_true, y_pred):
+    y_true = y_true.cpu().numpy()
+    y_pred = y_pred.cpu().numpy()
+    return f1_score(y_true, y_pred, average='macro')
 
 def test(data, pth, criterion, model):
     """
@@ -37,6 +58,9 @@ def test(data, pth, criterion, model):
     batches = len(data)
     total_test_loss = 0.0
 
+    all_labels = []
+    all_preds = []
+
     progress_bar = tqdm(enumerate(data), total=batches, desc=f'Evaluation', leave=True)
 
     with torch.no_grad():
@@ -51,9 +75,21 @@ def test(data, pth, criterion, model):
             total_test_loss += test_loss.item()
             progress_bar.set_postfix(Loss=test_loss.item())
 
+            all_labels.append(y)
+            all_preds.append(X_dec.argmax(dim=1))
+
         avg_test_loss = total_test_loss / batches
 
+        accuracy_metric = accuracy(all_labels, all_preds)
+        precision_metric = precision(all_labels, all_preds)
+        recall_metric = recall(all_labels, all_preds)
+        f1_metric = f1(all_labels, all_preds)
+
     logger.info(f'\nTesting complete!\nTesting Loss: {avg_test_loss:.6f}\n')
+
+    return {
+        'avg_test_loss': avg_test_loss,
+    }
 
 def main(**params):
     """
@@ -93,7 +129,7 @@ def main(**params):
     
     pth = utils.load_model_from_s3(model_url)
  
-    test(data=dataloaders[0],
+    ... = test(data=dataloaders[0],
          pth=pth,
          criterion=criterion,
          model=model)

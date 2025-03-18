@@ -691,35 +691,6 @@ test = ["Pillow", "contourpy[test-no-images]", "matplotlib"]
 test-no-images = ["pytest", "pytest-cov", "pytest-rerunfailures", "pytest-xdist", "wurlitzer"]
 
 [[package]]
-name = "conv-lstm-ae"
-version = "0.1"
-description = "Convolutional LSTM Autoencoder"
-optional = false
-python-versions = ">=3.9,<3.14"
-groups = ["main"]
-files = []
-develop = true
-
-[package.dependencies]
-boto3 = "^1.26"
-librosa = "^0.10.2.post1"
-matplotlib = "^3.8"
-mne = "^1.7"
-numpy = "^1.26"
-pandas = "^2.1"
-s3fs = "^2023.1.0"
-scikit-learn = "^1.4"
-scipy = "^1.11"
-seaborn = "^0.13.2"
-torch = "^2.0.1"
-tqdm = "^4.66.2"
-yasa = "^0.6.4"
-
-[package.source]
-type = "directory"
-url = "../algorithms/conv_lstm_ae"
-
-[[package]]
 name = "cycler"
 version = "0.12.1"
 description = "Composable style cycles"
@@ -1488,24 +1459,6 @@ files = [
 ]
 
 [[package]]
-name = "kobe2"
-version = "0.1"
-description = "Kobe2: Benchmarking for Machine Learning"
-optional = false
-python-versions = ">=3.9,<3.14"
-groups = ["main"]
-files = []
-develop = true
-
-[package.dependencies]
-boto3 = "^1.26"
-s3fs = "^2023.1.0"
-
-[package.source]
-type = "directory"
-url = "../kobe2"
-
-[[package]]
 name = "lazy-loader"
 version = "0.4"
 description = "Makes it easy to load subpackages and functions on demand."
@@ -1665,35 +1618,6 @@ scipy = ">=1.7.3"
 
 [package.extras]
 test = ["pytest"]
-
-[[package]]
-name = "lstm-ae"
-version = "0.1"
-description = "LSTM Autoencoder"
-optional = false
-python-versions = ">=3.9,<3.14"
-groups = ["main"]
-files = []
-develop = true
-
-[package.dependencies]
-boto3 = "^1.26"
-librosa = "^0.10.2.post1"
-matplotlib = "^3.8"
-mne = "^1.7"
-numpy = "^1.26"
-pandas = "^2.1"
-s3fs = "^2023.1.0"
-scikit-learn = "^1.4"
-scipy = "^1.11"
-seaborn = "^0.13.2"
-torch = "^2.0.1"
-tqdm = "^4.66.2"
-yasa = "^0.6.4"
-
-[package.source]
-type = "directory"
-url = "../algorithms/lstm_ae"
 
 [[package]]
 name = "markupsafe"
@@ -4011,4 +3935,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<3.14"
-content-hash = "70bb019b52fdb14ef909a54ca2fb2bba259c2384a435525c66e31173e9171638"
+content-hash = "abd33a58624baa5833e6908d70080549aa08581377c988b33f2fa306440d1b19"
