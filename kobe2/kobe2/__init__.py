@@ -1,11 +1,3 @@
-from .operator import run as operate
-# from .evaluator import run as evaluate
+from .main import main
 
-def kobe(input, output):
-    """
-    Run the operator first, then the evaluator.
-    """
-    operate(input, output)
-    # evaluate(input, output)
-
-__all__ = ["kobe"]
+__all__ = ["main"]
