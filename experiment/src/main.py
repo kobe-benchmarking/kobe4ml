@@ -19,7 +19,7 @@ def gather_configs(dir):
 def create_exp_dir(config, dir):
     metadata = config['metadata']
     name = metadata['name']
-    date = metadata['date']
+    date = metadata['date'].replace('/', '_')
 
     exp_dir_name = f"{name}_{date}"
     exp_dir = os.path.join(dir, exp_dir_name)
