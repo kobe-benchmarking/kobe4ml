@@ -41,7 +41,7 @@ def load_module(experiment, method):
     params.update(model_params)
     params.update(process_params)
 
-    module_name = f"algorithms.{model_params['id']}.src.{method}"
+    module_name = f"algorithms.{model_params['id']}"
     module = importlib.import_module(module_name)
 
     return module, params
@@ -58,7 +58,7 @@ def main():
         
         module, params = load_module(experiment=exp, method=method)
 
-        call = lambda: module.main(**params)
+        call = lambda: module.main(**params).get(method)
         calls.append(call)
 
     kobe(calls, exp_dir)
