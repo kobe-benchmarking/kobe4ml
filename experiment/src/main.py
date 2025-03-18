@@ -1,7 +1,7 @@
 import os
 import importlib
 
-from kobe2 import main as kobe
+from kobe2.kobe2 import main as kobe
 from . import utils
 
 logger = utils.get_logger(level='INFO')
