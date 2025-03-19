@@ -28,6 +28,3 @@ boto3 = "^1.26"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-benchmark = "main:main"

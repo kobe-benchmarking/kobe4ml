@@ -1,7 +1,7 @@
 import os
 import importlib
 
-from kobe2.kobe2 import main as kobe
+from kobe2 import main as kobe
 from . import utils
 
 logger = utils.get_logger(level='INFO')
@@ -58,7 +58,7 @@ def main():
         
         module, params = load_module(experiment=exp, method=method)
 
-        call = lambda: module.main(**params).get(method)
+        call = lambda: getattr(module, method)(**params)
         calls.append(call)
 
     kobe(calls, exp_dir)
