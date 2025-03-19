@@ -1,15 +1,5 @@
-# id = 'lstm_ae'
-# name = 'LSTM_Autoencoder'
-# num_feats = 2
-# latent_seq_len = 1 
-# latent_num_feats = 8 
-# hidden_size = 4
-# num_layers = 1
-# dropout = 0.05
-
 import torch
 from tqdm import tqdm
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 import warnings
 
 from . import utils
@@ -21,35 +11,33 @@ logger.info(f'Device is {device}')
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-def accuracy(y_true, y_pred):
-    y_true = y_true.cpu().numpy()
-    y_pred = y_pred.cpu().numpy()
-    return accuracy_score(y_true, y_pred)
+def mae(X, X_dec):
+    """
+    Compute Mean Absolute Error (MAE) manually.
 
-def precision(y_true, y_pred):
-    y_true = y_true.cpu().numpy()
-    y_pred = y_pred.cpu().numpy()
-    return precision_score(y_true, y_pred, average='macro')
+    :param X: Original input tensor.
+    :param X_dec: Reconstructed output tensor.
+    :return: MAE value.
+    """
+    return torch.mean(torch.abs(X - X_dec)).item()
 
-def recall(y_true, y_pred):
-    y_true = y_true.cpu().numpy()
-    y_pred = y_pred.cpu().numpy()
-    return recall_score(y_true, y_pred, average='macro')
+def mse(X, X_dec):
+    """
+    Compute Mean Squared Error (MSE) manually.
 
-def f1(y_true, y_pred):
-    y_true = y_true.cpu().numpy()
-    y_pred = y_pred.cpu().numpy()
-    return f1_score(y_true, y_pred, average='macro')
+    :param X: Original input tensor.
+    :param X_dec: Reconstructed output tensor.
+    :return: MSE value.
+    """
+    return torch.mean((X - X_dec) ** 2).item()
 
 def test(data, pth, criterion, model):
     """
-    Test the model on the provided data and calculate the test loss.
+    Test the model on the provided data and calculate the test loss, MAE, and MSE.
 
     :param data: Data to test the model on.
     :param criterion: Loss function used to compute the test loss.
     :param model: The model to be evaluated.
-    :param visualize: Whether to visualize the model's predictions.
-    :param estimate: Whether to estimate the quality of the predictions.
     """
     model.load_state_dict(pth)
     model.to(device)
@@ -57,9 +45,8 @@ def test(data, pth, criterion, model):
 
     batches = len(data)
     total_test_loss = 0.0
-
-    all_labels = []
-    all_preds = []
+    total_mae = 0.0
+    total_mse = 0.0
 
     progress_bar = tqdm(enumerate(data), total=batches, desc=f'Evaluation', leave=True)
 
@@ -71,24 +58,25 @@ def test(data, pth, criterion, model):
             X_dec, _ = model(X)
 
             test_loss = criterion(X_dec, X)
-
             total_test_loss += test_loss.item()
+
+            total_mae += mae(X, X_dec)
+            total_mse += mse(X, X_dec)
+
             progress_bar.set_postfix(Loss=test_loss.item())
 
-            all_labels.append(y)
-            all_preds.append(X_dec.argmax(dim=1))
+    avg_test_loss = total_test_loss / batches
+    avg_mae = total_mae / batches
+    avg_mse = total_mse / batches
 
-        avg_test_loss = total_test_loss / batches
-
-        accuracy_metric = accuracy(all_labels, all_preds)
-        precision_metric = precision(all_labels, all_preds)
-        recall_metric = recall(all_labels, all_preds)
-        f1_metric = f1(all_labels, all_preds)
-
-    logger.info(f'\nTesting complete!\nTesting Loss: {avg_test_loss:.6f}\n')
+    logger.info(f'\nTesting complete!\n'
+                f'Testing Loss: {avg_test_loss:.6f}\n'
+                f'MAE: {avg_mae:.6f}\n'
+                f'MSE: {avg_mse:.6f}\n')
 
     return {
-        'avg_test_loss': avg_test_loss,
+        'mae': avg_mae,
+        'mse': avg_mse
     }
 
 def main(**params):
@@ -129,7 +117,7 @@ def main(**params):
     
     pth = utils.load_model_from_s3(model_url)
  
-    ... = test(data=dataloaders[0],
-         pth=pth,
-         criterion=criterion,
-         model=model)
+    metrics = test(data=dataloaders[0],
+                   pth=pth,
+                   criterion=criterion,
+                   model=model)

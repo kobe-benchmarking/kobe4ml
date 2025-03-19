@@ -27,7 +27,5 @@ process:
   dataset: s3://manolo-data/datasets/bitbrain-ds/
   
 metrics:
-  - accuracy
-  - f1_score
-  - precision
-  - recall
+  - mae
+  - mse
