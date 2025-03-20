@@ -2,7 +2,7 @@
 name = "lstm_ae"
 version = "0.1"
 packages = [
-    { include = "src" }
+    { include = "lstm_ae" }
 ]
 description = "LSTM Autoencoder"
 authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
@@ -15,12 +15,9 @@ pandas = "^2.1"
 numpy = "^1.26"
 scipy = "^1.11"
 scikit-learn = "^1.4"
-matplotlib = "^3.8"
-librosa = "^0.10.2.post1"
 torch = "^2.0.1"
-seaborn = "^0.13.2"
 tqdm = "^4.66.2"
-boto3 = "^1.26"
+boto3 = "^1.37.1"
 
 [build-system]
 requires = ["poetry-core"]
