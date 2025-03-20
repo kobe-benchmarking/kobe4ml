@@ -180,42 +180,6 @@ def save_json(data, filename):
     with open(filename, 'w') as f:
         json.dump(data, f)
 
-class WeightedCrossEntropyLoss(nn.Module):
-    def __init__(self, weights):
-        """
-        Initialize the WeightedCrossEntropyLoss module.
-
-        :param weights: dictionary
-        """
-        super(WeightedCrossEntropyLoss, self).__init__()
-        self.weights = self.get_weights(weights)
-
-    def get_weights(self, weights):
-        """
-        Extract weights from the given dictionary and convert them to a tensor.
-
-        :param weights: dictionary
-        :return: tensor
-        """
-        weights = [weights[i] for i in range(len(weights))]
-
-        return torch.tensor(weights, dtype=torch.float)
-
-    def forward(self, pred, true):
-        """
-        Compute the weighted cross-entropy loss.
-
-        :param pred: tensor (batch_size * seq_len, num_classes)
-        :param true: tensor (batch_size * seq_len)
-        :return: tensor
-        """
-        if true.size(0) == 0 or pred.size(0) == 0:
-            return torch.tensor(0.0, requires_grad=True, device=pred.device)
-
-        loss = F.cross_entropy(pred, true, weight=self.weights.to(pred.device))
-
-        return loss
-
 def robust_normalize(df, exclude, path):
     """
     Normalize data using robust scaling (median and IQR) from precomputed stats.

@@ -101,23 +101,23 @@ def main(params):
 
     dataloaders = create_dataloaders(datasets, batch_size=batch_size, drop_last=False)
 
-    # model_class = globals()[name]
-    # model = model_class(seq_len=seq_len, 
-    #                     num_feats=num_feats, 
-    #                     latent_seq_len=latent_seq_len,
-    #                     latent_num_feats=latent_num_feats,
-    #                     hidden_size=hidden_size,
-    #                     num_layers=num_layers,
-    #                     dropout=dropout)
+    model_class = globals()[name]
+    model = model_class(seq_len=seq_len, 
+                        num_feats=num_feats, 
+                        latent_seq_len=latent_seq_len,
+                        latent_num_feats=latent_num_feats,
+                        hidden_size=hidden_size,
+                        num_layers=num_layers,
+                        dropout=dropout)
 
-    # if hasattr(utils, loss):
-    #     criterion = getattr(utils, loss)()
-    # else:
-    #     raise ValueError(f"Loss function '{loss}' not found in utils")
+    if hasattr(utils, loss):
+        criterion = getattr(utils, loss)()
+    else:
+        raise ValueError(f"Loss function '{loss}' not found in utils")
     
-    # pth = utils.load_model_from_s3(model_url)
+    pth = utils.load_model_from_s3(model_url)
  
-    # metrics = test(data=dataloaders[0],
-    #                pth=pth,
-    #                criterion=criterion,
-    #                model=model)
+    metrics = test(data=dataloaders[0],
+                   pth=pth,
+                   criterion=criterion,
+                   model=model)

@@ -54,6 +54,8 @@ def main():
     calls = []
 
     for exp in experiments:
+        logger.info(f"Running experiment for model: {exp['model']['parameters']['id']}")
+
         exp_dir = create_exp_dir(config=exp, dir='experiments')
 
         process = exp['process']['name']

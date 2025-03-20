@@ -1,5 +1,5 @@
 metadata:
-  name: kn7fej4o
+  name: ke3sep8b
   date: 06/03/2025
 
 model: 
@@ -22,7 +22,7 @@ process:
   parameters:
     batch_size: 512
     seq_len: 240
-    loss: CrossEntropyLoss
+    loss: BlendedLoss
 
   dataset: s3://manolo-data/datasets/bitbrain-ds/
   
