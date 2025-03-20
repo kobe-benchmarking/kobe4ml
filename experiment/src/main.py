@@ -1,10 +1,13 @@
 import os
+import sys
 import importlib
 
 from kobe2 import main as kobe
 from . import utils
 
 logger = utils.get_logger(level='INFO')
+
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "..")))
 
 def gather_configs(dir):
     configs = []
@@ -58,7 +61,7 @@ def main():
         
         module, params = load_module(experiment=exp, method=method)
 
-        call = lambda: getattr(module, method)(**params)
+        call = lambda: getattr(module, method)(params)
         calls.append(call)
 
     kobe(calls, exp_dir)

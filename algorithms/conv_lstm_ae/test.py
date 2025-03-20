@@ -79,21 +79,21 @@ def test(data, pth, criterion, model):
         'mse': avg_mse
     }
 
-def main(**params):
+def main(params):
     """
     Main function to execute the testing workflow, including data preparation and model evaluation.
     """
-    name, model_url, ds_url, _, num_feats, latent_seq_len, latent_num_feats, hidden_size, num_layers, dropout, batch_size, seq_len, loss = params
+    name, model_url, ds_url, id, num_feats, latent_seq_len, latent_num_feats, hidden_size, num_layers, dropout, batch_size, seq_len, loss = params.values()
 
     samples, chunks = 7680, 32
     seq_len = samples // chunks
 
-    bitbrain_dir = utils.get_dir(ds_url, 'bitbrain')
-    raw_dir = utils.get_dir(ds_url, 'raw')
+    bitbrain_dir = os.path.join(ds_url, 'bitbrain')
+    raw_dir = os.path.join(ds_url, 'raw')
 
     get_boas_data(base_path=bitbrain_dir, output_path=raw_dir)
     
-    datapaths = split_data(dir=raw_dir, train_size=43, val_size=3, test_size=10)
+    datapaths = split_data(dir=raw_dir, train_size=3, val_size=2, test_size=2)
     
     _, _, test_df = get_dataframes(datapaths, seq_len=seq_len, exist=True)
 
@@ -101,23 +101,23 @@ def main(**params):
 
     dataloaders = create_dataloaders(datasets, batch_size=batch_size, drop_last=False)
 
-    model_class = globals()[name]
-    model = model_class(seq_len=seq_len, 
-                        num_feats=num_feats, 
-                        latent_seq_len=latent_seq_len,
-                        latent_num_feats=latent_num_feats,
-                        hidden_size=hidden_size,
-                        num_layers=num_layers,
-                        dropout=dropout)
+    # model_class = globals()[name]
+    # model = model_class(seq_len=seq_len, 
+    #                     num_feats=num_feats, 
+    #                     latent_seq_len=latent_seq_len,
+    #                     latent_num_feats=latent_num_feats,
+    #                     hidden_size=hidden_size,
+    #                     num_layers=num_layers,
+    #                     dropout=dropout)
 
-    if hasattr(utils, loss):
-        criterion = getattr(utils, loss)()
-    else:
-        raise ValueError(f"Loss function '{loss}' not found in utils")
+    # if hasattr(utils, loss):
+    #     criterion = getattr(utils, loss)()
+    # else:
+    #     raise ValueError(f"Loss function '{loss}' not found in utils")
     
-    pth = utils.load_model_from_s3(model_url)
+    # pth = utils.load_model_from_s3(model_url)
  
-    metrics = test(data=dataloaders[0],
-                   pth=pth,
-                   criterion=criterion,
-                   model=model)
+    # metrics = test(data=dataloaders[0],
+    #                pth=pth,
+    #                criterion=criterion,
+    #                model=model)

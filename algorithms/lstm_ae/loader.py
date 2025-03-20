@@ -4,6 +4,8 @@ import pandas as pd
 import numpy as np
 from torch.utils.data import Dataset, DataLoader
 import os
+import dask.dataframe as dd
+import io
 import s3fs
 import json
 import mne
@@ -13,23 +15,15 @@ from . import utils
 logger = utils.get_logger(level='DEBUG')
 
 def get_boas_data(base_path, output_path):
-    """
-    Retrieve and combine EEG and event data for subjects from the Bitbrain dataset. For each subject, 
-    this function reads EEG signals from an EDF file and event data from a TSV file, combines them, 
-    and saves the result as a CSV file in the specified output directory.
-
-    :param base_path: Path to the base directory containing subject folders.
-    :param output_path: Path to the directory where combined data will be saved.
-    """
     fs = s3fs.S3FileSystem(anon=False)
 
     for subject_folder in fs.glob(f'{base_path}/sub-*'):
         subject_id = os.path.basename(subject_folder)
         eeg_folder = f'{subject_folder}/eeg'
 
-        output_file = os.path.join(output_path, f'{subject_id}.csv')
+        output_file = f"{output_path}/{subject_id}.csv"
 
-        if os.path.exists(output_file):
+        if fs.exists(output_file):
             continue
 
         if not fs.exists(eeg_folder):
@@ -41,11 +35,12 @@ def get_boas_data(base_path, output_path):
 
         try:
             with fs.open(eeg_file_pattern, 'rb') as eeg_file:
-                raw = mne.io.read_raw_edf(eeg_file, preload=True)
+                eeg_bytes = io.BytesIO(eeg_file.read()) 
+                raw = mne.io.read_raw_edf(eeg_bytes, preload=True)
                 x_data = raw.to_data_frame()
 
-                logger.debug(f'x_data shape for {subject_id}: {x_data.shape}')
-                logger.debug(f'x_data sample:\n{x_data.head()}')
+            logger.debug(f'x_data shape for {subject_id}: {x_data.shape}')
+            logger.debug(f'x_data sample:\n{x_data.head()}')
 
         except Exception as e:
             logger.info(f'Error loading EEG data for {subject_id}: {e}')
@@ -55,8 +50,8 @@ def get_boas_data(base_path, output_path):
             with fs.open(events_file_pattern, 'r') as events_file:
                 y_data = pd.read_csv(events_file, delimiter='\t')
 
-                logger.debug(f'y_data shape for {subject_id}: {y_data.shape}')
-                logger.debug(f'y_data sample:\n{y_data.head()}')
+            logger.debug(f'y_data shape for {subject_id}: {y_data.shape}')
+            logger.debug(f'y_data sample:\n{y_data.head()}')
 
         except Exception as e:
             logger.info(f'Error loading events data for {subject_id}: {e}')
@@ -67,14 +62,13 @@ def get_boas_data(base_path, output_path):
         for _, row in y_data.iterrows():
             begsample = row['begsample'] - 1
             endsample = row['endsample'] - 1
-            
             y_expanded.loc[begsample:endsample] = row.values
 
         combined_data = pd.concat([x_data, y_expanded], axis=1)
 
         with fs.open(output_file, 'w') as output_s3_file:
             combined_data.to_csv(output_s3_file, index=False)
-        
+
         logger.info(f'Saved combined data for {subject_id} to {output_file}')
 
 class TSDataset(Dataset):
@@ -298,15 +292,18 @@ def get_dataframes(paths, seq_len=240, exist=False, output_s3_path='s3://manolo-
         proc_path = f"{output_s3_path}/{name}.csv"
 
         if exist and fs.exists(proc_path):
-            with fs.open(proc_path, 'r') as file:
-                df = pd.read_csv(file)
+            file_size = fs.info(proc_path)['size']
+            logger.info(f'File size: {file_size} bytes')
+
+            df = dd.read_csv(f's3://{proc_path}', storage_options={'anon': False})
+            df = df.compute()
+
             logger.info(f'Loaded existing dataframe from {proc_path}.')
         else:
             df = combine_data(paths, name, seq_len)
 
             if name == 'train':
                 logger.info('Calculating class weights from the training dataframe.')
-
                 weights, _ = extract_weights(df, label_col='majority')
 
             label_mapping = get_label_mapping(weights=weights)
@@ -314,7 +311,7 @@ def get_dataframes(paths, seq_len=240, exist=False, output_s3_path='s3://manolo-
 
             with fs.open(proc_path, 'w') as file:
                 df.to_csv(file, index=False)
-            
+
             logger.info(f'Saved {name} dataframe to {proc_path}.')
 
         dataframes.append(df)
