@@ -16,15 +16,11 @@ numpy = "^1.26"
 scipy = "^1.11"
 scikit-learn = "^1.4"
 matplotlib = "^3.8"
-mne = "^1.7"
-yasa = "^0.6.4"
 librosa = "^0.10.2.post1"
 torch = "^2.0.1"
 seaborn = "^0.13.2"
 tqdm = "^4.66.2"
-s3fs = "^2023.1.0"
 boto3 = "^1.26"
-dask = "^2024.3.0"
 
 [build-system]
 requires = ["poetry-core"]

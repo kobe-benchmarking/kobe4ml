@@ -4,6 +4,7 @@ import importlib
 
 from kobe2 import main as kobe
 from . import utils
+from loader import *
 
 logger = utils.get_logger(level='INFO')
 
@@ -32,15 +33,37 @@ def create_exp_dir(config, dir):
 
     return exp_dir
 
-def load_module(experiment, method):
+def preprocess(url, batch_size):
+    samples, chunks = 7680, 32
+    seq_len = samples // chunks
+
+    bitbrain_dir = os.path.join(url, 'bitbrain')
+    raw_dir = os.path.join(url, 'raw')
+
+    get_boas_data(base_path=bitbrain_dir, output_path=raw_dir)
+    
+    datapaths = split_data(dir=raw_dir, train_size=3, val_size=2, test_size=2)
+    
+    _, _, test_df = get_dataframes(datapaths, seq_len=seq_len, exist=True)
+
+    datasets = create_datasets(dataframes=(test_df,), seq_len=seq_len)
+
+    dataloaders = create_dataloaders(datasets, batch_size=batch_size, drop_last=False)
+
+    return dataloaders
+
+def load_module(experiment):
     model_name = experiment['model']['name']
     model_url = experiment['model']['url']
     ds_url = experiment['process']['dataset']
+    batch_size = experiment['process']['parameters']['batch_size']
 
     model_params = experiment['model']['parameters']
     process_params = experiment['process']['parameters']
 
-    params = {'name': model_name, 'pth': model_url, 'ds': ds_url}
+    dataloaders = preprocess(url=ds_url, batch_size=batch_size)
+
+    params = {'name': model_name, 'pth': model_url, 'dls': dataloaders}
     params.update(model_params)
     params.update(process_params)
 
@@ -61,7 +84,7 @@ def main():
         process = exp['process']['name']
         method = "test" if process == 'inference' else "train"
         
-        module, params = load_module(experiment=exp, method=method)
+        module, params = load_module(experiment=exp)
 
         call = lambda: getattr(module, method)(params)
         calls.append(call)

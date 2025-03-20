@@ -2,15 +2,11 @@ import os
 import json
 import boto3
 from io import BytesIO
-import numpy as np
-from collections import namedtuple
-import s3fs
 import logging
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.optim.lr_scheduler as sched
-import torch.nn.functional as F
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, precision_recall_fscore_support
 import seaborn as sns
@@ -179,59 +175,6 @@ def save_json(data, filename):
     """
     with open(filename, 'w') as f:
         json.dump(data, f)
-
-def robust_normalize(df, exclude, path):
-    """
-    Normalize data using robust scaling (median and IQR) from precomputed stats.
-
-    :param df: DataFrame containing the data to normalize.
-    :param exclude: List of columns to exclude from normalization.
-    :param path: File path to save the computed statistics.
-    :return: Processed DataFrame with normalized data.
-    """
-    fs = s3fs.S3FileSystem(anon=False)
-    newdf = df.copy()
-
-    stats = get_stats(df)
-
-    stats_json = json.dumps(stats, indent=4)
-    with fs.open(path, 'w') as f:
-        f.write(stats_json)
-    
-    for col in df.columns:
-        if col not in exclude:
-            median = stats[col]['median']
-            iqr = stats[col]['iqr']
-            
-            newdf[col] = (df[col] - median) / (iqr if iqr > 0 else 1)
-
-    return newdf
-
-def get_stats(df):
-    """
-    Compute mean, standard deviation, median, and IQR for each column in the DataFrame.
-
-    :param df: DataFrame containing the data to compute statistics for.
-    :return: Dictionary containing statistics for each column.
-    """
-    stats = {}
-
-    for col in df.columns:
-        series = df[col]
-
-        mean = series.mean()
-        std = series.std()
-        median = series.median()
-        iqr = series.quantile(0.75) - series.quantile(0.25)
-
-        stats[col] = {
-            'mean': mean,
-            'std': std,
-            'median': median,
-            'iqr': iqr
-        }
-
-    return stats
     
 class BlendedLoss(nn.Module):
     def __init__(self, p=1.0, epsilon=1e-6, blend=0.8):
