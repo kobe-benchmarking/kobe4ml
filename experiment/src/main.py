@@ -4,7 +4,7 @@ import importlib
 
 from kobe2 import main as kobe
 from . import utils
-from loader import *
+from .loader import *
 
 logger = utils.get_logger(level='INFO')
 
