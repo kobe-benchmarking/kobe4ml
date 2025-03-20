@@ -10,18 +10,17 @@ authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.14"
-pandas = "^2.1"
-numpy = "^1.26"
-scipy = "^1.11"
-scikit-learn = "^1.4"
-matplotlib = "^3.8"
-librosa = "^0.10.2.post1"
-torch = "^2.0.1"
-seaborn = "^0.13.2"
-tqdm = "^4.66.2"
-s3fs = "^2023.1.0"
-dask = "^2024.3.0"
+
+# Python version for the project
+python = ">=3.9,<3.14"  
+
+# Loading and creating dataloaders
+pandas = "^2.1"         # For data manipulation and analysis
+mne = "^1.7"            # For processing and analyzing EEG data
+numpy = "^1.26"         # For numerical computations (e.g., tensor operations)
+torch = "^2.0.1"        # For creating PyTorch dataloaders
+s3fs = "^2023.1.0"      # For interacting with AWS S3 file systems to load data
+dask = "^2024.3.0"      # For parallel computing and handling large datasets efficiently
 
 kobe2 = { path = "../kobe2", develop = true }
 lstm_ae = { path = "../algorithms/lstm_ae", develop = true }

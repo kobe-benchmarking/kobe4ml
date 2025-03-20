@@ -1,5 +1,4 @@
 import os
-import json
 import boto3
 from io import BytesIO
 import logging
@@ -7,9 +6,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.optim.lr_scheduler as sched
-import matplotlib.pyplot as plt
-from sklearn.metrics import confusion_matrix, precision_recall_fscore_support
-import seaborn as sns
 
 def get_logger(level='DEBUG'):
     """
@@ -59,31 +55,6 @@ def get_path(*dirs, filename):
 
     return path
 
-def get_prfs(true, pred, avg=['micro', 'macro', 'weighted'], include_support=False, zero_division=0):
-    """
-    Calculate Precision, Recall, F-score, and Support using specified averaging methods.
-
-    :param true: List of true labels.
-    :param pred: List of predicted labels.
-    :param avg: Averaging methods to use for calculating metrics.
-    :param include_support: Whether to include Support in the output.
-    :param zero_division: Value to return when there is a zero division.
-    :return: Dictionary containing Precision, Recall, F-score, and Support for each averaging method.
-    """
-    prfs = {}
-
-    for method in avg:
-        precision, recall, fscore, support = precision_recall_fscore_support(true, pred, average=method, zero_division=zero_division)
-
-        prfs[f'precision_{method}'] = precision
-        prfs[f'recall_{method}'] = recall
-        prfs[f'fscore_{method}'] = fscore
-
-        if include_support:
-            prfs[f'support_{method}'] = support
-
-    return prfs
-
 def get_optim(name, model, lr):
     """
     Get optimizer object based on name, model, and learning rate.
@@ -111,70 +82,6 @@ def get_sched(optimizer, name, **params):
     scheduler = sched_class(optimizer, **params)
 
     return scheduler
-
-def visualize(type, values, labels, title, plot_func=None, coloring=None, names=None, classes=None, tick=False, path='static'):
-    """
-    Visualize (x,y) data points.
-
-    :param type: Type of visualization ('single-plot', 'multi-plot', or 'heatmap').
-    :param values: List of tuples or tuple containing the data points to visualize.
-    :param labels: Tuple containing labels for the x and y axes.
-    :param title: Title of the visualization.
-    :param plot_func: Plotting function (optional).
-    :param coloring: List or str containing colors for the plots (optional).
-    :param names: List of names for the plots (optional).
-    :param tick: Whether to display ticks on axes (optional).
-    :param classes: List of class names for labeling (optional).
-    :param path: Directory path to save the visualization.
-    """
-    x_label, y_label = labels
-    plt.figure(figsize=(10, 6))
-
-    if type == 'single-plot':
-        x_values, y_values = values
-        plot_func(x_values, y_values, color=coloring)
-
-        if tick:
-            plt.xticks(range(len(classes)), classes)
-            plt.yticks(range(len(classes)), classes)
-
-    elif type == 'multi-plot':
-        x_values, y_values = values
-
-        for i, (x_values, y_values) in enumerate(values):
-            plot_func(x_values, y_values, color=coloring[i], label=names[i])
-            plt.legend()
-
-        if tick:
-            plt.xticks(range(len(classes)), classes)
-            plt.yticks(range(len(classes)), classes)
-
-    elif type == 'heatmap':
-        x_values, y_values = values
-
-        cm = confusion_matrix(x_values, y_values)
-        cmap = sns.blend_palette(coloring, as_cmap=True)
-
-        sns.heatmap(cm, annot=True, fmt="d", cmap=cmap, xticklabels=classes, yticklabels=classes)
-
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
-    plt.title(title)
-    plt.tight_layout()
-
-    filename = f"{title.lower().replace(' ', '_')}.png"
-    plt.savefig(os.path.join(path, filename), dpi=300)
-    plt.close()
-
-def save_json(data, filename):
-    """
-    Save data to a JSON file.
-
-    :param data: Dictionary containing the data to save.
-    :param filename: Name of the file to save the data into.
-    """
-    with open(filename, 'w') as f:
-        json.dump(data, f)
     
 class BlendedLoss(nn.Module):
     def __init__(self, p=1.0, epsilon=1e-6, blend=0.8):

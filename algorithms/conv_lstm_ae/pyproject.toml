@@ -2,7 +2,7 @@
 name = "conv_lstm_ae"
 version = "0.1"
 packages = [
-    { include = "src" }
+    { include = "conv_lstm_ae" }
 ]
 description = "Convolutional LSTM Autoencoder"
 authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
@@ -10,17 +10,9 @@ authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.14"
-pandas = "^2.1"
-numpy = "^1.26"
-scipy = "^1.11"
-scikit-learn = "^1.4"
-matplotlib = "^3.8"
-librosa = "^0.10.2.post1"
-torch = "^2.0.1"
-seaborn = "^0.13.2"
-tqdm = "^4.66.2"
-boto3 = "^1.26"
+python = ">=3.9,<3.14"      # Python version for the project
+torch = "^2.0.1"            # Needed for the PyTorch imports (torch, torch.nn, torch.optim)
+boto3 = "^1.37.1"           # Needed for the boto3 import (for interacting with AWS S3)
 
 [build-system]
 requires = ["poetry-core"]

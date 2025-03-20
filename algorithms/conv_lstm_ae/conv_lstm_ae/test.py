@@ -1,6 +1,4 @@
 import torch
-from tqdm import tqdm
-import warnings
 
 from . import utils
 from .loader import *
@@ -8,8 +6,6 @@ from .model import *
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 logger.info(f'Device is {device}')
-
-warnings.filterwarnings("ignore", category=FutureWarning)
 
 def mae(X, X_dec):
     """
@@ -48,10 +44,8 @@ def test(data, pth, criterion, model):
     total_mae = 0.0
     total_mse = 0.0
 
-    progress_bar = tqdm(enumerate(data), total=batches, desc=f'Evaluation', leave=True)
-
     with torch.no_grad():
-        for _, (X, _) in progress_bar:
+        for _, (X, _) in data:
             X = X.to(device)
 
             X, t = separate(src=X, c=[0,1], t=[2])
@@ -62,8 +56,6 @@ def test(data, pth, criterion, model):
 
             total_mae += mae(X, X_dec)
             total_mse += mse(X, X_dec)
-
-            progress_bar.set_postfix(Loss=test_loss.item())
 
     avg_test_loss = total_test_loss / batches
     avg_mae = total_mae / batches

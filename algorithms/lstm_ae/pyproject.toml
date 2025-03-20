@@ -10,14 +10,9 @@ authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.14"
-pandas = "^2.1"
-numpy = "^1.26"
-scipy = "^1.11"
-scikit-learn = "^1.4"
-torch = "^2.0.1"
-tqdm = "^4.66.2"
-boto3 = "^1.37.1"
+python = ">=3.9,<3.14"      # Python version for the project
+torch = "^2.0.1"            # Needed for the PyTorch imports (torch, torch.nn, torch.optim)
+boto3 = "^1.37.1"           # Needed for the boto3 import (for interacting with AWS S3)
 
 [build-system]
 requires = ["poetry-core"]
