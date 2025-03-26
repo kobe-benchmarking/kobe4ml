@@ -67,7 +67,7 @@ def load_module(experiment):
     params.update(model_params)
     params.update(process_params)
 
-    module_name = model_params['id']
+    module_name = experiment['implementation']['python']
     module = importlib.import_module(module_name)
 
     return module, params
@@ -77,7 +77,7 @@ def main():
     calls = []
 
     for exp in experiments:
-        logger.info(f"Running experiment for model: {exp['model']['parameters']['id']}")
+        logger.info(f"Running experiment for model: {exp['implementation']['python']}")
 
         exp_dir = create_exp_dir(config=exp, dir='experiments')
 

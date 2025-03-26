@@ -2,13 +2,16 @@ metadata:
   name: ke3sep8b
   date: 06/03/2025
 
+implementation:
+    python: conv_lstm_ae
+    url: ...
+
 model: 
   name: ConvLSTM_Autoencoder
   description: A Convolutional LSTM architecture that classifies timeseries into categorical classes.
   url: s3://manolo-data/models/conv_lstm_ae.pth
 
   parameters: 
-    id: conv_lstm_ae
     num_feats: 2
     latent_seq_len: 1 
     latent_num_feats: 8 

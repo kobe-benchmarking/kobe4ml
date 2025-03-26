@@ -2,13 +2,16 @@ metadata:
   name: kn7fej4o
   date: 06/03/2025
 
+implementation:
+    python: lstm_ae
+    url: ...
+
 model: 
   name: LSTM_Autoencoder
   description: An LSTM architecture that classifies timeseries into categorical classes.
   url: s3://manolo-data/models/lstm_ae.pth
 
   parameters:
-    id: lstm_ae
     num_feats: 2
     latent_seq_len: 1 
     latent_num_feats: 8 
