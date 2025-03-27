@@ -22,10 +22,8 @@ def gather_configs(dir):
 
 def create_exp_dir(config, dir):
     metadata = config['metadata']
-    name = metadata['name']
-    date = metadata['date'].replace('/', '_')
+    exp_dir_name = metadata['experiment']
 
-    exp_dir_name = f"{name}_{date}"
     exp_dir = os.path.join(dir, exp_dir_name)
 
     os.makedirs(exp_dir, exist_ok=True)
@@ -53,17 +51,17 @@ def preprocess(url, batch_size):
     return dataloaders
 
 def load_module(experiment):
-    model_name = experiment['model']['name']
-    model_url = experiment['model']['url']
-    ds_url = experiment['process']['dataset']
-    batch_size = experiment['process']['parameters']['batch_size']
+    name = experiment['implementation']['module']
+    model_url = experiment['run']['model']['url']
+    ds_url = experiment['run']['dataset']['url']
+    batch_size = experiment['run']['parameters']['batch_size']
 
-    model_params = experiment['model']['parameters']
-    process_params = experiment['process']['parameters']
+    model_params = experiment['run']['model']['parameters']
+    process_params = experiment['run']['parameters']
 
     dataloaders = preprocess(url=ds_url, batch_size=batch_size)
 
-    params = {'name': model_name, 'pth': model_url, 'dls': dataloaders}
+    params = {'name': name, 'pth': model_url, 'dls': dataloaders}
     params.update(model_params)
     params.update(process_params)
 
@@ -81,7 +79,7 @@ def main():
 
         exp_dir = create_exp_dir(config=exp, dir='experiments')
 
-        process = exp['process']['name']
+        process = exp['run']['type']
         method = "test" if process == 'inference' else "train"
         
         module, params = load_module(experiment=exp)

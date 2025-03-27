@@ -1,20 +1,21 @@
 metadata:
   experiment: kn7fej4o
   date: 06/03/2025
-  name: BitBrain-LSTM_Autoencoder
+  name: BitBrain-LSTM-Autoencoder
   description: A paragraph-long description of this run. Here, this run applies an LSTM architecture that classifies timeseries into categorical classes on the BitBrain dataset.
-
-
 
 implementation:
     module: lstm_ae
-    url: ...
+    # url: ...
 
 run:
   id: kn7fej4o_01
   type: inference
+
   model: 
+    name: LSTM_Autoencoder # check
     url: s3://manolo-data/models/lstm_ae.pth
+    
     parameters:
       num_feats: 2
       latent_seq_len: 1 
@@ -34,4 +35,3 @@ run:
   metrics:
     - module: mae
     - module: mse
-
