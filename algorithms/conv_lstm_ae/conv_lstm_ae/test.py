@@ -75,12 +75,12 @@ def main(params):
     """
     Main function to execute the testing workflow, including data preparation and model evaluation.
     """
-    name, model_url, dls, id, num_feats, latent_seq_len, latent_num_feats, hidden_size, num_layers, dropout, batch_size, seq_len, loss = params.values()
+    model_url, dls, id, num_feats, latent_seq_len, latent_num_feats, hidden_size, num_layers, dropout, batch_size, seq_len, loss = params.values()
 
     samples, chunks = 7680, 32
     seq_len = samples // chunks
 
-    model_class = globals()[name]
+    model_class = ConvLSTM_Autoencoder()
     model = model_class(seq_len=seq_len, 
                         num_feats=num_feats, 
                         latent_seq_len=latent_seq_len,

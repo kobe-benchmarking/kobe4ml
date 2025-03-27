@@ -51,7 +51,6 @@ def preprocess(url, batch_size):
     return dataloaders
 
 def load_module(experiment):
-    name = experiment['implementation']['module']
     model_url = experiment['run']['model']['url']
     ds_url = experiment['run']['dataset']['url']
     batch_size = experiment['run']['parameters']['batch_size']
@@ -61,7 +60,7 @@ def load_module(experiment):
 
     dataloaders = preprocess(url=ds_url, batch_size=batch_size)
 
-    params = {'name': name, 'pth': model_url, 'dls': dataloaders}
+    params = {'pth': model_url, 'dls': dataloaders}
     params.update(model_params)
     params.update(process_params)
 

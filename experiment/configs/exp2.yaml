@@ -13,7 +13,6 @@ run:
   type: inference
 
   model: 
-    name: ConvLSTM_Autoencoder
     url: s3://manolo-data/models/conv_lstm_ae.pth
     
     parameters:

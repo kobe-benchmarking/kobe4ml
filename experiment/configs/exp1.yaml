@@ -13,7 +13,6 @@ run:
   type: inference
 
   model: 
-    name: LSTM_Autoencoder # check
     url: s3://manolo-data/models/lstm_ae.pth
     
     parameters:
