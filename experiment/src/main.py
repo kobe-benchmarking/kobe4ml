@@ -21,12 +21,11 @@ def gather_configs(dir):
     return configs
 
 def create_exp_dir(config, dir):
-    metadata = config['metadata']
-    exp_dir_name = metadata['experiment']
+    exp_dir_name = config['metadata']['experiment']
 
     exp_dir = os.path.join(dir, exp_dir_name)
-
     os.makedirs(exp_dir, exist_ok=True)
+    
     logger.info(f"Created directory: {exp_dir}")
 
     return exp_dir
@@ -50,13 +49,13 @@ def preprocess(url, batch_size):
 
     return dataloaders
 
-def load_module(experiment):
-    model_url = experiment['run']['model']['url']
-    ds_url = experiment['run']['dataset']['url']
-    batch_size = experiment['run']['parameters']['batch_size']
+def load_module(name, run):
+    model_url = run['model']['url']
+    ds_url = run['dataset']['url']
+    batch_size = run['parameters']['batch_size']
 
-    model_params = experiment['run']['model']['parameters']
-    process_params = experiment['run']['parameters']
+    model_params = run['model']['parameters']
+    process_params = run['parameters']
 
     dataloaders = preprocess(url=ds_url, batch_size=batch_size)
 
@@ -64,8 +63,7 @@ def load_module(experiment):
     params.update(model_params)
     params.update(process_params)
 
-    module_name = experiment['implementation']['python']
-    module = importlib.import_module(module_name)
+    module = importlib.import_module(name)
 
     return module, params
 
@@ -78,13 +76,15 @@ def main():
 
         exp_dir = create_exp_dir(config=exp, dir='experiments')
 
-        process = exp['run']['type']
-        method = "test" if process == 'inference' else "train"
-        
-        module, params = load_module(experiment=exp)
+        for run in exp['run']:
+            process = run['type']
+            method = "test" if process == 'inference' else "train"
 
-        call = lambda: getattr(module, method)(params)
-        calls.append(call)
+            module, params = load_module(name=exp['implementation']['python'],
+                                         run=run)
+
+            call = lambda: getattr(module, method)(params)
+            calls.append(call)
 
     kobe(calls, exp_dir)
 
