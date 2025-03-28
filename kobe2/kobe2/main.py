@@ -7,9 +7,9 @@ def main(calls, runs, dir):
     for i, call in enumerate(calls):
         try:
             metrics = call()
-            metrics["call_id"] = runs[i]
+            metrics["run"] = runs[i]
         except Exception as e:
-            metrics = {"call_id": i, "status": "error", "error": str(e)}
+            metrics = {"run": i, "status": "error", "error": str(e)}
         
         results.append(metrics)
 
