@@ -72,7 +72,7 @@ def main():
     calls, runs = [], []
 
     for exp in experiments:
-        logger.info(f"Running experiment for model: {exp['implementation']['python']}")
+        logger.info(f"Running experiment for model: {exp['implementation']['module']}")
 
         exp_dir = create_exp_dir(config=exp, dir='experiments')
 
@@ -80,7 +80,7 @@ def main():
             process = run['type']
             method = "test" if process == 'inference' else "train"
 
-            module, params = load_module(name=exp['implementation']['python'],
+            module, params = load_module(name=exp['implementation']['module'],
                                          run=run)
 
             call = lambda: getattr(module, method)(params)
