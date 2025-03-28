@@ -25,7 +25,7 @@ def create_exp_dir(config, dir):
 
     exp_dir = os.path.join(dir, exp_dir_name)
     os.makedirs(exp_dir, exist_ok=True)
-    
+
     logger.info(f"Created directory: {exp_dir}")
 
     return exp_dir
@@ -69,7 +69,7 @@ def load_module(name, run):
 
 def main():
     experiments = gather_configs(dir='configs')
-    calls = []
+    calls, runs = [], []
 
     for exp in experiments:
         logger.info(f"Running experiment for model: {exp['implementation']['python']}")
@@ -86,7 +86,9 @@ def main():
             call = lambda: getattr(module, method)(params)
             calls.append(call)
 
-    kobe(calls, exp_dir)
+            runs.append(run['id'])
+
+    kobe(calls, runs, exp_dir)
 
 if __name__ == "__main__":
     main()

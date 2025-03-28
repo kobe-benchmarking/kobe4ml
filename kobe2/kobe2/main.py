@@ -1,16 +1,17 @@
 import os
 import pandas as pd
 
-def main(calls, dir):
+def main(calls, runs, dir):
     results = []
     
     for i, call in enumerate(calls):
         try:
             metrics = call()
-            results.append(metrics)
+            metrics["call_id"] = runs[i]
         except Exception as e:
-            print(f"Experiment {i} failed: {e}")
-            results.append({'error': str(e)})
+            metrics = {"call_id": i, "status": "error", "error": str(e)}
+        
+        results.append(metrics)
 
     if results:
         df = pd.DataFrame(results)
