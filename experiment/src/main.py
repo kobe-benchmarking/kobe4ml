@@ -6,8 +6,6 @@ from kobe2 import main as kobe
 from . import utils
 from .loader import *
 
-logger = utils.get_logger(level='INFO')
-
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "..")))
 
 def gather_configs(dir):

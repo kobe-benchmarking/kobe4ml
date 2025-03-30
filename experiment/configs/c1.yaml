@@ -7,7 +7,6 @@ metadata:
 
 implementation:
     module: lstm_ae
-    # url: ...
 
 run:
   - id: kn7fej4o_01

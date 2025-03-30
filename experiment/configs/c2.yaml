@@ -7,7 +7,6 @@ metadata:
 
 implementation:
     module: conv_lstm_ae
-    # url: ...
 
 run:
   - id: kn7fej4o_03
