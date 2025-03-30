@@ -1,13 +1,16 @@
 import os
 import pandas as pd
 
-def main(calls, runs, dir):
+def main(calls, runs, dir, logger):
     results = []
     
     for i, call in enumerate(calls):
         try:
             metrics = call()
             metrics["run"] = runs[i]
+
+            logger.info(f"Metrics for run {i}: {metrics}")
+
         except Exception as e:
             metrics = {"run": i, "status": "error", "error": str(e)}
         
@@ -18,4 +21,4 @@ def main(calls, runs, dir):
         csv_path = os.path.join(dir, "results.csv")
         df.to_csv(csv_path, index=False)
 
-        print(f"Results saved to {csv_path}")
+        logger.info(f"Results saved to {csv_path}")

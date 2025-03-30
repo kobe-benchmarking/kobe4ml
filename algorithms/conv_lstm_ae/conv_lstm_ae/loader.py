@@ -2,7 +2,7 @@ import torch
 
 from . import utils
 
-logger = utils.get_logger(level='DEBUG')
+logger = utils.get_logger(level='CRITICAL')
 
 def separate(src, c, t):
     """
