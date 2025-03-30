@@ -12,7 +12,7 @@ import mne
 
 from . import utils
 
-logger = utils.get_logger(level='DEBUG')
+logger = utils.get_logger(level='INFO')
 
 def get_boas_data(base_path, output_path):
     fs = s3fs.S3FileSystem(anon=False)
@@ -27,7 +27,7 @@ def get_boas_data(base_path, output_path):
             continue
 
         if not fs.exists(eeg_folder):
-            logger.info(f'No EEG folder found for {subject_id}. Skipping.')
+            logger.debug(f'No EEG folder found for {subject_id}. Skipping.')
             continue
 
         eeg_file_pattern = f'{eeg_folder}/{subject_id}_task-Sleep_acq-headband_eeg.edf'
@@ -43,7 +43,7 @@ def get_boas_data(base_path, output_path):
             logger.debug(f'x_data sample:\n{x_data.head()}')
 
         except Exception as e:
-            logger.info(f'Error loading EEG data for {subject_id}: {e}')
+            logger.debug(f'Error loading EEG data for {subject_id}: {e}')
             continue
 
         try:
@@ -54,7 +54,7 @@ def get_boas_data(base_path, output_path):
             logger.debug(f'y_data sample:\n{y_data.head()}')
 
         except Exception as e:
-            logger.info(f'Error loading events data for {subject_id}: {e}')
+            logger.debug(f'Error loading events data for {subject_id}: {e}')
             continue
 
         y_expanded = pd.DataFrame(index=x_data.index, columns=y_data.columns)
@@ -69,7 +69,7 @@ def get_boas_data(base_path, output_path):
         with fs.open(output_file, 'w') as output_s3_file:
             combined_data.to_csv(output_s3_file, index=False)
 
-        logger.info(f'Saved combined data for {subject_id} to {output_file}')
+        logger.debug(f'Saved combined data for {subject_id} to {output_file}')
 
 class TSDataset(Dataset):
     def __init__(self, df, seq_len, X, t, y, per_epoch=True):
@@ -89,7 +89,7 @@ class TSDataset(Dataset):
         self.y = df[y]
         self.per_epoch = per_epoch
 
-        logger.info(f'Initializing dataset with: samples={self.num_samples}, samples/seq={seq_len}, seqs={self.num_seqs}, epochs={self.num_epochs} ')
+        logger.debug(f'Initializing dataset with: samples={self.num_samples}, samples/seq={seq_len}, seqs={self.num_seqs}, epochs={self.num_epochs} ')
 
     def __len__(self):
         """
@@ -173,13 +173,13 @@ def split_data(dir, train_size=57, val_size=1, test_size=1):
 
     files = fs.glob(f'{dir}/*.csv')
     
-    logger.info(f'Found {len(files)} files in directory: {dir} ready for splitting.')
+    logger.debug(f'Found {len(files)} files in directory: {dir} ready for splitting.')
 
     train_paths = files[:train_size]
     val_paths = files[train_size:train_size + val_size]
     test_paths = files[train_size + val_size:train_size + val_size + test_size]
 
-    logger.info(f'Splitting complete!')
+    logger.debug(f'Splitting complete!')
 
     return (train_paths, val_paths, test_paths)
 
@@ -219,7 +219,7 @@ def combine_data(paths, name, seq_len=240, output_s3_path='s3://manolo-data/data
     dataframes, dataframes_8 = [], []
     total_removed_majority = 0
 
-    logger.info(f'Combining data from {len(paths)} files.')
+    logger.debug(f'Combining data from {len(paths)} files.')
 
     for path in paths:
         X, t, y = load_file(path)
@@ -243,7 +243,7 @@ def combine_data(paths, name, seq_len=240, output_s3_path='s3://manolo-data/data
 
         dataframes.append(df)
     
-    logger.info(f'Removed {total_removed_majority} rows with majority value 8.')
+    logger.debug(f'Removed {total_removed_majority} rows with majority value 8.')
 
     if name=='test':
         if dataframes_8:
@@ -253,16 +253,16 @@ def combine_data(paths, name, seq_len=240, output_s3_path='s3://manolo-data/data
             with fs.open(proc_path_8, 'w') as file:
                 df_8.to_csv(file, index=False)
 
-            logger.info(f'Saved {df_8.shape[0]} rows with majority=8 to {proc_path_8}.')
+            logger.debug(f'Saved {df_8.shape[0]} rows with majority=8 to {proc_path_8}.')
         else:
-            logger.info(f"The dataframe contains no rows with majority=8, therefore no {name}8.csv was saved.")
+            logger.debug(f"The dataframe contains no rows with majority=8, therefore no {name}8.csv was saved.")
 
     df = pd.concat(dataframes, ignore_index=True)
-    logger.info(f'Combined dataframe shape: {df.shape}')
+    logger.debug(f'Combined dataframe shape: {df.shape}')
     
     rows_before_nan_drop = df.shape[0]
     df.dropna(inplace=True)
-    logger.info(f'Removed {rows_before_nan_drop - df.shape[0]} rows with NaN values.')
+    logger.debug(f'Removed {rows_before_nan_drop - df.shape[0]} rows with NaN values.')
 
     assert not df.isna().any().any(), 'NaN values found in the dataframe!'
 
@@ -286,24 +286,24 @@ def get_dataframes(paths, seq_len=240, exist=False, output_s3_path='s3://manolo-
     names = ['train', 'val', 'test']
     weights = None
 
-    logger.info('Creating dataframes for training, validation, and testing.')
+    logger.debug('Creating dataframes for training, validation, and testing.')
 
     for paths, name in zip(paths, names):
         proc_path = f"{output_s3_path}/{name}.csv"
 
         if exist and fs.exists(proc_path):
             file_size = fs.info(proc_path)['size']
-            logger.info(f'File size: {file_size} bytes')
+            logger.debug(f'File size: {file_size} bytes')
 
             df = dd.read_csv(f's3://{proc_path}', storage_options={'anon': False})
             df = df.compute()
 
-            logger.info(f'Loaded existing dataframe from {proc_path}.')
+            logger.debug(f'Loaded existing dataframe from {proc_path}.')
         else:
             df = combine_data(paths, name, seq_len)
 
             if name == 'train':
-                logger.info('Calculating class weights from the training dataframe.')
+                logger.debug('Calculating class weights from the training dataframe.')
                 weights, _ = extract_weights(df, label_col='majority')
 
             label_mapping = get_label_mapping(weights=weights)
@@ -312,11 +312,11 @@ def get_dataframes(paths, seq_len=240, exist=False, output_s3_path='s3://manolo-
             with fs.open(proc_path, 'w') as file:
                 df.to_csv(file, index=False)
 
-            logger.info(f'Saved {name} dataframe to {proc_path}.')
+            logger.debug(f'Saved {name} dataframe to {proc_path}.')
 
         dataframes.append(df)
 
-    logger.info('Dataframes for training, validation, and testing are ready!')
+    logger.debug('Dataframes for training, validation, and testing are ready!')
 
     return tuple(dataframes)
 
@@ -346,7 +346,7 @@ def extract_weights(df, label_col, output_s3_path='s3://manolo-data/datasets/bit
     with fs.open(output_s3_path, 'w') as f:
         f.write(weights_json)
     
-    logger.info(f'Saved class weights to {output_s3_path}.')
+    logger.debug(f'Saved class weights to {output_s3_path}.')
 
     return weights, new_weights
 
@@ -369,13 +369,13 @@ def create_datasets(dataframes, seq_len=7680):
     t = ['time_norm', 'time', 'seq_id', 'night']
     y = ['majority']
 
-    logger.info('Creating datasets from dataframes.') 
+    logger.debug('Creating datasets from dataframes.') 
 
     for df in dataframes:
         dataset = TSDataset(df, seq_len, X, t, y)
         datasets.append(dataset)
 
-    logger.info(f'Datasets created successfully!')
+    logger.debug(f'Datasets created successfully!')
 
     return tuple(datasets)
 
@@ -396,7 +396,7 @@ def create_dataloaders(datasets, batch_size=1, shuffle=[True, False, False], num
     if num_workers is None:
         num_workers = cpu_cores
 
-    logger.info(f'System has {cpu_cores} CPU cores. Using {num_workers}/{cpu_cores} workers for data loading.')
+    logger.debug(f'System has {cpu_cores} CPU cores. Using {num_workers}/{cpu_cores} workers for data loading.')
     
     for dataset, shuffle in zip(datasets, shuffle):
         full_batches = dataset.num_seqs // batch_size
@@ -410,8 +410,8 @@ def create_dataloaders(datasets, batch_size=1, shuffle=[True, False, False], num
         )
         dataloaders.append(dataloader)
 
-        logger.info(f'Total batches={len(dataloader)} & full batches={full_batches}, with each full batch containing {batch_size} sequences.')
+        logger.debug(f'Total batches={len(dataloader)} & full batches={full_batches}, with each full batch containing {batch_size} sequences.')
     
-    logger.info('DataLoaders created successfully.')
+    logger.debug('DataLoaders created successfully.')
 
     return tuple(dataloaders)
