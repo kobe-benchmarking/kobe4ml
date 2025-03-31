@@ -6,6 +6,8 @@ def main(calls, runs, dir, logger):
     
     for i, call in enumerate(calls):
         try:
+            logger.info(f"Running call {i}...")
+            
             metrics = call()
             metrics["run"] = runs[i]
 

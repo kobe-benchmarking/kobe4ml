@@ -48,7 +48,7 @@ run:
       - mae
       - mse
 
-    id: kn7fej4o_02
+  - id: kn7fej4o_02
     type: inference
 
     model: 
