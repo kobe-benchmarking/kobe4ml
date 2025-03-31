@@ -9,11 +9,10 @@ def main(calls, runs, dir, logger):
             metrics = call()
             metrics["run"] = runs[i]
 
-            logger.info(f"Metrics for run {i}: {metrics}")
-
         except Exception as e:
             metrics = {"run": i, "status": "error", "error": str(e)}
         
+        logger.info(f"Metrics for run {i}: {metrics}")
         results.append(metrics)
 
     if results:
