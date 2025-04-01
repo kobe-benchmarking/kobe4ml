@@ -143,14 +143,13 @@ def main(params):
     samples, chunks = 7680, 32
     seq_len = samples // chunks
 
-    model_class = ConvLSTM_Autoencoder()
-    model = model_class(seq_len=seq_len, 
-                        num_feats=num_feats, 
-                        latent_seq_len=latent_seq_len,
-                        latent_num_feats=latent_num_feats,
-                        hidden_size=hidden_size,
-                        num_layers=num_layers,
-                        dropout=dropout)
+    model = ConvLSTM_Autoencoder(seq_len=seq_len, 
+                                 num_feats=num_feats, 
+                                 latent_seq_len=latent_seq_len,
+                                 latent_num_feats=latent_num_feats,
+                                 hidden_size=hidden_size,
+                                 num_layers=num_layers,
+                                 dropout=dropout)
 
     if hasattr(utils, loss):
         criterion = getattr(utils, loss)()
@@ -166,3 +165,5 @@ def main(params):
                     lr=lr,
                     optimizer=optimizer,
                     scheduler=scheduler)
+    
+    return metrics

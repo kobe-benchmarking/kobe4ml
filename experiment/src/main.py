@@ -31,7 +31,7 @@ def create_exp_dir(config, dir):
 
     return exp_dir
 
-def preprocess(url, batch_size):
+def preprocess(url, batch_size, process):
     logger.info(f"Preprocessing data from URL: {url} with batch size: {batch_size}")
 
     samples, chunks = 7680, 32
@@ -42,15 +42,23 @@ def preprocess(url, batch_size):
 
     get_boas_data(base_path=bitbrain_dir, output_path=raw_dir)
     datapaths = split_data(dir=raw_dir, train_size=3, val_size=2, test_size=2)
-    _, _, test_df = get_dataframes(datapaths, seq_len=seq_len, exist=True)
-    datasets = create_datasets(dataframes=(test_df,), seq_len=seq_len)
+
+    if process == 'inference':
+        _, _, test_df = get_dataframes(datapaths, seq_len=seq_len, exist=True)
+        datasets = create_datasets(dataframes=(test_df,), seq_len=seq_len)
+    elif process == 'training':
+        train_df, val_df, _ = get_dataframes(datapaths, seq_len=seq_len, exist=True)
+        datasets = create_datasets(dataframes=(train_df, val_df), seq_len=seq_len)
+    else:
+        raise ValueError(f"Process type '{process}' not recognized")
+
     dataloaders = create_dataloaders(datasets, batch_size=batch_size, drop_last=False)
 
     logger.info("Data preprocessing completed successfully")
 
     return dataloaders
 
-def load_module(name, run):
+def load_module(name, run, process):
     logger.info(f"Loading module: {name} for run ID: {run['id']}")
 
     model_url = run['model']['url']
@@ -60,7 +68,7 @@ def load_module(name, run):
     model_params = run['model']['parameters']
     process_params = run['parameters']
 
-    dataloaders = preprocess(url=ds_url, batch_size=batch_size)
+    dataloaders = preprocess(url=ds_url, batch_size=batch_size, process=process)
 
     params = {'pth': model_url, 'dls': dataloaders}
     params.update(model_params)
@@ -89,7 +97,8 @@ def main():
             method = "test" if process == 'inference' else "train"
 
             module, params = load_module(name=exp['implementation']['module'],
-                                         run=run)
+                                         run=run,
+                                         process=process)
 
             call = lambda: getattr(module, method)(params)
             calls.append(call)

@@ -45,7 +45,7 @@ def test(data, pth, criterion, model):
     total_mse = 0.0
 
     with torch.no_grad():
-        for _, (X, _) in data:
+        for _, (X, _) in enumerate(data):
             X = X.to(device)
 
             X, t = separate(src=X, c=[0,1], t=[2])
@@ -80,14 +80,13 @@ def main(params):
     samples, chunks = 7680, 32
     seq_len = samples // chunks
 
-    model_class = ConvLSTM_Autoencoder()
-    model = model_class(seq_len=seq_len, 
-                        num_feats=num_feats, 
-                        latent_seq_len=latent_seq_len,
-                        latent_num_feats=latent_num_feats,
-                        hidden_size=hidden_size,
-                        num_layers=num_layers,
-                        dropout=dropout)
+    model = ConvLSTM_Autoencoder(seq_len=seq_len, 
+                                 num_feats=num_feats, 
+                                 latent_seq_len=latent_seq_len,
+                                 latent_num_feats=latent_num_feats,
+                                 hidden_size=hidden_size,
+                                 num_layers=num_layers,
+                                 dropout=dropout)
 
     if hasattr(utils, loss):
         criterion = getattr(utils, loss)()
@@ -100,3 +99,5 @@ def main(params):
                    pth=pth,
                    criterion=criterion,
                    model=model)
+    
+    return metrics

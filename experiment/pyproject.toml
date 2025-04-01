@@ -23,8 +23,8 @@ s3fs = "^2023.1.0"      # For interacting with AWS S3 file systems to load data
 dask = { version = "^2024.3.0", extras = ["dataframe"] }      # For parallel computing and handling large datasets efficiently
 
 kobe2 = { path = "../kobe2", develop = true }
-lstm_ae = { url = "https://manolo-data.s3.eu-north-1.amazonaws.com/algorithms/lstm_ae-0.1-py3-none-any.whl" }
-conv_lstm_ae = { url = "https://manolo-data.s3.eu-north-1.amazonaws.com/algorithms/conv_lstm_ae-0.1-py3-none-any.whl" }
+lstm_ae = { path = "../algorithms/lstm_ae", develop = true }
+conv_lstm_ae = { path = "../algorithms/conv_lstm_ae", develop = true }
 
 [build-system]
 requires = ["poetry-core"]
