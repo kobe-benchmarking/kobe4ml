@@ -34,7 +34,10 @@ def load_params(run, process):
     model_params = run['model']['parameters']
     process_params = run['parameters']
 
-    dataloaders = preprocess(url=ds_url, params=process_params, process=process)
+    loader = load_module(name=run['loader'])
+    dataloaders = getattr(loader, "preprocess")({"url": ds_url, 
+                                                 "batch_size": process_params, 
+                                                 "process": process})
 
     params = {'pth': model_url, 'dls': dataloaders}
     params.update(model_params)
@@ -68,8 +71,6 @@ def main(experiments, dir='experiments'):
             params = load_params(run=run, process=process)
 
             call = lambda: getattr(implementation, method)(params)
-
-            #loader = load_module(name=run['loader'])
 
             experiments_data[exp_name]["calls"].append(call)
             experiments_data[exp_name]["runs"].append(run['id'])

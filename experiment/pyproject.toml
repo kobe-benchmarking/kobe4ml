@@ -14,17 +14,12 @@ readme = "README.md"
 # Python version for the project
 python = ">=3.9,<3.14"  
 
-# Loading and creating dataloaders
-pandas = "^2.1"         # For data manipulation and analysis
-mne = "^1.7"            # For processing and analyzing EEG data
-numpy = "^1.26"         # For numerical computations (e.g., tensor operations)
-torch = "^2.0.1"        # For creating PyTorch dataloaders
-s3fs = "^2023.1.0"      # For interacting with AWS S3 file systems to load data
-dask = { version = "^2024.3.0", extras = ["dataframe"] }      # For parallel computing and handling large datasets efficiently
-
 kobe2 = { path = "../kobe2", develop = true }
+
 lstm_ae = { path = "../algorithms/lstm_ae", develop = true }
 conv_lstm_ae = { path = "../algorithms/conv_lstm_ae", develop = true }
+
+bitbrain_loader = { path = "../loaders/bitbrain_loader", develop = true }
 
 [build-system]
 requires = ["poetry-core"]

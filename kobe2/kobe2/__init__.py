@@ -1,3 +1,3 @@
-from .main import main
+from .main import main as kobe
 
-__all__ = ["main"]
+__all__ = ["kobe"]
