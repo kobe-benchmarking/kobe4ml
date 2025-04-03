@@ -43,7 +43,7 @@ def load_params(run, process):
     return params
 
 def main(experiments, dir='experiments'):
-    calls, runs, results = {}, {}, {}
+    experiments_data = {}
 
     for exp in experiments:
         logger.info(f"Running experiment for model: {exp['implementation']['module']}")
@@ -51,9 +51,12 @@ def main(experiments, dir='experiments'):
         exp_name = exp['metadata']['experiment']
         exp_dir = create_exp_dir(config=exp, dir=dir)
 
-        calls.setdefault(exp_name, [])
-        runs.setdefault(exp_name, [])
-        results.setdefault(exp_name, [])
+        if exp_name not in experiments_data:
+            experiments_data[exp_name] = {
+                "calls": [],
+                "runs": [],
+                "results": []
+            }
 
         for run in exp['run']:
             logger.info(f"Processing run: {run['id']} with type: {run['type']}")
@@ -65,24 +68,24 @@ def main(experiments, dir='experiments'):
             params = load_params(run=run, process=process)
 
             call = lambda: getattr(implementation, method)(params)
-            calls[exp_name].append(call)
 
             #loader = load_module(name=run['loader'])
 
-            runs[exp_name].append(run['id'])
+            experiments_data[exp_name]["calls"].append(call)
+            experiments_data[exp_name]["runs"].append(run['id'])
 
-    for exp_name, call_list in calls.items():
-        for i, call in enumerate(call_list):
+    for exp_name, data in experiments_data.items():
+        for i, call in enumerate(data["calls"]):
             metrics = call()
-            metrics["run"] = runs[exp_name][i] 
+            metrics["run"] = data["runs"][i]
 
             logger.info(f"[{exp_name}] Metrics for run {i}: {metrics}")
 
-            results[exp_name].append(metrics)
+            data["results"].append(metrics)
 
-    for exp_name, metrics_list in results.items():
-        if metrics_list:
-            df = pd.DataFrame(metrics_list)
+    for exp_name, data in experiments_data.items():
+        if data["results"]:
+            df = pd.DataFrame(data["results"])
             exp_dir = os.path.join(dir, exp_name)
             csv_path = os.path.join(exp_dir, "results.csv")
             df.to_csv(csv_path, index=False)
