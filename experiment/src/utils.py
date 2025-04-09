@@ -1,3 +1,4 @@
+import yaml
 import logging
 
 def get_logger(level='DEBUG'):
@@ -20,3 +21,13 @@ def get_logger(level='DEBUG'):
         logger.addHandler(stream_handler)
     
     return logger
+
+def load_yaml(file_path):
+    """
+    Load a YAML file and return its contents.
+
+    :param file_path: Path to the YAML file.
+    :return: Loaded YAML content.
+    """
+    with open(file_path, 'r') as file:
+        return yaml.safe_load(file)
