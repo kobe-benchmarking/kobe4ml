@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "svm"
+version = "0.1"
+packages = [
+    { include = "svm" }
+]
+description = "SVM Classifier"
+authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
+	    "Stasinos Konstantopoulos <konstant@iit.demokritos.gr>" ]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.14"      # Python version for the project
+scikit-learn = "^1.4.1"     # For building and training SVM models
+numpy = "^1.24"             # Required for numerical operations and handling arrays
+pandas = "^2.2"             # Useful for data manipulation and working with DataFrames
+boto3 = "^1.37.1"           # Needed for the boto3 import (for interacting with AWS S3)
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
