@@ -1,0 +1,52 @@
+metadata:
+  parent_id: kn7fej4o
+  id: kn7fej4o_03
+  version: v1
+  name: BitBrain-RF
+  description: This run applies a Random Forest that classifies time series into categorical classes on the BitBrain dataset.
+
+implementation:
+  module: rf
+
+steps:
+  - id: p_01
+    type: prepare
+
+    parameters:
+      model_url: s3://manolo-data/models/rf.pkl
+
+      model:
+        n_estimators: 100
+        criterion: 'gini'
+
+    data:
+      loader: bitbrain_trad_loader
+      location: s3://manolo-data/datasets/bitbrain-ds/
+
+      parameters:
+        process: prepare
+
+    metrics:
+      - accuracy
+      - mae
+      - mse
+      - train_time
+
+  - id: i_01
+    type: work
+
+    parameters:
+      model_url: s3://manolo-data/models/rf.pkl
+
+    data:
+      loader: bitbrain_trad_loader
+      location: s3://manolo-data/datasets/bitbrain-ds/
+
+      parameters:
+        process: work
+
+    metrics:
+      - accuracy
+      - mae
+      - mse
+      - test_time
