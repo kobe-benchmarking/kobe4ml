@@ -1,46 +1,50 @@
 metadata:
-  experiment: kn7fej4o
-  date: 06/03/2025
-  id: c2
-  name: BitBrain-ConvLSTM-Autoencoder
-  description: A paragraph-long description of this run. Here, this run applies a convolutional LSTM architecture that classifies timeseries into categorical classes on the BitBrain dataset.
+  parent_id: kn7fej4o
+  id: kn7fej4o_02
+  version: v1
+  name: BitBrain-LSTM-Autoencoder
+  description: This run applies a Convolutional LSTM autoencoder architecture that learns to reconstruct the BitBrain time series dataset.
 
 implementation:
-    module: conv_lstm_ae
+  module: conv_lstm_ae
 
-run:
-  - id: kn7fej4o_03
-    type: training
-    loader: bitbrain_torch_loader
+steps:
+  - id: kn7fej4o_02_01
+    type: prepare
 
-    model: 
-      url: s3://manolo-data/models/lstm_ae.pth
-      
-      parameters:
+    parameters:
+      model_url: s3://manolo-data/models/conv_lstm_ae.pth
+
+      model:
         num_feats: 2
-        latent_seq_len: 1 
-        latent_num_feats: 8 
+        latent_seq_len: 1
+        latent_num_feats: 8
         hidden_size: 4
         num_layers: 1
         dropout: 0.05
 
-    parameters:
-      batch_size: 512
-      seq_len: 240
-      loss: BlendedLoss
-      epochs: 1000
-      patience: 30
-      lr: 0.0001
-      optimizer: Adam
-      scheduler:
-        name: ReduceLROnPlateau
-        params: 
-          factor: 0.99
-          patience: 3
+      process:
+        batch_size: 512
+        seq_len: 240
+        loss: BlendedLoss
+        epochs: 1000
+        patience: 30
+        lr: 0.0001
+        optimizer: Adam
+        scheduler:
+          name: ReduceLROnPlateau
+          params:
+            factor: 0.99
+            patience: 3
 
-    dataset:
-      url: s3://manolo-data/datasets/bitbrain-ds/
-    
+    data:
+      loader: bitbrain_torch_loader
+      location: s3://manolo-data/datasets/bitbrain-ds/
+
+      parameters:
+        process: prepare
+        batch_size: 512
+
     metrics:
       - epochs
       - train_time
@@ -48,35 +52,34 @@ run:
       - best_val_loss
       - mae
       - mse
-      
-  - id: kn7fej4o_04
-    type: inference
-    loader: bitbrain_torch_loader
 
-    model: 
-      url: s3://manolo-data/models/conv_lstm_ae.pth
-      
-      parameters:
+  - id: kn7fej4o_02_02
+    type: work
+
+    parameters:
+      model_url: s3://manolo-data/models/conv_lstm_ae.pth
+
+      model:
         num_feats: 2
-        latent_seq_len: 1 
-        latent_num_feats: 8 
+        latent_seq_len: 1
+        latent_num_feats: 8
         hidden_size: 4
         num_layers: 1
         dropout: 0.05
 
-    parameters:
-      batch_size: 512
-      seq_len: 240
-      loss: BlendedLoss
+      process:
+        batch_size: 512
+        seq_len: 240
+        loss: BlendedLoss
 
-    dataset:
-      url: s3://manolo-data/datasets/bitbrain-ds/
-    
+    data:
+      loader: bitbrain_torch_loader
+      location: s3://manolo-data/datasets/bitbrain-ds/
+
+      parameters:
+        process: work
+        batch_size: 512
+
     metrics:
       - mae
       - mse
-
-    # TBD
-    # metrics:
-    #   - module: mae
-    #   - module: mse

@@ -3,14 +3,13 @@ metadata:
   id: kn7fej4o_01
   version: v1
   name: BitBrain-LSTM-Autoencoder
-  description: This run applies an LSTM autoencoder architecture that classifies
-    time series into categorical classes on the BitBrain dataset.
+  description: This run applies a LSTM autoencoder architecture that learns to reconstruct the BitBrain time series dataset.
 
 implementation:
   module: lstm_ae
 
 steps:
-  - id: p_01
+  - id: kn7fej4o_01_01
     type: prepare
 
     parameters:
@@ -54,7 +53,7 @@ steps:
       - mae
       - mse
 
-  - id: i_01
+  - id: kn7fej4o_01_02
     type: work
 
     parameters:
