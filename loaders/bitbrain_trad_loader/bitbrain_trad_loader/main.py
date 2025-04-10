@@ -7,6 +7,8 @@ import s3fs
 import json
 import mne
 
+from . import utils
+
 logger = utils.get_logger(level='INFO')
 
 def get_boas_data(base_path, output_path):
