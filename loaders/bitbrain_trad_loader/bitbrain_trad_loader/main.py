@@ -7,8 +7,6 @@ import s3fs
 import json
 import mne
 
-from . import utils
-
 logger = utils.get_logger(level='INFO')
 
 def get_boas_data(base_path, output_path):
@@ -262,13 +260,11 @@ def get_label_mapping(weights):
 
     return label_mapping
 
-def create_dataset(dataframe, seq_len=7680*7, num_classes=5):
+def create_dataset(dataframe):
     """
     Create dataset for the specified dataframe (e.g. training and testing).
 
     :param dataframe: Dataframe containing EEG data.
-    :param seq_len: Sequence length for each dataset sample.
-    :param num_classes: Number of output classes for classification.
     :return: X, y - numpy arrays with the dataset.
     """
     logger.debug('Creating dataset from dataframe.')
@@ -279,11 +275,9 @@ def create_dataset(dataframe, seq_len=7680*7, num_classes=5):
     X_columns = ['HB_1', 'HB_2']
     y_column = 'majority'
 
-    for idx in range(len(dataframe) - seq_len + 1):
-        X_data = dataframe[X_columns].iloc[idx:idx + seq_len].values
-        y_data = dataframe[y_column].iloc[idx:idx + seq_len].values
-
-        y_data = utils.one_hot_encode(y_data, num_classes)
+    for idx in range(len(dataframe)):
+        X_data = dataframe[X_columns].iloc[idx].values
+        y_data = dataframe[y_column].iloc[idx]
 
         X_list.append(X_data)
         y_list.append(y_data)
@@ -294,18 +288,6 @@ def create_dataset(dataframe, seq_len=7680*7, num_classes=5):
     logger.debug(f'Datasets created successfully! Shapes -> X: {X.shape}, y: {y.shape}')
     
     return X, y
-
-def get_num_classes(dataframe, label_col='majority'):
-    """
-    Get the number of unique classes in the given label column.
-
-    :param dataframe: DataFrame containing the data.
-    :param label_col: The name of the column containing the class labels.
-    :return: The number of unique classes.
-    """
-    num_classes = dataframe[label_col].nunique()
-    logger.debug(f'Number of unique classes in {label_col}: {num_classes}')
-    return num_classes
 
 def main(url, batch_size, process):
     logger.info(f"Preprocessing data from URL: {url} with batch size: {batch_size}")
@@ -326,8 +308,7 @@ def main(url, batch_size, process):
     else:
         raise ValueError(f"Process type '{process}' not recognized")
     
-    num_classes = get_num_classes(df, label_col='majority')
-    dataset = create_dataset(dataframe=df, seq_len=seq_len, num_classes=num_classes)
+    dataset = create_dataset(dataframe=df)
 
     logger.info("Data preprocessing completed successfully")
 
