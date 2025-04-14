@@ -37,26 +37,39 @@ def load_module(name):
 
     return module
 
-# def load_params(step, process):
-#     logger.info(f"Loading parameters for step ID: {step['id']}")
+def load_impl_params(step):
+    """
+    Load parameters that configure the implementation for a specific step.
 
-#     model_url = step['model']['url']
-#     ds_url = step['dataset']['url']
+    :param step: Dictionary containing step information.
+    :return: Dictionary of parameters.
+    """
+    logger.info(f"Loading parameters for step {step['id']}.")
 
-#     model_params = step['model']['parameters']
-#     process_params = step['parameters']
-#     batch_size = process_params["batch_size"]
+    params = step['parameters']
+    data = step['data']
+    metrics = step['metrics']
 
-#     loader = load_module(name=step['loader'])
-#     dataloaders = getattr(loader, "preprocess")({"url": ds_url, 
-#                                                  "batch_size": batch_size, 
-#                                                  "process": process})
+    loader = data['loader']
+    loader_module = load_module(name=loader)
 
-#     params = {'pth': model_url, 'dls': dataloaders}
-#     params.update(model_params)
-#     params.update(process_params)
+    ds_url = data['location']
+    data_params = data['parameters']
+    loader_params = {'url': ds_url}
+    loader_params.update(data_params)
 
-#     return params
+    dls = loader_module.preprocess(**loader_params)
+
+    model_url = params['model_url']
+    model_params = params['model']
+    process_params = params['process']
+
+    impl_params = {'pth': model_url, 'dls': dls}
+    impl_params.update(model_params)
+    impl_params.update(process_params)
+    impl_params.update(metrics)
+
+    return impl_params
 
 def main(configs, dir='experiments'):
     """
@@ -87,29 +100,29 @@ def main(configs, dir='experiments'):
             logger.info(f"Processing step {step['id']} for {method}ing benchmarking.")
 
             impl = load_module(name=cfg['implementation']['module'])
+            params = load_impl_params(step)
 
+            call = lambda: getattr(impl, method)(params)
 
-    #         params = load_params(step=step, process=process)
+            experiments_data[exp_name]["calls"].append(call)
+            experiments_data[exp_name]["steps"].append(step['id'])
 
-    #         call = lambda: getattr(impl, method)(params)
+    for exp_name, data in experiments_data.items():
+        for i, call in enumerate(data["calls"]):
+            metrics = call()
+            data["results"].append(metrics)
 
-    #         experiments_data[exp_name]["calls"].append(call)
-    #         experiments_data[exp_name]["steps"].append(step['id'])
+            logger.info(f"Metrics for step {i}: {metrics}.")
 
-    # for exp_name, data in experiments_data.items():
-    #     for i, call in enumerate(data["calls"]):
-    #         metrics = call()
-    #         metrics["step"] = data["steps"][i]
+    for exp_name, data in experiments_data.items():
+        if data["results"]:
+            df = pd.DataFrame(data["results"])
 
-    #         logger.info(f"[{exp_name}] Metrics for step {i}: {metrics}")
+            exp_dir = os.path.join(dir, exp_name)
+            csv_path = os.path.join(exp_dir, "results.csv")
 
-    #         data["results"].append(metrics)
+            df.to_csv(csv_path, index=False)
+            logger.info(f"Results saved to {csv_path}.")
 
-    # for exp_name, data in experiments_data.items():
-    #     if data["results"]:
-    #         df = pd.DataFrame(data["results"])
-    #         exp_dir = os.path.join(dir, exp_name)
-    #         csv_path = os.path.join(exp_dir, "results.csv")
-    #         df.to_csv(csv_path, index=False)
-
-    #     logger.info(f"Results saved to {csv_path}")
+        else:
+            logger.info("No results to save.")

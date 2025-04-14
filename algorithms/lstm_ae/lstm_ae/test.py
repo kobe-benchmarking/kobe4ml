@@ -75,7 +75,7 @@ def main(params):
     """
     Main function to execute the testing workflow, including data preparation and model evaluation.
     """
-    model_url, dls, num_feats, latent_seq_len, latent_num_feats, hidden_size, num_layers, dropout, batch_size, seq_len, loss = params.values()
+    model_url, dls, num_feats, latent_seq_len, latent_num_feats, hidden_size, num_layers, dropout, seq_len, loss, metrics = params.values()
 
     samples, chunks = 7680, 32
     seq_len = samples // chunks

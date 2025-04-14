@@ -291,8 +291,15 @@ def create_dataset(dataframe):
     
     return X, y
 
-def main(url, batch_size, process):
-    logger.info(f"Preprocessing data from URL: {url} with batch size: {batch_size}")
+def main(url, process):
+    """
+    Main function to preprocess the data.
+
+    :param url: URL of the dataset.
+    :param process: Type of process (train/test).
+    :return: Processed dataset.
+    """
+    logger.info(f"Preprocessing data from URL: {url}.")
 
     samples, epochs = 7680, 7
     seq_len = samples * epochs
@@ -303,9 +310,9 @@ def main(url, batch_size, process):
     get_boas_data(base_path=bitbrain_dir, output_path=raw_dir)
     datapaths = split_data(dir=raw_dir, train_size=3, test_size=2)
 
-    if process == 'inference':
+    if process == 'test':
         _, df = get_dataframes(datapaths, seq_len=seq_len, exist=True)
-    elif process == 'training':
+    elif process == 'train':
         df, _ = get_dataframes(datapaths, seq_len=seq_len, exist=True)
     else:
         raise ValueError(f"Process type '{process}' not recognized")

@@ -416,8 +416,16 @@ def create_dataloaders(datasets, batch_size=1, shuffle=[True, False, False], num
 
     return tuple(dataloaders)
 
-def main(url, batch_size, process):
-    logger.info(f"Preprocessing data from URL: {url} with batch size: {batch_size}")
+def main(url, process, batch_size):
+    """
+    Main function to preprocess the data.
+
+    :param url: URL of the dataset.
+    :param process: Type of process (train/test).
+    :param batch_size: Size of the batch for processing.
+    :return: Processed dataset.
+    """
+    logger.info(f"Preprocessing data from URL: {url} with batch size: {batch_size}.")
 
     samples, chunks = 7680, 32
     seq_len = samples // chunks
@@ -428,10 +436,10 @@ def main(url, batch_size, process):
     get_boas_data(base_path=bitbrain_dir, output_path=raw_dir)
     datapaths = split_data(dir=raw_dir, train_size=3, val_size=2, test_size=2)
 
-    if process == 'inference':
+    if process == 'test':
         _, _, test_df = get_dataframes(datapaths, seq_len=seq_len, exist=True)
         datasets = create_datasets(dataframes=(test_df,), seq_len=seq_len)
-    elif process == 'training':
+    elif process == 'train':
         train_df, val_df, _ = get_dataframes(datapaths, seq_len=seq_len, exist=True)
         datasets = create_datasets(dataframes=(train_df, val_df), seq_len=seq_len)
     else:

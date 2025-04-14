@@ -24,7 +24,6 @@ steps:
         dropout: 0.05
 
       process:
-        batch_size: 512
         seq_len: 240
         loss: BlendedLoss
         epochs: 1000
@@ -68,7 +67,6 @@ steps:
         dropout: 0.05
 
       process:
-        batch_size: 512
         seq_len: 240
         loss: BlendedLoss
 
