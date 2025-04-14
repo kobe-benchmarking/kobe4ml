@@ -6,7 +6,7 @@ from . import utils
 
 logger = utils.get_logger(level='INFO')
 
-def create_exp_dir(exp_name, dir):
+def create_exp_dir(name, dir):
     """
     Create experiment directory if it doesn't exist.
 
@@ -14,7 +14,7 @@ def create_exp_dir(exp_name, dir):
     :param dir: Base directory for experiments.
     :return: Path to the experiment directory.
     """
-    exp_dir = os.path.join(dir, exp_name)
+    exp_dir = os.path.join(dir, name)
 
     if not os.path.exists(exp_dir):
         os.makedirs(exp_dir)

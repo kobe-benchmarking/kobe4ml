@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "conv_lstm_ae"
-version = "0.3"
+version = "0.4"
 packages = [
     { include = "conv_lstm_ae" }
 ]

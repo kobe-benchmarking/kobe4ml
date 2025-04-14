@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "exp"
-version = "0.2"
+version = "0.3"
 packages = [
     { include = "src" }
 ]
