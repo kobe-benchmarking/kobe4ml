@@ -27,13 +27,15 @@ def mse(X, X_dec):
     """
     return torch.mean((X - X_dec) ** 2).item()
 
-def test(data, pth, criterion, model):
+def test(data, pth, criterion, model, metrics):
     """
     Test the model on the provided data and calculate the test loss, MAE, and MSE.
 
     :param data: Data to test the model on.
     :param criterion: Loss function used to compute the test loss.
     :param model: The model to be evaluated.
+    :param metrics: List of metric names to calculate (e.g., ['mae', 'mse']).
+    :return: Dictionary containing metrics as defined in the input metrics list.
     """
     model.load_state_dict(pth)
     model.to(device)
@@ -61,15 +63,15 @@ def test(data, pth, criterion, model):
     avg_mae = total_mae / batches
     avg_mse = total_mse / batches
 
-    logger.info(f'\nTesting complete!\n'
-                f'Testing Loss: {avg_test_loss:.6f}\n'
-                f'MAE: {avg_mae:.6f}\n'
-                f'MSE: {avg_mse:.6f}\n')
-
-    return {
+    all_metrics = {
+        'test_loss': avg_test_loss,
         'mae': avg_mae,
         'mse': avg_mse
     }
+
+    filtered_metrics = {metric: all_metrics[metric] for metric in metrics if metric in all_metrics}
+
+    return filtered_metrics
 
 def main(params):
     """
@@ -98,6 +100,7 @@ def main(params):
     metrics = test(data=dls[0],
                    pth=pth,
                    criterion=criterion,
-                   model=model)
+                   model=model,
+                   metrics=metrics)
     
     return metrics

@@ -23,5 +23,11 @@ def get_logger(level='DEBUG'):
     return logger
 
 def load_yaml(file_path):
+    """
+    Load a YAML file and return its contents as a dictionary.
+    
+    :param file_path: Path to the YAML file.
+    :return: Dictionary containing the contents of the YAML file.
+    """
     with open(file_path, 'r') as file:
         return yaml.safe_load(file)

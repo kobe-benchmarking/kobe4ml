@@ -28,7 +28,7 @@ def mse(X, X_dec):
     """
     return torch.mean((X - X_dec) ** 2).item()
 
-def train(data, model_url, criterion, model, epochs, patience, lr, optimizer, scheduler):
+def train(data, model_url, criterion, model, epochs, patience, lr, optimizer, scheduler, metrics):
     """
     Train the model on the provided data and calculate the test loss, MAE, and MSE.
 
@@ -41,7 +41,8 @@ def train(data, model_url, criterion, model, epochs, patience, lr, optimizer, sc
     :param lr: Learning rate for optimization.
     :param optimizer: Optimizer type or configuration for training.
     :param scheduler: Learning rate scheduler configuration.
-    :return: Dictionary containing training results, including best train/validation loss, MAE, MSE, and total training time.
+    :param metrics: List of metric names to calculate (e.g., ['mae', 'mse']).
+    :return: Dictionary containing metrics as defined in the input metrics list.
     """
     model.to(device)
 
@@ -125,7 +126,7 @@ def train(data, model_url, criterion, model, epochs, patience, lr, optimizer, sc
 
         scheduler.step(avg_val_loss)
 
-    return {
+    all_metrics = {
         'epochs': epoch + 1,
         'train_time': train_time,
         'best_train_loss': best_train_loss,
@@ -133,6 +134,10 @@ def train(data, model_url, criterion, model, epochs, patience, lr, optimizer, sc
         'mae': avg_mae,
         'mse': avg_mse
     }
+
+    filtered_metrics = {metric: all_metrics[metric] for metric in metrics if metric in all_metrics}
+
+    return filtered_metrics
 
 def main(params):
     """
@@ -164,6 +169,7 @@ def main(params):
                     patience=patience,
                     lr=lr,
                     optimizer=optimizer,
-                    scheduler=scheduler)
+                    scheduler=scheduler,
+                    metrics=metrics)
     
     return metrics
