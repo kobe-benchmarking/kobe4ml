@@ -1,6 +1,6 @@
 metadata:
-  parent_id: kn7fej4o
-  id: kn7fej4o_03
+  parent_id: ae2jrt8m
+  id: ae2jrt8m_02
   version: v1
   name: BitBrain-RF
   description: This run applies a Random Forest that classifies time series into categorical classes on the BitBrain dataset.
@@ -9,7 +9,7 @@ implementation:
   module: rf
 
 steps:
-  - id: p_01
+  - id: ae2jrt8m_02_01
     type: prepare
 
     parameters:
@@ -32,7 +32,7 @@ steps:
       - mse
       - train_time
 
-  - id: i_01
+  - id: ae2jrt8m_02_02
     type: work
 
     parameters:

@@ -1,6 +1,6 @@
 metadata:
-  parent_id: kn7fej4o
-  id: kn7fej4o_03
+  parent_id: ae2jrt8m
+  id: ae2jrt8m_01
   version: v1
   name: BitBrain-SVM
   description: This run applies an SVM that classifies time series into categorical classes on the BitBrain dataset.
@@ -9,7 +9,7 @@ implementation:
   module: svm
 
 steps:
-  - id: p_01
+  - id: ae2jrt8m_01_01
     type: prepare
 
     parameters:
@@ -33,7 +33,7 @@ steps:
       - mse
       - train_time
 
-  - id: i_01
+  - id: ae2jrt8m_01_02
     type: work
 
     parameters:
