@@ -48,7 +48,6 @@ def save_model_to_s3(model, model_url):
     model_byte_stream.seek(0)
 
     s3.upload_fileobj(model_byte_stream, bucket_name, key)
-    print(f"Model saved to {model_url}")
     
 def load_model_from_s3(url):
     """

@@ -112,12 +112,12 @@ def train(data, model_url, criterion, model, epochs, patience, lr, optimizer, sc
         train_time += duration
 
         if avg_val_loss < best_val_loss:
+            stationary = 0
+            
             best_val_loss = avg_val_loss
             best_train_loss = avg_train_loss
 
-            stationary = 0
-
-            # save model to s3 bucket using model_url reference
+            utils.save_model_to_s3(model, model_url)
         else:
             stationary += 1
 

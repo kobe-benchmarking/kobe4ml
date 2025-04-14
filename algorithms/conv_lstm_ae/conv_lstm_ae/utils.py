@@ -117,10 +117,10 @@ class BlendedLoss(nn.Module):
     
 def load_model_from_s3(url):
     """
-    Load the model directly from S3 into memory.
+    Load a PyTorch model's state_dict from S3 into memory.
     
     :param url: S3 URL of the model (e.g., 's3://bucket-name/path/to/model.pth')
-    :return: Loaded model
+    :return: Loaded PyTorch model.
     """
     s3 = boto3.client('s3')
     s3_parts = url.replace('s3://', '').split('/', 1)
@@ -134,3 +134,21 @@ def load_model_from_s3(url):
     model_state_dict = torch.load(model_byte_stream, map_location='cpu')
 
     return model_state_dict
+
+def save_model_to_s3(model, url):
+    """
+    Save a PyTorch model's state_dict directly to an S3 location.
+
+    :param model: PyTorch model to save.
+    :param url: S3 URL where the model will be saved (e.g., 's3://bucket-name/path/to/model.pth').
+    """
+    s3 = boto3.client('s3')
+    s3_parts = url.replace('s3://', '').split('/', 1)
+    bucket_name = s3_parts[0]
+    key = s3_parts[1]
+
+    buffer = BytesIO()
+    torch.save(model.state_dict(), buffer)
+    buffer.seek(0)
+
+    s3.upload_fileobj(buffer, bucket_name, key)
