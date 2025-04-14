@@ -296,7 +296,7 @@ def main(url, process):
     Main function to preprocess the data.
 
     :param url: URL of the dataset.
-    :param process: Type of process (train/test).
+    :param process: Type of process (prepare/work).
     :return: Processed dataset.
     """
     logger.info(f"Preprocessing data from URL: {url}.")
@@ -310,9 +310,9 @@ def main(url, process):
     get_boas_data(base_path=bitbrain_dir, output_path=raw_dir)
     datapaths = split_data(dir=raw_dir, train_size=3, test_size=2)
 
-    if process == 'test':
+    if process == 'work':
         _, df = get_dataframes(datapaths, seq_len=seq_len, exist=True)
-    elif process == 'train':
+    elif process == 'prepare':
         df, _ = get_dataframes(datapaths, seq_len=seq_len, exist=True)
     else:
         raise ValueError(f"Process type '{process}' not recognized")

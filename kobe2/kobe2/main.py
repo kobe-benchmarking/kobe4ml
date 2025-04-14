@@ -20,7 +20,6 @@ def create_exp_dir(name, dir):
         os.makedirs(exp_dir)
         logger.info(f"Created experiment directory: {exp_dir}")
     else:
-        print(".")
         logger.info(f"Experiment directory already exists: {exp_dir}")
 
     return exp_dir
@@ -67,7 +66,7 @@ def load_impl_params(step):
     impl_params = {'pth': model_url, 'dls': dls}
     impl_params.update(model_params)
     impl_params.update(process_params)
-    impl_params.update(metrics)
+    impl_params["metrics"] = metrics
 
     return impl_params
 
@@ -78,7 +77,7 @@ def main(configs, dir='experiments'):
     :param dir: Directory to save experiment results.
     """
     experiments_data = {}
-    methods_dict = {"prepare": "train", "inference": "test"}
+    methods_dict = {"prepare": "train", "work": "test"}
 
     for cfg in configs:
         logger.info(f"Reading configuration {cfg['metadata']['id']} for {cfg['metadata']['name']}.")
@@ -93,7 +92,7 @@ def main(configs, dir='experiments'):
                 "results": []
             }
 
-        for step in cfg['step']:
+        for step in cfg['steps']:
             process = step['type']
             method = methods_dict[process]
 
@@ -126,3 +125,5 @@ def main(configs, dir='experiments'):
 
         else:
             logger.info("No results to save.")
+
+    logger.info("よくやった!")

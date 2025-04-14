@@ -421,7 +421,7 @@ def main(url, process, batch_size):
     Main function to preprocess the data.
 
     :param url: URL of the dataset.
-    :param process: Type of process (train/test).
+    :param process: Type of process (prepare/work).
     :param batch_size: Size of the batch for processing.
     :return: Processed dataset.
     """
@@ -436,10 +436,10 @@ def main(url, process, batch_size):
     get_boas_data(base_path=bitbrain_dir, output_path=raw_dir)
     datapaths = split_data(dir=raw_dir, train_size=3, val_size=2, test_size=2)
 
-    if process == 'test':
+    if process == 'work':
         _, _, test_df = get_dataframes(datapaths, seq_len=seq_len, exist=True)
         datasets = create_datasets(dataframes=(test_df,), seq_len=seq_len)
-    elif process == 'train':
+    elif process == 'prepare':
         train_df, val_df, _ = get_dataframes(datapaths, seq_len=seq_len, exist=True)
         datasets = create_datasets(dataframes=(train_df, val_df), seq_len=seq_len)
     else:
