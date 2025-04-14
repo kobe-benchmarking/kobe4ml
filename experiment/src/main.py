@@ -19,10 +19,10 @@ def gather_configs(dir):
     return configs
 
 def main():
-    experiments = gather_configs(dir='configs')
+    configs = gather_configs(dir='configs')
 
-    logger.info("Starting Kobe for experiment runs")
-    kobe(experiments, dir='experiments')
+    logger.info("Starting KOBE...")
+    kobe(configs, dir='experiments')
 
 if __name__ == "__main__":
     main()
