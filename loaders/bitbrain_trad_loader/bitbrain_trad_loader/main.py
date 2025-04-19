@@ -68,7 +68,7 @@ def get_boas_data(base_path, output_path):
 
         logger.debug(f'Saved combined data for {subject_id} to {output_file}')
 
-def split_data(dir, train_size=57, test_size=1):
+def split_data(dir, train_size, test_size):
     """
     Split the CSV files into training and test sets.
 
@@ -291,7 +291,7 @@ def create_dataset(dataframe):
     
     return X, y
 
-def main(url, process):
+def main(url, process, train_size, test_size, seq_len):
     """
     Main function to preprocess the data.
 
@@ -299,16 +299,15 @@ def main(url, process):
     :param process: Type of process (prepare/work).
     :return: Processed dataset.
     """
-    logger.info(f"Preprocessing data from URL: {url}.")
+    seq_len = 7680*2
 
-    samples, epochs = 7680, 7
-    seq_len = samples * epochs
+    logger.info(f"Preprocessing data from URL: {url}.")
 
     bitbrain_dir = os.path.join(url, 'bitbrain')
     raw_dir = os.path.join(url, 'raw')
 
     get_boas_data(base_path=bitbrain_dir, output_path=raw_dir)
-    datapaths = split_data(dir=raw_dir, train_size=3, test_size=2)
+    datapaths = split_data(dir=raw_dir, train_size=train_size, test_size=test_size)
 
     if process == 'work':
         _, df = get_dataframes(datapaths, seq_len=seq_len, exist=True)

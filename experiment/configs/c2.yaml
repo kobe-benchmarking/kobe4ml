@@ -43,6 +43,10 @@ steps:
       parameters:
         process: prepare
         batch_size: 512
+        train_size: 2
+        val_size: 1
+        test_size: 1
+        seq_len: 240
 
     metrics:
       - epochs
@@ -77,6 +81,10 @@ steps:
       parameters:
         process: work
         batch_size: 512
+        train_size: 2
+        val_size: 1
+        test_size: 1
+        seq_len: 240
 
     metrics:
       - mae
