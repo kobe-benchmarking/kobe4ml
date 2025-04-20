@@ -70,7 +70,7 @@ def load_impl_params(step):
 
     return impl_params
 
-def main(configs, dir='experiments'):
+def main(configs, dir='static'):
     """
     Main function to process configurations and run experiments.
     :param configs: List of configuration dictionaries.

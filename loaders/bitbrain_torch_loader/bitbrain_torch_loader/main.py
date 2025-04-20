@@ -193,11 +193,14 @@ def split_data(dir, train_size=57, val_size=1, test_size=1):
     
     logger.debug(f'Found {len(files)} files in directory: {dir} ready for splitting.')
 
-    train_paths = files[:train_size]
-    val_paths = files[train_size:train_size + val_size]
-    test_paths = files[train_size + val_size:train_size + val_size + test_size]
+    train_paths = [f's3://{file}' for file in files[:train_size]]
+    val_paths = [f's3://{file}' for file in files[train_size:train_size + val_size]]
+    test_paths = [f's3://{file}' for file in files[train_size + val_size:train_size + val_size + test_size]]
 
     logger.debug(f'Splitting complete!')
+    logger.debug(f'Train paths: {train_paths}')
+    logger.debug(f'Validation paths: {val_paths}')
+    logger.debug(f'Test paths: {test_paths}')
 
     return (train_paths, val_paths, test_paths)
 
@@ -222,7 +225,7 @@ def load_file(path):
 
     return X, t, y
 
-def combine_data(paths, name, seq_len=240, output_s3_path='s3://manolo-data/datasets/bitbrain-ds/proc'):
+def combine_data(paths, name, seq_len, output_s3_path):
     """
     Combine data from multiple CSV files into a dataframe, processing sequences and removing invalid rows.
 
@@ -289,7 +292,7 @@ def combine_data(paths, name, seq_len=240, output_s3_path='s3://manolo-data/data
 
     return df
 
-def get_dataframes(paths, seq_len=240, exist=False, output_s3_path='s3://manolo-data/datasets/bitbrain-ds/proc'):
+def get_dataframes(paths, seq_len, exist, output_s3_path, weights_path):
     """
     Create or load dataframes for training, validation, and testing.
 
@@ -297,6 +300,7 @@ def get_dataframes(paths, seq_len=240, exist=False, output_s3_path='s3://manolo-
     :param seq_len: Sequence length for processing.
     :param exist: Boolean flag indicating if the dataframes already exist.
     :param output_s3_path: S3 path where processed CSV files should be stored.
+    :param weights_path: S3 path where weights.json should be stored.
     :return: Tuple of dataframes for train, validation, and test sets.
     """
     fs = s3fs.S3FileSystem(anon=False)
@@ -318,11 +322,11 @@ def get_dataframes(paths, seq_len=240, exist=False, output_s3_path='s3://manolo-
 
             logger.debug(f'Loaded existing dataframe from {proc_path}.')
         else:
-            df = combine_data(paths, name, seq_len)
+            df = combine_data(paths, name, seq_len, output_s3_path)
 
             if name == 'train':
                 logger.debug('Calculating class weights from the training dataframe.')
-                weights, _ = extract_weights(df, label_col='majority')
+                weights, _ = extract_weights(df, label_col='majority', output_s3_path=weights_path)
 
             label_mapping = get_label_mapping(weights=weights)
             df['majority'] = df['majority'].map(label_mapping)
@@ -338,7 +342,7 @@ def get_dataframes(paths, seq_len=240, exist=False, output_s3_path='s3://manolo-
 
     return tuple(dataframes)
 
-def extract_weights(df, label_col, output_s3_path='s3://manolo-data/datasets/bitbrain-ds/weights.json'):
+def extract_weights(df, label_col, output_s3_path):
     """
     Calculate class weights from the training dataframe to handle class imbalance, and save them to S3.
 
@@ -448,21 +452,34 @@ def main(url, process, batch_size, train_size, val_size, test_size, seq_len):
     :return: Processed dataset.
     """
     seq_len = 240
-
     logger.info(f"Preprocessing data from URL: {url} with batch size: {batch_size}.")
 
     bitbrain_dir = os.path.join(url, 'bitbrain')
     raw_dir = os.path.join(url, 'raw')
+    proc_dir = os.path.join(url, 'proc')
+    weights_path = os.path.join(url, 'weights.json')
 
     get_boas_data(base_path=bitbrain_dir, output_path=raw_dir)
     datapaths = split_data(dir=raw_dir, train_size=train_size, val_size=val_size, test_size=test_size)
 
     if process == 'work':
-        _, _, test_df = get_dataframes(datapaths, seq_len=seq_len, exist=False)
+        _, _, test_df = get_dataframes(datapaths, 
+                                       seq_len=seq_len, 
+                                       exist=False, 
+                                       output_s3_path=proc_dir, 
+                                       weights_path=weights_path)
+        
         datasets = create_datasets(dataframes=(test_df,), seq_len=seq_len)
+
     elif process == 'prepare':
-        train_df, val_df, _ = get_dataframes(datapaths, seq_len=seq_len, exist=False)
+        train_df, val_df, _ = get_dataframes(datapaths, 
+                                             seq_len=seq_len,
+                                             exist=False,
+                                             output_s3_path=proc_dir, 
+                                             weights_path=weights_path)
+        
         datasets = create_datasets(dataframes=(train_df, val_df), seq_len=seq_len)
+
     else:
         raise ValueError(f"Process type '{process}' not recognized")
 
