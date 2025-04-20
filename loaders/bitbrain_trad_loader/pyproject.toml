@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bitbrain_trad_loader"
-version = "0.2"
+version = "0.5"
 packages = [
     { include = "bitbrain_trad_loader" }
 ]

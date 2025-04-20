@@ -177,7 +177,7 @@ class TSDataset(Dataset):
         else:
             return self.max_seq_id + 1
 
-def split_data(dir, train_size=57, val_size=1, test_size=1):
+def split_data(dir, train_size, val_size, test_size):
     """
     Split the CSV files into training, validation, and test sets.
 
@@ -292,7 +292,7 @@ def combine_data(paths, name, seq_len, output_s3_path):
 
     return df
 
-def get_dataframes(paths, seq_len, exist, output_s3_path, weights_path):
+def get_dataframes(paths, seq_len, exist, output_s3_path):
     """
     Create or load dataframes for training, validation, and testing.
 
@@ -300,13 +300,13 @@ def get_dataframes(paths, seq_len, exist, output_s3_path, weights_path):
     :param seq_len: Sequence length for processing.
     :param exist: Boolean flag indicating if the dataframes already exist.
     :param output_s3_path: S3 path where processed CSV files should be stored.
-    :param weights_path: S3 path where weights.json should be stored.
     :return: Tuple of dataframes for train, validation, and test sets.
     """
     fs = s3fs.S3FileSystem(anon=False)
     dataframes = []
     names = ['train', 'val', 'test']
     weights = None
+    weights_path = f"{output_s3_path}/weights.json"
 
     logger.debug('Creating dataframes for training, validation, and testing.')
 
@@ -465,18 +465,16 @@ def main(url, process, batch_size, train_size, val_size, test_size, seq_len):
     if process == 'work':
         _, _, test_df = get_dataframes(datapaths, 
                                        seq_len=seq_len, 
-                                       exist=False, 
-                                       output_s3_path=proc_dir, 
-                                       weights_path=weights_path)
+                                       exist=True, 
+                                       output_s3_path=proc_dir)
         
         datasets = create_datasets(dataframes=(test_df,), seq_len=seq_len)
 
     elif process == 'prepare':
         train_df, val_df, _ = get_dataframes(datapaths, 
                                              seq_len=seq_len,
-                                             exist=False,
-                                             output_s3_path=proc_dir, 
-                                             weights_path=weights_path)
+                                             exist=True,
+                                             output_s3_path=proc_dir)
         
         datasets = create_datasets(dataframes=(train_df, val_df), seq_len=seq_len)
 
