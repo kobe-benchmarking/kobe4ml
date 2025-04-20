@@ -311,22 +311,22 @@ def create_dataset(dataframe):
     
     return X, y
 
-def main(url, process, train_size, test_size, seq_len):
+def main(in_url, out_url, process, train_size, test_size, seq_len):
     """
     Main function to preprocess the data.
 
-    :param url: URL of the dataset.
+    :param in_url: Input URL for the dataset.
+    :param out_url: Output URL for the processed dataset.
     :param process: Type of process (prepare/work).
     :return: Processed dataset.
     """
     seq_len = 7680*2
 
-    logger.info(f"Preprocessing data from URL: {url}.")
+    logger.info(f"Preprocessing data from URL: {in_url}.")
 
-    bitbrain_dir = os.path.join(url, 'bitbrain')
-    raw_dir = os.path.join(url, 'raw')
-    proc_dir = os.path.join(url, 'proc')
-    weights_path = os.path.join(url, 'weights.json')
+    bitbrain_dir = os.path.join(in_url, 'bitbrain')
+    raw_dir = os.path.join(out_url, 'raw')
+    proc_dir = os.path.join(out_url, 'proc')
 
     get_boas_data(base_path=bitbrain_dir, output_path=raw_dir)
     datapaths = split_data(dir=raw_dir, train_size=train_size, test_size=test_size)

@@ -22,7 +22,7 @@ def main():
     configs = gather_configs(dir='configs')
 
     logger.info("Starting KOBE...")
-    kobe(configs, dir='experiments')
+    kobe(configs, dir='static')
 
 if __name__ == "__main__":
     main()

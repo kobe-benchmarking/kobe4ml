@@ -53,8 +53,10 @@ def load_impl_params(step):
     loader_module = load_module(name=loader)
 
     ds_url = data['location']
+    ds_step_url = os.path.join(ds_url, 'temp', step['id'])
     data_params = data['parameters']
-    loader_params = {'url': ds_url}
+    
+    loader_params = {'in_url': ds_url, 'out_url': ds_step_url}
     loader_params.update(data_params)
 
     dls = loader_module.preprocess(**loader_params)
