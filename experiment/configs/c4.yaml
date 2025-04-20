@@ -13,7 +13,8 @@ steps:
     type: prepare
 
     parameters:
-      model_url: s3://manolo-data/models/rf.pkl
+      model_name: rf.pkl
+      model_location: s3://manolo-data/models/
 
       model:
         n_estimators: 100
@@ -28,6 +29,7 @@ steps:
         train_size: 2
         test_size: 1
         seq_len: 15360
+        exist: False
 
     metrics:
       - accuracy
@@ -39,7 +41,8 @@ steps:
     type: work
 
     parameters:
-      model_url: s3://manolo-data/models/rf.pkl
+      model_name: rf.pkl
+      model_location: s3://manolo-data/models/
 
     data:
       loader: bitbrain_trad_loader
@@ -50,6 +53,7 @@ steps:
         train_size: 2
         test_size: 1
         seq_len: 15360
+        exist: False
 
     metrics:
       - accuracy

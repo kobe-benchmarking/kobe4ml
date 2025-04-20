@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import tempfile
 import dask.dataframe as dd
 import os
 import io
@@ -311,13 +312,17 @@ def create_dataset(dataframe):
     
     return X, y
 
-def main(in_url, out_url, process, train_size, test_size, seq_len):
+def main(in_url, out_url, process, train_size, test_size, seq_len, exist):
     """
     Main function to preprocess the data.
 
     :param in_url: Input URL for the dataset.
     :param out_url: Output URL for the processed dataset.
     :param process: Type of process (prepare/work).
+    :param train_size: Number of training samples.
+    :param test_size: Number of testing samples.
+    :param seq_len: Sequence length of the data.
+    :param exist: Boolean flag indicating if the dataframes already exist.
     :return: Processed dataset.
     """
     seq_len = 7680*2
@@ -334,13 +339,13 @@ def main(in_url, out_url, process, train_size, test_size, seq_len):
     if process == 'work':
         _, df = get_dataframes(datapaths, 
                                seq_len=seq_len, 
-                               exist=False, 
+                               exist=exist, 
                                output_s3_path=proc_dir,)
         
     elif process == 'prepare':
         df, _ = get_dataframes(datapaths, 
                                seq_len=seq_len, 
-                               exist=False, 
+                               exist=exist, 
                                output_s3_path=proc_dir)
 
     else:

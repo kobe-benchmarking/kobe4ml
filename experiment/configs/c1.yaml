@@ -13,7 +13,8 @@ steps:
     type: prepare
 
     parameters:
-      model_url: s3://manolo-data/models/lstm_ae.pth
+      model_name: lstm_ae.pth 
+      model_location: s3://manolo-data/models/
 
       model:
         num_feats: 2
@@ -47,6 +48,7 @@ steps:
         val_size: 1
         test_size: 1
         seq_len: 240
+        exist: True
 
     metrics:
       - epochs
@@ -60,7 +62,8 @@ steps:
     type: work
 
     parameters:
-      model_url: s3://manolo-data/models/lstm_ae.pth
+      model_name: lstm_ae.pth 
+      model_location: s3://manolo-data/models/
 
       model:
         num_feats: 2
@@ -85,6 +88,7 @@ steps:
         val_size: 1
         test_size: 1
         seq_len: 240
+        exist: True
 
     metrics:
       - mae

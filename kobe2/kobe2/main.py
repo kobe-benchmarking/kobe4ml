@@ -36,11 +36,12 @@ def load_module(name):
 
     return module
 
-def load_impl_params(step):
+def load_impl_params(step, cfg_id):
     """
     Load parameters that configure the implementation for a specific step.
 
     :param step: Dictionary containing step information.
+    :param cfg_id: Configuration ID.
     :return: Dictionary of parameters.
     """
     logger.info(f"Loading parameters for step {step['id']}.")
@@ -53,7 +54,7 @@ def load_impl_params(step):
     loader_module = load_module(name=loader)
 
     ds_url = data['location']
-    ds_step_url = os.path.join(ds_url, 'temp', step['id'])
+    ds_step_url = os.path.join(ds_url, 'temp', cfg_id)
     data_params = data['parameters']
     
     loader_params = {'in_url': ds_url, 'out_url': ds_step_url}
@@ -61,7 +62,7 @@ def load_impl_params(step):
 
     dls = loader_module.preprocess(**loader_params)
 
-    model_url = params['model_url']
+    model_url = os.path.join(params['model_location'], cfg_id, params['model_name'])
     model_params = params['model']
     process_params = params['process']
 
@@ -82,7 +83,8 @@ def main(configs, dir='static'):
     methods_dict = {"prepare": "train", "work": "test"}
 
     for cfg in configs:
-        logger.info(f"Reading configuration {cfg['metadata']['id']} for {cfg['metadata']['name']}.")
+        cfg_id = cfg['metadata']['id']
+        logger.info(f"Reading configuration {cfg_id} for {cfg['metadata']['name']}.")
         
         exp_name = cfg['metadata']['parent_id']
         exp_dir = create_exp_dir(name=exp_name, dir=dir)
@@ -101,7 +103,7 @@ def main(configs, dir='static'):
             logger.info(f"Processing step {step['id']} for {method}ing benchmarking.")
 
             impl = load_module(name=cfg['implementation']['module'])
-            params = load_impl_params(step)
+            params = load_impl_params(step, cfg_id)
 
             call = lambda: getattr(impl, method)(params)
 

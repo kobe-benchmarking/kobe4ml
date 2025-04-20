@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bitbrain_torch_loader"
-version = "0.25"
+version = "0.26"
 packages = [
     { include = "bitbrain_torch_loader" }
 ]

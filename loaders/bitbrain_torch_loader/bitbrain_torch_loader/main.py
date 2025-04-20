@@ -438,7 +438,7 @@ def create_dataloaders(datasets, batch_size=1, shuffle=[True, False, False], num
 
     return tuple(dataloaders)
 
-def main(in_url, out_url, process, batch_size, train_size, val_size, test_size, seq_len):
+def main(in_url, out_url, process, batch_size, train_size, val_size, test_size, seq_len, exist):
     """
     Main function to preprocess the data.
 
@@ -450,6 +450,7 @@ def main(in_url, out_url, process, batch_size, train_size, val_size, test_size, 
     :param val_size: Number of subjects for validation.
     :param test_size: Number of subjects for testing.
     :param seq_len: Sequence length of the data.
+    :param exist: Boolean flag indicating if the dataframes already exist.
     :return: Processed dataset.
     """
     seq_len = 240
@@ -465,7 +466,7 @@ def main(in_url, out_url, process, batch_size, train_size, val_size, test_size, 
     if process == 'work':
         _, _, test_df = get_dataframes(datapaths, 
                                        seq_len=seq_len, 
-                                       exist=False, 
+                                       exist=exist, 
                                        output_s3_path=proc_dir)
         
         datasets = create_datasets(dataframes=(test_df,), seq_len=seq_len)
@@ -473,7 +474,7 @@ def main(in_url, out_url, process, batch_size, train_size, val_size, test_size, 
     elif process == 'prepare':
         train_df, val_df, _ = get_dataframes(datapaths, 
                                              seq_len=seq_len,
-                                             exist=False,
+                                             exist=exist,
                                              output_s3_path=proc_dir)
         
         datasets = create_datasets(dataframes=(train_df, val_df), seq_len=seq_len)

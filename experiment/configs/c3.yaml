@@ -13,7 +13,8 @@ steps:
     type: prepare
 
     parameters:
-      model_url: s3://manolo-data/models/svm.pkl
+      model_name: svm.pkl
+      model_location: s3://manolo-data/models/
 
       model:
         kernel: 'linear'
@@ -29,6 +30,7 @@ steps:
         train_size: 2
         test_size: 1
         seq_len: 15360
+        exist: False
 
     metrics:
       - accuracy
@@ -40,7 +42,8 @@ steps:
     type: work
 
     parameters:
-      model_url: s3://manolo-data/models/svm.pkl
+      model_name: svm.pkl
+      model_location: s3://manolo-data/models/
 
     data:
       loader: bitbrain_trad_loader
@@ -51,6 +54,7 @@ steps:
         train_size: 2
         test_size: 1
         seq_len: 15360
+        exist: False
 
     metrics:
       - accuracy
