@@ -1,4 +1,5 @@
 import torch
+import tempfile
 import multiprocessing
 import pandas as pd
 import numpy as np
@@ -12,18 +13,22 @@ import mne
 
 from . import utils
 
-logger = utils.get_logger(level='INFO')
+logger = utils.get_logger(level='DEBUG')
 
 def get_boas_data(base_path, output_path):
     fs = s3fs.S3FileSystem(anon=False)
 
     for subject_folder in fs.glob(f'{base_path}/sub-*'):
         subject_id = os.path.basename(subject_folder)
+        logger.debug(f'Processing subject folder: {subject_folder} with ID: {subject_id}')
+
         eeg_folder = f'{subject_folder}/eeg'
 
         output_file = f"{output_path}/{subject_id}.csv"
+        logger.debug(f'Output file path: {output_file}')
 
         if fs.exists(output_file):
+            logger.debug(f'Output file {output_file} already exists. Skipping.')
             continue
 
         if not fs.exists(eeg_folder):
@@ -35,9 +40,22 @@ def get_boas_data(base_path, output_path):
 
         try:
             with fs.open(eeg_file_pattern, 'rb') as eeg_file:
-                eeg_bytes = io.BytesIO(eeg_file.read()) 
-                raw = mne.io.read_raw_edf(eeg_bytes, preload=True)
+
+                eeg_content = eeg_file.read()
+                logger.debug(f'EEG file size: {len(eeg_content)} bytes')
+
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.edf') as tmp_file:
+                    tmp_file.write(eeg_content)
+                    logger.debug(f'Temporary file created at: {tmp_file.name}')
+                    logger.debug(f"Temporary file is an eeg file: {tmp_file.name.endswith('.edf')}")
+
+                    tmp_file_path = tmp_file.name
+
+                raw = mne.io.read_raw_edf(tmp_file_path, preload=True)
+                logger.debug(f'Raw EEG data is not empty: {raw is not None}')
+
                 x_data = raw.to_data_frame()
+                logger.debug(f'EEG data shape for {subject_id}: {x_data.shape}')
 
             logger.debug(f'x_data shape for {subject_id}: {x_data.shape}')
             logger.debug(f'x_data sample:\n{x_data.head()}')
@@ -440,10 +458,10 @@ def main(url, process, batch_size, train_size, val_size, test_size, seq_len):
     datapaths = split_data(dir=raw_dir, train_size=train_size, val_size=val_size, test_size=test_size)
 
     if process == 'work':
-        _, _, test_df = get_dataframes(datapaths, seq_len=seq_len, exist=True)
+        _, _, test_df = get_dataframes(datapaths, seq_len=seq_len, exist=False)
         datasets = create_datasets(dataframes=(test_df,), seq_len=seq_len)
     elif process == 'prepare':
-        train_df, val_df, _ = get_dataframes(datapaths, seq_len=seq_len, exist=True)
+        train_df, val_df, _ = get_dataframes(datapaths, seq_len=seq_len, exist=False)
         datasets = create_datasets(dataframes=(train_df, val_df), seq_len=seq_len)
     else:
         raise ValueError(f"Process type '{process}' not recognized")

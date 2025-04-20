@@ -21,7 +21,7 @@ steps:
 
     data:
       loader: bitbrain_trad_loader
-      location: s3://manolo-data/datasets/bitbrain-ds/
+      location: s3://manolo-data/datasets/bitbrain-ds-empty/
 
       parameters:
         process: prepare
@@ -43,7 +43,7 @@ steps:
 
     data:
       loader: bitbrain_trad_loader
-      location: s3://manolo-data/datasets/bitbrain-ds/
+      location: s3://manolo-data/datasets/bitbrain-ds-empty/
 
       parameters:
         process: work
