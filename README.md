@@ -7,33 +7,89 @@ kobe4ml/
 │   ├── lstm_ae/       
 │   │   ├── lstm_ae/     
 │   │   │   ├── __init__.py  
-│   │   │   ├── model.py       
+│   │   │   ├── model.py   
+│   │   │   ├── loader.py     
 │   │   │   ├── train.py 
 │   │   │   ├── test.py   
+│   │   │   ├── utils.py    
 │   │   │── pyproject.toml 
+│   │   │── README.md
 │   ├── conv_lstm_ae/       
 │   │   ├── conv_lstm_ae/     
 │   │   │   ├── __init__.py  
-│   │   │   ├── model.py       
+│   │   │   ├── model.py     
+│   │   │   ├── loader.py       
 │   │   │   ├── train.py 
 │   │   │   ├── test.py   
+│   │   │   ├── utils.py     
 │   │   │── pyproject.toml 
+│   │   │── README.md
+│   ├── rf/       
+│   │   ├── rf/     
+│   │   │   ├── __init__.py     
+│   │   │   ├── train.py 
+│   │   │   ├── test.py   
+│   │   │   ├── utils.py     
+│   │   │── pyproject.toml 
+│   │   │── README.md
+│   ├── svm/       
+│   │   ├── svm/     
+│   │   │   ├── __init__.py     
+│   │   │   ├── train.py 
+│   │   │   ├── test.py   
+│   │   │   ├── utils.py     
+│   │   │── pyproject.toml 
+│   │   │── README.md
+│   ├── ...   
 │
 ├── experiment/         
 │   ├── src/              
 │   │   ├── __init__.py   
 │   │   ├── main.py     
 │   │   ├── utils.py     
-│   │   ├── loader.py     
-│   │   ├── model.py   
-│   ├── configs/         
-│   ├── pyproject.toml    
+│   ├── configs/      
+│   │   ├── c1.yaml 
+│   │   ├── c2.yaml    
+│   │   ├── c3.yaml    
+│   │   ├── c4.yaml  
+│   │   ├── ...
+│   │   
+│   ├── static/ 
+│   │   ├── kn7fej4o
+│   │   │   ├── results.csv
+│   │   ├── ae2jrt8m  
+│   │   │   ├── results.csv
+│   │   ├── ...
+│   │   
+│   ├── pyproject.toml 
+│   │── README.md   
 │
 ├── kobe2/         
 │   ├── kobe2/              
 │   │   ├── __init__.py   
 │   │   ├── main.py    
-│   ├── pyproject.toml    
+│   │   ├── utils.py   
+│   ├── pyproject.toml   
+│   │── README.md    
+│
+├── loaders/         
+│   ├── bitbrain-torch-loader/    
+│   │   ├── bitbrain-torch-loader/           
+│   │   │   ├── __init__.py   
+│   │   │   ├── main.py    
+│   │   │   ├── utils.py   
+│   │   ├── pyproject.toml   
+│   │   │── README.md    
+│   ├── bitbrain-trad-loader/    
+│   │   ├── bitbrain-trad-loader/           
+│   │   │   ├── __init__.py   
+│   │   │   ├── main.py    
+│   │   │   ├── utils.py   
+│   │   ├── pyproject.toml   
+│   │   │── README.md   
+│   ├── ... 
+│   
+│── README.md    
 ```
 
 # Build and Upload Packages
