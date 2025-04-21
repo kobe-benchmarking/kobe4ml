@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "exp"
+version = "0.4"
+packages = [
+    { include = "src" }
+]
+description = "Experiment: ML Benchmarking"
+authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
+	    "Stasinos Konstantopoulos <konstant@iit.demokritos.gr>" ]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+
+# Python version for the project
+python = ">=3.9,<3.14"  
+
+kobe2 = { path = "../kobe2", develop = true }
+
+lstm_ae = { path = "../algorithms/lstm_ae", develop = true }
+conv_lstm_ae = { path = "../algorithms/conv_lstm_ae", develop = true }
+svm = { path = "../algorithms/svm", develop = true }
+rf = { path = "../algorithms/rf", develop = true }
+
+bitbrain_torch_loader = { path = "../loaders/bitbrain_torch_loader", develop = true }
+bitbrain_trad_loader = { path = "../loaders/bitbrain_trad_loader", develop = true }
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+benchmark = "src.main:main"

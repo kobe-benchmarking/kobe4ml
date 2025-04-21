@@ -1,0 +1,63 @@
+metadata:
+  parent_id: ae2jrt8m
+  id: ae2jrt8m_01
+  version: v1
+  name: BitBrain-SVM
+  description: This run applies an SVM that classifies time series into categorical classes on the BitBrain dataset.
+
+implementation:
+  module: svm
+
+steps:
+  - id: ae2jrt8m_01_01
+    type: prepare
+
+    parameters:
+      model_name: svm.pkl
+      model_location: s3://manolo-data/models/
+
+      model:
+        C: 1.0
+        tol: 0.001
+        max_iter: 1000
+
+    data:
+      loader: bitbrain_trad_loader
+      location: s3://manolo-data/datasets/bitbrain-ds-empty/
+
+      parameters:
+        process: prepare
+        train_size: 2
+        test_size: 1
+        seq_len: 15360
+        exist: True
+
+    metrics:
+      - accuracy
+      - mae
+      - mse
+      - train_time
+
+  - id: ae2jrt8m_01_02
+    type: work
+
+    parameters:
+      model_name: svm.pkl
+      model_location: s3://manolo-data/models/
+
+    data:
+      loader: bitbrain_trad_loader
+      location: s3://manolo-data/datasets/bitbrain-ds-empty/
+
+      parameters:
+        process: work
+        train_size: 2
+        test_size: 1
+        seq_len: 15360
+        exist: True
+
+    metrics:
+      - accuracy
+      - mae
+      - mse
+      - test_time
