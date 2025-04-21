@@ -43,6 +43,6 @@ def main(params):
 
     model = utils.load_model_from_s3(model_url)
 
-    metrics = test(data, model_url, model, metrics)
+    metrics = test(data, model, metrics)
     
     return metrics

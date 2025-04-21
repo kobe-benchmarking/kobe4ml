@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rf"
-version = "0.2"
+version = "0.5"
 packages = [
     { include = "rf" }
 ]

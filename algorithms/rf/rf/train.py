@@ -45,9 +45,9 @@ def main(params):
     """
     Main function to execute the training workflow, including data preparation and model training.
     """
-    model_url, data, n_estimators, criterion, metrics = params.values()
+    model_url, data, n_estimators, criterion, max_depth, metrics = params.values()
 
-    model = RandomForestClassifier(n_estimators, criterion)
+    model = RandomForestClassifier(n_estimators=n_estimators, criterion=criterion, max_depth=max_depth)
 
     metrics = train(data, model_url, model, metrics)
     

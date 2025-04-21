@@ -17,9 +17,9 @@ steps:
       model_location: s3://manolo-data/models/
 
       model:
-        kernel: 'linear'
         C: 1.0
-        gamma: 'scale'
+        tol: 0.001
+        max_iter: 1000
 
     data:
       loader: bitbrain_trad_loader
@@ -30,7 +30,7 @@ steps:
         train_size: 2
         test_size: 1
         seq_len: 15360
-        exist: False
+        exist: True
 
     metrics:
       - accuracy
@@ -54,7 +54,7 @@ steps:
         train_size: 2
         test_size: 1
         seq_len: 15360
-        exist: False
+        exist: True
 
     metrics:
       - accuracy

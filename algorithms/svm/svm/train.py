@@ -1,5 +1,5 @@
 import time
-from sklearn.svm import SVC
+from sklearn.svm import LinearSVC
 from sklearn.metrics import accuracy_score, mean_absolute_error, mean_squared_error
 
 from . import utils
@@ -45,9 +45,9 @@ def main(params):
     """
     Main function to execute the training workflow, including data preparation and model training.
     """
-    model_url, data, kernel, C, gamma, metrics = params.values()
+    model_url, data, C, tol, max_iter, metrics = params.values()
 
-    model = SVC(kernel, C, gamma)
+    model = LinearSVC(C=C, max_iter=max_iter, tol=tol)
 
     metrics = train(data, model_url, model, metrics)
     

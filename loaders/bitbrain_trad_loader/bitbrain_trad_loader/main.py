@@ -290,26 +290,15 @@ def create_dataset(dataframe):
     :param dataframe: Dataframe containing EEG data.
     :return: X, y - numpy arrays with the dataset.
     """
-    logger.debug('Creating dataset from dataframe.')
-
-    X_list = []
-    y_list = []
-
     X_columns = ['HB_1', 'HB_2']
     y_column = 'majority'
 
-    for idx in range(len(dataframe)):
-        X_data = dataframe[X_columns].iloc[idx].values
-        y_data = dataframe[y_column].iloc[idx]
+    logger.debug('Creating dataset from dataframe (vectorized).')
 
-        X_list.append(X_data)
-        y_list.append(y_data)
-
-    X = np.array(X_list)
-    y = np.array(y_list)
+    X = dataframe[X_columns].values.astype(np.float32)
+    y = dataframe[y_column].values.astype(np.int64)
 
     logger.debug(f'Datasets created successfully! Shapes -> X: {X.shape}, y: {y.shape}')
-    
     return X, y
 
 def main(in_url, out_url, process, train_size, test_size, seq_len, exist):

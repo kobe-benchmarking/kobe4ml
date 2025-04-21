@@ -63,13 +63,16 @@ def load_impl_params(step, cfg_id):
     dls = loader_module.preprocess(**loader_params)
 
     model_url = os.path.join(params['model_location'], cfg_id, params['model_name'])
-    model_params = params['model']
-    process_params = params['process']
+
+    model_params = params['model'] if 'model' in params else {}
+    process_params = params['process'] if 'process' in params else {}
 
     impl_params = {'pth': model_url, 'dls': dls}
     impl_params.update(model_params)
     impl_params.update(process_params)
     impl_params["metrics"] = metrics
+
+    logger.info(f"Parameters for step {step['id']} loaded successfully.")
 
     return impl_params
 
@@ -105,7 +108,7 @@ def main(configs, dir='static'):
             impl = load_module(name=cfg['implementation']['module'])
             params = load_impl_params(step, cfg_id)
 
-            call = lambda: getattr(impl, method)(params)
+            call = lambda impl=impl, m=method, p=params: getattr(impl, m)(p)
 
             experiments_data[exp_name]["calls"].append(call)
             experiments_data[exp_name]["steps"].append(step['id'])
@@ -115,7 +118,7 @@ def main(configs, dir='static'):
             metrics = call()
             data["results"].append(metrics)
 
-            logger.info(f"Metrics for step {i}: {metrics}.")
+            logger.info(f"Metrics for {data['steps'][i]}: {metrics}.")
 
     for exp_name, data in experiments_data.items():
         if data["results"]:
@@ -124,7 +127,7 @@ def main(configs, dir='static'):
             exp_dir = os.path.join(dir, exp_name)
             csv_path = os.path.join(exp_dir, "results.csv")
 
-            df.to_csv(csv_path, index=False)
+            df.to_csv(csv_path, float_format="%.3f", index=False)
             logger.info(f"Results saved to {csv_path}.")
 
         else:
