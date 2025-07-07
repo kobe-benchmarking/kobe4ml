@@ -1,0 +1,149 @@
+metadata:
+  parent_id: kn7fej4o
+  id: kn7fej4o_01
+  version: v1
+  name: BitBrain-LSTM-Autoencoder
+  description: This run applies a LSTM autoencoder architecture that learns to reconstruct the BitBrain time series dataset.   
+
+  references:
+    access_point_1:
+      location: https://16.171.214.46:48031/
+      username: manolo-056
+      password: z5@!18k$0Y-9b_h3r2     
+
+steps:
+  - id: kn7fej4o_01_01
+    type: prepare
+
+    node:
+      id: ec2-01
+      type: edge
+
+      communication:          
+        ssh:
+          host: 16.171.214.46
+          user: ec2-user
+          port: 22
+
+          key: 
+            filename: natalia.pem
+            access: access_point_1
+
+      deployment:
+        docker_image: lstm_ae:latest
+        filename: lstm_ae.tar
+        access: access_point_1
+
+    implementation:
+      model:
+        num_feats: 2
+        latent_seq_len: 1
+        latent_num_feats: 8
+        hidden_size: 4
+        num_layers: 1
+        dropout: 0.05
+
+      process:
+        seq_len: 240
+        loss: BlendedLoss
+        epochs: 3
+        patience: 30
+        lr: 0.0001
+        optimizer: Adam
+        
+        scheduler:
+          name: ReduceLROnPlateau
+          params:
+            factor: 0.99
+            patience: 3
+
+      weights: 
+        filename: lstm_ae.pth 
+        access: access_point_1
+
+    data:
+      name: bitbrain
+      access: access_point_1
+
+      loader: 
+        docker_image: torch_loader:latest
+        filename: torch_loader.tar
+        access: access_point_1
+
+      parameters:
+        process: prepare
+        batch_size: 512
+        train_size: 2
+        val_size: 1
+        test_size: 1
+        seq_len: 240
+        exist: True
+
+    metrics:
+      - epochs
+      - train_time
+      - best_train_loss
+      - best_val_loss
+      - mae
+      - mse
+
+  - id: kn7fej4o_01_02
+    type: work
+
+    node:
+      id: ec2-01
+      type: edge
+
+      communication:          
+        ssh:
+          host: 16.171.214.46
+          user: ec2-user
+          port: 22
+
+          key: 
+            filename: natalia.pem
+            access: access_point_1
+
+      deployment:
+        docker_image: lstm_ae:latest
+        filename: lstm_ae.tar
+        access: access_point_1
+
+    implementation:
+      model:
+        num_feats: 2
+        latent_seq_len: 1
+        latent_num_feats: 8
+        hidden_size: 4
+        num_layers: 1
+        dropout: 0.05
+
+      process:
+        seq_len: 240
+        loss: BlendedLoss
+
+      weights: 
+        filename: lstm_ae.pth 
+        access: access_point_1
+
+    data:
+      name: bitbrain
+      access: access_point_1
+
+      loader: 
+        docker_image: torch_loader:latest
+        filename: torch_loader.tar
+        access: access_point_1
+
+      parameters:
+        process: work
+        batch_size: 512
+        train_size: 2
+        val_size: 1
+        test_size: 1
+        seq_len: 240
+        exist: True
+
+    metrics:
+      - mae
+      - mse
