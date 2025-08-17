@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "kobe2"
-version = "0.17"
+version = "0.18"
 packages = [
     { include = "kobe2" }
 ]
@@ -10,8 +10,12 @@ authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.14"          # Python version for the project
-pandas = "^2.1"                 # For data manipulation and analysis
+python = ">=3.9,<3.14"        
+pandas = "^2.1"
+numpy = "^1.26"
+mne = "^1.7"      
+
+attn_ae = { path = "../algorithms/attn_ae", develop = true }
 
 [build-system]
 requires = ["poetry-core"]

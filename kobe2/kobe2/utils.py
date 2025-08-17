@@ -1,5 +1,6 @@
 import yaml
 import logging
+import os
 
 def get_logger(level='DEBUG'):
     """
@@ -22,12 +23,40 @@ def get_logger(level='DEBUG'):
     
     return logger
 
-def load_yaml(file_path):
+def get_dir(*sub_dirs):
+    """
+    Retrieve or create a directory path based on the script's location and the specified subdirectories.
+
+    :param sub_dirs: List of subdirectories to append to the script's directory.
+    :return: Full path to the directory.
+    """
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    dir = os.path.join(script_dir, *sub_dirs)
+
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+
+    return dir
+
+def get_path(*dirs, filename):
+    """
+    Construct a full file path by combining directory paths and a filename.
+
+    :param dirs: List of directory paths.
+    :param filename: Name of the file.
+    :return: Full path to the file.
+    """
+    dir_path = get_dir(*dirs)
+    path = os.path.join(dir_path, filename)
+
+    return path    
+
+def load_yaml(path):
     """
     Load a YAML file and return its contents as a dictionary.
     
-    :param file_path: Path to the YAML file.
+    :param path: Path to the YAML file.
     :return: Dictionary containing the contents of the YAML file.
     """
-    with open(file_path, 'r') as file:
+    with open(path, 'r') as file:
         return yaml.safe_load(file)
