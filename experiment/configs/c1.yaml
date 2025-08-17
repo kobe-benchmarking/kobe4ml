@@ -1,33 +1,33 @@
 metadata:
-  parent_id: kn7fej4o
-  id: kn7fej4o_01
+  parent_id: dcoss
+  id: dcoss_01
   version: v1
-  name: BitBrain-LSTM-Autoencoder
-  description: This run applies a LSTM autoencoder architecture that learns to reconstruct the BitBrain time series dataset.
+  name: BitBrain-Attn-Autoencoder
+  description: This run applies an Attention-based autoencoder architecture that learns to reconstruct the BitBrain time series dataset.   
 
 implementation:
-  module: lstm_ae
+  module: attn_ae
 
 steps:
-  - id: kn7fej4o_01_01
+  - id: dcoss_01_01
     type: prepare
 
     parameters:
-      model_name: lstm_ae.pth 
-      model_location: s3://manolo-data/models/
+      model_name: attn_ae.pth 
+      model_location: models
 
       model:
-        num_feats: 2
+        num_feats: 3
         latent_seq_len: 1
         latent_num_feats: 8
-        hidden_size: 4
+        num_heads: 1
         num_layers: 1
         dropout: 0.05
 
       process:
         seq_len: 240
         loss: BlendedLoss
-        epochs: 2
+        epochs: 3
         patience: 30
         lr: 0.0001
         optimizer: Adam
@@ -38,8 +38,9 @@ steps:
             patience: 3
 
     data:
-      loader: bitbrain_torch_loader
-      location: s3://manolo-data/datasets/bitbrain-ds-empty/
+      loader: https://kobe-benchmarking.github.io/kobe4ml/torch-loader/torch_loader-0.28-py3-none-any.whl
+      name: bitbrain
+      location: bitbrain_conv
 
       parameters:
         process: prepare
@@ -48,7 +49,10 @@ steps:
         val_size: 1
         test_size: 1
         seq_len: 240
-        exist: True
+        norm_include: ['HB_1', 'HB_2', 'time']
+        full_epoch: 7680
+        per_epoch: True
+
 
     metrics:
       - epochs
@@ -58,18 +62,18 @@ steps:
       - mae
       - mse
 
-  - id: kn7fej4o_01_02
+  - id: dcoss_01_02
     type: work
 
     parameters:
-      model_name: lstm_ae.pth 
-      model_location: s3://manolo-data/models/
+      model_name: attn_ae.pth 
+      model_location: models
 
       model:
-        num_feats: 2
+        num_feats: 3
         latent_seq_len: 1
         latent_num_feats: 8
-        hidden_size: 4
+        num_heads: 1
         num_layers: 1
         dropout: 0.05
 
@@ -78,8 +82,9 @@ steps:
         loss: BlendedLoss
 
     data:
-      loader: bitbrain_torch_loader
-      location: s3://manolo-data/datasets/bitbrain-ds-empty/
+      loader: https://kobe-benchmarking.github.io/kobe4ml/torch-loader/torch_loader-0.28-py3-none-any.whl
+      name: bitbrain
+      location: bitbrain_conv
 
       parameters:
         process: work
@@ -88,7 +93,9 @@ steps:
         val_size: 1
         test_size: 1
         seq_len: 240
-        exist: True
+        norm_include: ['HB_1', 'HB_2', 'time']
+        full_epoch: 7680
+        per_epoch: True
 
     metrics:
       - mae
