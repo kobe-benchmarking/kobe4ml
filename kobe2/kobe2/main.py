@@ -76,8 +76,7 @@ def load_impl_params(step, id):
     data = step['data']
     metrics = step['metrics']
 
-    loader = data['loader']
-    loader_module = load_module(name=loader)
+    loader_module = load_module(module_url=data['loader'])
 
     ds_loc = data['location']
     ds_name = data['name']
@@ -142,7 +141,7 @@ def main(configs, dir='static'):
 
             logger.info(f"Processing step {step['id']} for {method}ing benchmarking.")
 
-            impl = load_module(name=cfg['implementation']['module'])
+            impl = load_module(module_url=cfg['implementation']['module'])
             params = load_impl_params(step, id)
 
             call = lambda impl=impl, m=method, p=params: getattr(impl, m)(p)

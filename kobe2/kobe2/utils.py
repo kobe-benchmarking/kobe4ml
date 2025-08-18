@@ -30,8 +30,7 @@ def get_dir(*sub_dirs):
     :param sub_dirs: List of subdirectories to append to the script's directory.
     :return: Full path to the directory.
     """
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    dir = os.path.join(script_dir, *sub_dirs)
+    dir = os.path.join(*sub_dirs)
 
     if not os.path.exists(dir):
         os.makedirs(dir)
