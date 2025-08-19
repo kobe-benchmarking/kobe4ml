@@ -56,11 +56,11 @@ steps:
         norm_include: ['HB_1', 'HB_2', 'time']
         full_epoch: 7680
         per_epoch: True
-        shifted: False
-        splitted: False
-        weighted: False
-        analyzed: False
-        normalized: False
+        shifted: True
+        splitted: True
+        weighted: True
+        analyzed: True
+        normalized: True
 
     metrics:
       - epochs
@@ -107,11 +107,11 @@ steps:
         norm_include: ['HB_1', 'HB_2', 'time']
         full_epoch: 7680
         per_epoch: True
-        shifted: False
-        splitted: False
-        weighted: False
-        analyzed: False
-        normalized: False
+        shifted: True
+        splitted: True
+        weighted: True
+        analyzed: True
+        normalized: True
 
     metrics:
       - mae

@@ -9,8 +9,7 @@ def main(dir, name, process, batch_size, train_size, val_size, test_size, seq_le
     """
     Main function to create torch loaders from the Bitbrain dataset, suitable for machine learning tasks.
     """
-    dls = {'train': None, 'val': None, 'test': None}
-
+    dls = {}
     process_map = {"prepare": ["train", "val"],
                    "work": ["test"]}
 
@@ -62,7 +61,7 @@ def main(dir, name, process, batch_size, train_size, val_size, test_size, seq_le
                                       num_workers=None, 
                                       drop_last=False)
     
-    return dls
+    return tuple(dls[p] for p in process_map[process])
 
 if __name__ == "__main__":
     main()

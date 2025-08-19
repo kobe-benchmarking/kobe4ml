@@ -124,7 +124,6 @@ def main(configs, dir='static'):
 
         if parent_id not in experiments_data:
             experiments_data[parent_id] = {
-                "calls": [],
                 "steps": [],
                 "results": []
             }
@@ -139,16 +138,12 @@ def main(configs, dir='static'):
             params = load_impl_params(step)
 
             call = lambda impl=impl, m=method, p=params: getattr(impl, m)(p)
+            metrics = call()
 
-            experiments_data[parent_id]["calls"].append(call)
+            experiments_data[parent_id]["results"].append(metrics)
             experiments_data[parent_id]["steps"].append(step['id'])
 
-    for parent_id, data in experiments_data.items():
-        for i, call in enumerate(data["calls"]):
-            metrics = call()
-            data["results"].append(metrics)
-
-            logger.info(f"Metrics for {data['steps'][i]}: {metrics}.")
+            logger.info(f"Metrics for step {step['id']}: {metrics}.")
 
     for parent_id, data in experiments_data.items():
         if data["results"]:
