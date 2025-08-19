@@ -15,8 +15,6 @@ pandas = "^2.1"
 numpy = "^1.26"
 mne = "^1.7"      
 
-attn_ae = { path = "../algorithms/attn_ae", develop = true }
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

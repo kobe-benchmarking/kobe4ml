@@ -35,7 +35,6 @@ def load_module(cfg, target_dir=None):
     
     cfg should be a dict with:
         - package: name of the package (required)
-        - version: version string (optional)
         - index_url: extra index URL (optional)
     """
     if target_dir is None:
@@ -43,19 +42,17 @@ def load_module(cfg, target_dir=None):
     os.makedirs(target_dir, exist_ok=True)
 
     package = cfg["package"]
-    version = cfg.get("version") or ""
     index_url = cfg.get("index_url")
-
-    spec = f"{package}=={version}" if version else package
 
     try:
         return importlib.import_module(package)
     except ImportError:
-        logger.info(f"{package} not found locally. Installing {spec}...")
+        logger.info(f"{package} not found locally, installing...")
 
     cmd = [
         sys.executable, "-m", "pip", "install", "--upgrade",
-        "--target", target_dir, spec,
+        "--target", target_dir,
+        package,
         "--extra-index-url", index_url
     ]
 
@@ -65,7 +62,7 @@ def load_module(cfg, target_dir=None):
         sys.path.insert(0, target_dir)
 
     module = importlib.import_module(package)
-    logger.info(f"Module {package} loaded successfully from {spec}.")
+    logger.info(f"Module {package} loaded successfully from {target_dir}.")
 
     return module
 

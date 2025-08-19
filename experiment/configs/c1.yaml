@@ -6,9 +6,8 @@ metadata:
   description: This run applies an Attention-based autoencoder architecture that learns to reconstruct the BitBrain time series dataset.   
 
 implementation:
-  package: attn_ae       
-  version: "0.1"             
-  index_url: https://kobe-benchmarking.github.io/kobe4ml/simple
+  package: attn_ae          
+  index_url: https://kobe-benchmarking.github.io/kobe4ml/
 
 steps:
   - id: dcoss_01_01
@@ -41,9 +40,8 @@ steps:
 
     data:
       loader:
-        package: torch_loader       
-        version: "0.28"              
-        index_url: https://kobe-benchmarking.github.io/kobe4ml/simple
+        package: torch_loader          
+        index_url: https://kobe-benchmarking.github.io/kobe4ml/
 
       name: bitbrain
       location: bitbrain_conv
@@ -89,9 +87,8 @@ steps:
 
     data:
       loader:
-        package: torch_loader       
-        version: "0.28"              
-        index_url: https://kobe-benchmarking.github.io/kobe4ml/simple
+        package: torch_loader          
+        index_url: https://kobe-benchmarking.github.io/kobe4ml/
 
       name: bitbrain
       location: bitbrain_conv
