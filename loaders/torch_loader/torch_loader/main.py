@@ -1,7 +1,8 @@
 import os
+from . import utils
 from . import tabular as tl
 
-logger = tl.get_logger(level='INFO')
+logger = utils.get_logger(level='INFO')
 
 def main(dir, name, process, batch_size, train_size, val_size, test_size, seq_len, norm_include, full_epoch, per_epoch):
     """
