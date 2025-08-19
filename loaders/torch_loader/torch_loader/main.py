@@ -5,7 +5,7 @@ from . import shared as sh
 
 logger = utils.get_logger(level='INFO')
 
-def main(dir, name, process, batch_size, train_size, val_size, test_size, seq_len, norm_include, full_epoch, per_epoch):
+def main(dir, name, process, batch_size, train_size, val_size, test_size, seq_len, norm_include, full_epoch, per_epoch, shifted, splitted, weighted, analyzed, normalized):
     """
     Main function to create torch loaders from the Bitbrain dataset, suitable for machine learning tasks.
     """
@@ -15,19 +15,20 @@ def main(dir, name, process, batch_size, train_size, val_size, test_size, seq_le
                    "work": ["test"]}
 
     logger.info("Shifting labels in the entire dataset.")
-    sh.shift_labels(dir, name=name)
+    sh.shift_labels(dir, name=name, done=shifted)
 
     logger.info("Splitting data into train, val, test.")
     sh.split_data(dir=dir, 
                   name=name, 
                   train_size=train_size, 
                   val_size=val_size, 
-                  test_size=test_size)
+                  test_size=test_size,
+                  done=splitted)
     
-    weights = sh.extract_weights(dir, name=name)
+    weights = sh.extract_weights(dir, name=name, done=weighted)
     logger.info(f"Training data class weights:\n{weights}")
 
-    stats = tl.get_stats(dir, name=name)
+    stats = tl.get_stats(dir, name=name, done=analyzed)
     logger.info(f"Calculated statistics from training data.")
 
     for p in process_map.get(process, []):
@@ -36,14 +37,16 @@ def main(dir, name, process, batch_size, train_size, val_size, test_size, seq_le
                               name=name,
                               process=p,
                               include=norm_include,
-                              stats=stats)
+                              stats=stats,
+                              done=normalized)
         
         logger.info(f"Normalizing {p} data with robust normalization.")
         tl.robust_normalize(dir=dir,
                             name=name,
                             process=p,
                             include=norm_include,
-                            stats=stats)
+                            stats=stats,
+                            done=normalized)
         
         logger.info(f"Creating TSDataset for {p} data.")
         ds = tl.TSDataset(dir=dir, 

@@ -44,19 +44,23 @@ steps:
         index_url: https://kobe-benchmarking.github.io/kobe4ml/
 
       name: bitbrain
-      location: bitbrain_conv
+      location: datasets/bitbrain_conv
 
       parameters:
         process: prepare
         batch_size: 512
-        train_size: 2
-        val_size: 1
-        test_size: 1
+        train_size: 0.65
+        val_size: 0.15
+        test_size: 0.20
         seq_len: 240
         norm_include: ['HB_1', 'HB_2', 'time']
         full_epoch: 7680
         per_epoch: True
-
+        shifted: False
+        splitted: False
+        weighted: False
+        analyzed: False
+        normalized: False
 
     metrics:
       - epochs
@@ -91,18 +95,23 @@ steps:
         index_url: https://kobe-benchmarking.github.io/kobe4ml/
 
       name: bitbrain
-      location: bitbrain_conv
+      location: datasets/bitbrain_conv
 
       parameters:
         process: work
         batch_size: 512
-        train_size: 2
-        val_size: 1
-        test_size: 1
+        train_size: 0.65
+        val_size: 0.15
+        test_size: 0.20
         seq_len: 240
         norm_include: ['HB_1', 'HB_2', 'time']
         full_epoch: 7680
         per_epoch: True
+        shifted: False
+        splitted: False
+        weighted: False
+        analyzed: False
+        normalized: False
 
     metrics:
       - mae

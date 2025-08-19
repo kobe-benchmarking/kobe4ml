@@ -6,17 +6,23 @@ from . import utils
 
 logger = utils.get_logger(level='DEBUG')
 
-def get_stats(dir, name):
+def get_stats(dir, name, done=False):
     """
     Load structured .npz train data and metadata, compute stats (mean, std, median, IQR) per column,
     and save the stats as a JSON file.
 
     :param dir: Directory containing {name}-train.npz and {name}.json.
     :param name: Dataset name prefix (e.g., 'bitbrain').
+    :param done: If True, skip the stats calculation.
     :return: Dict of stats keyed by column name.
     """
     data_path = utils.get_path(dir, filename=f"{name}-train.npz")
     meta_path = utils.get_path(dir, filename=f"{name}.json")
+    stats_path = utils.get_path(dir, filename=f"{name}-stats.json")
+
+    if done:
+        logger.info(f"Skipping stats calculation for {data_path}.")
+        return utils.load_json(stats_path)
 
     data = utils.load_npz(data_path)
     metadata = utils.load_json(meta_path)
@@ -43,14 +49,13 @@ def get_stats(dir, name):
                 'iqr': float(iqr)
             }
 
-    stats_path = utils.get_path(dir, filename=f"{name}-stats.json")
     utils.save_json(data=stats, path=stats_path)
 
     logger.info(f"Saved statistics JSON to {stats_path}.")
 
     return stats
 
-def robust_normalize(dir, name, process, include, stats):
+def robust_normalize(dir, name, process, include, stats, done=False):
     """
     Normalize structured .npz dataset using robust scaling (median and IQR) from precomputed stats. Applies normalization only to specified columns across any sub-array.
 
@@ -59,9 +64,14 @@ def robust_normalize(dir, name, process, include, stats):
     :param process: Process type (e.g., 'train', 'val', 'test').
     :param include: List of column names to include in normalization.
     :param stats: Dict of precomputed stats (median, iqr) keyed by column name.
+    :param done: If True, skip the normalization process.
     """
     data_path = utils.get_path(dir, filename=f"{name}-{process}.npz")
     meta_path = utils.get_path(dir, filename=f"{name}.json")
+
+    if done:
+        logger.info(f"Skipping robust normalization for {data_path}.")
+        return
 
     data = utils.load_npz(data_path)
     metadata = utils.load_json(meta_path)
@@ -83,7 +93,7 @@ def robust_normalize(dir, name, process, include, stats):
 
     logger.info(f"Robust normalized data saved to {norm_path}.")
 
-def standard_normalize(dir, name, process, include, stats):
+def standard_normalize(dir, name, process, include, stats, done=False):
     """
     Normalize structured .npz dataset using standard scaling (mean and std) from precomputed stats. Applies normalization only to specified columns across any sub-array.
 
@@ -92,9 +102,14 @@ def standard_normalize(dir, name, process, include, stats):
     :param process: Process type (e.g., 'train', 'val', 'test').
     :param include: List of column names to include in normalization.
     :param stats: Dict of precomputed stats (mean, std) keyed by column name.
+    :param done: If True, skip the normalization process.
     """
     data_path = utils.get_path(dir, filename=f"{name}-{process}.npz")
     meta_path = utils.get_path(dir, filename=f"{name}.json")
+
+    if done:
+        logger.info(f"Skipping standard normalization for {data_path}.")
+        return
 
     data = utils.load_npz(data_path)
     metadata = utils.load_json(meta_path)

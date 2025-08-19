@@ -29,49 +29,39 @@ def gather_configs(dir):
 
     return configs
 
-def load_module(cfg, target_dir=None):
+def load_module(cfg):
     """
-    Install and import a Python module given config.
-    
+    Install and import a Python module directly in the active environment.
+
     cfg should be a dict with:
         - package: name of the package (required)
         - index_url: extra index URL (optional)
     """
-    if target_dir is None:
-        target_dir = os.path.join(tempfile.gettempdir(), "remote_modules")
-    os.makedirs(target_dir, exist_ok=True)
-
     package = cfg["package"]
     index_url = cfg.get("index_url")
 
     try:
-        return importlib.import_module(package)
+        module = importlib.import_module(package)
+        logger.info(f"{package} already installed, using it.")
+        return module
     except ImportError:
-        logger.info(f"{package} not found locally, installing...")
+        logger.info(f"{package} not found, installing...")
 
-    cmd = [
-        sys.executable, "-m", "pip", "install", "--upgrade",
-        "--target", target_dir,
-        package,
-        "--extra-index-url", index_url
-    ]
+    cmd = [sys.executable, "-m", "pip", "install", "--upgrade", package]
+    if index_url:
+        cmd += ["--extra-index-url", index_url]
 
     subprocess.check_call(cmd)
 
-    if target_dir not in sys.path:
-        sys.path.insert(0, target_dir)
-
     module = importlib.import_module(package)
-    logger.info(f"Module {package} loaded successfully from {target_dir}.")
-
+    logger.info(f"{package} loaded successfully.")
     return module
 
-def load_impl_params(step, id):
+def load_impl_params(step):
     """
     Load parameters that configure the implementation for a specific step.
 
     :param step: Dictionary containing step information.
-    :param id: Configuration ID.
     :return: Dictionary of parameters.
     """
     logger.info(f"Loading parameters for step {step['id']}.")
@@ -146,7 +136,7 @@ def main(configs, dir='static'):
             logger.info(f"Processing step {step['id']} for {method}ing benchmarking.")
 
             impl = load_module(cfg=cfg['implementation'])
-            params = load_impl_params(step, id)
+            params = load_impl_params(step)
 
             call = lambda impl=impl, m=method, p=params: getattr(impl, m)(p)
 

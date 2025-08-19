@@ -8,16 +8,21 @@ from . import utils
 
 logger = utils.get_logger(level='DEBUG')
 
-def shift_labels(dir, name):
+def shift_labels(dir, name, done=False):
     """
     Load the structured .npz dataset and metadata, shift label values to start from 0,
     and save the updated .npz back to the same path.
 
     :param dir: Directory containing the dataset and metadata files.
     :param name: Dataset name prefix (e.g., 'bitbrain').
+    :param done: If True, skip the shifting process.
     """
     data_path = utils.get_path(dir, filename=f"{name}.npz")
     meta_path = utils.get_path(dir, filename=f"{name}.json")
+
+    if done:
+        logger.info(f"Skipping label shifting for {data_path}.")
+        return
 
     data = utils.load_npz(data_path)
     metadata = utils.load_json(meta_path)
@@ -44,7 +49,7 @@ def shift_labels(dir, name):
     utils.save_npz(data=data, path=data_path)
     logger.info(f"Shifted labels {label_cols} in {data_path} so values start at 0.")
 
-def split_data(dir, name, train_size=0.75, val_size=0.25, test_size=0):
+def split_data(dir, name, train_size=0.75, val_size=0.25, test_size=0, done=False):
     """
     Split structured .npz dataset into training, validation, and testing sets based on unique values in the split column.
 
@@ -53,9 +58,14 @@ def split_data(dir, name, train_size=0.75, val_size=0.25, test_size=0):
     :param train_size: Proportion of nights to use for training.
     :param val_size: Proportion of nights to use for validation.
     :param test_size: Proportion of nights to use for testing.
+    :param done: If True, skip the splitting process.
     """
     data_path = utils.get_path(dir, filename=f'{name}.npz')
     meta_path = utils.get_path(dir, filename=f'{name}.json')
+
+    if done:
+        logger.info(f"Skipping data splitting for {data_path}.")
+        return   
 
     train_path = utils.get_path(dir, filename=f'{name}-train.npz')
     val_path = utils.get_path(dir, filename=f'{name}-val.npz')
@@ -154,16 +164,23 @@ def split_data(dir, name, train_size=0.75, val_size=0.25, test_size=0):
         f"val ({len(next(iter(val_data.values())))} samples), "
         f"test ({len(next(iter(test_data.values())))} samples).")
 
-def extract_weights(dir, name):
+def extract_weights(dir, name, done=False):
     """
     Calculate class weights from the training structured .npz dataset to handle class imbalance, and save them to a JSON file. Supports multiple weight columns.
 
     :param dir: Directory to save the weights file.
     :param name: Name of the dataset (e.g., 'bitbrain').
+    :param done: If True, skip the weight extraction process.
     :return: Dictionary of class weights.
     """
     data_path = utils.get_path(dir, filename=f'{name}-train.npz')
     meta_path = utils.get_path(dir, filename=f'{name}.json')
+    
+    weights_path = utils.get_path(dir, filename=f'{name}-weights.json')
+
+    if done:
+        logger.info(f"Skipping weight extraction for {data_path}.")
+        return utils.load_json(weights_path)
 
     if not os.path.exists(data_path):
         raise FileNotFoundError(f"Training data file not found: {data_path}. Cannot extract weights.")
@@ -188,7 +205,6 @@ def extract_weights(dir, name):
         col_weights = {int(k): v / total for k, v in inverse_occs.items()}
         weights[col] = dict(sorted(col_weights.items()))
 
-    weights_path = utils.get_path(dir, filename=f'{name}-weights.json')
     utils.save_json(data=weights, path=weights_path)
     logger.info(f"Saved class weights to {weights_path}: {weights}")
 
