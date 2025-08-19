@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "torch_loader"
-version = "0.30"
+version = "0.31"
 packages = [
     { include = "torch_loader" }
 ]
@@ -17,7 +17,7 @@ python = ">=3.9,<3.14"
 # Loading and creating dataloaders
 pandas = "^2.1"         # For data manipulation and analysis
 numpy = "^1.26"         # For numerical computations (e.g., tensor operations)
-torch = "^2.0.1"        # For creating PyTorch dataloaders
+torch = "^2.7.0"        # For creating PyTorch dataloaders
 
 [build-system]
 requires = ["poetry-core"]
