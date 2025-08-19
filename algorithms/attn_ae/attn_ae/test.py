@@ -50,7 +50,7 @@ def test(data, pth, criterion, model, metrics):
         for _, (X, _) in enumerate(data):
             X = X.to(device)
 
-            X_dec, _ = model(X)
+            X_dec, _, _ = model(X)
 
             test_loss = criterion(X_dec, X)
             total_test_loss += test_loss.item()

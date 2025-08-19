@@ -69,7 +69,7 @@ def train(data, model_path, criterion, model, epochs, patience, lr, optimizer, s
         for _, (X, _) in enumerate(train_data):
             X = X.to(device)
 
-            X_dec, _ = model(X)
+            X_dec, _, _ = model(X)
 
             train_loss = criterion(X_dec, X)
             optimizer.zero_grad()
@@ -88,7 +88,7 @@ def train(data, model_path, criterion, model, epochs, patience, lr, optimizer, s
             for _, (X, _) in enumerate(val_data):
                 X = X.to(device)
 
-                X_dec, _ = model(X)
+                X_dec, _, _ = model(X)
 
                 val_loss = criterion(X_dec, X)
                 total_val_loss += val_loss.item()
