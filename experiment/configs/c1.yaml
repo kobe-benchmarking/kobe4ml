@@ -14,8 +14,7 @@ steps:
     type: prepare
 
     parameters:
-      model_name: attn_ae.pth 
-      model_location: models
+      model_location: models/attn_ae.pth 
 
       model:
         num_feats: 3
@@ -74,8 +73,7 @@ steps:
     type: work
 
     parameters:
-      model_name: attn_ae.pth 
-      model_location: models
+      model_location: models/attn_ae.pth 
 
       model:
         num_feats: 3

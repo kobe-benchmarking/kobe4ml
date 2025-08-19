@@ -70,22 +70,23 @@ def load_impl_params(step):
     data = step['data']
     metrics = step['metrics']
 
+    root = os.path.abspath(os.path.join(os.getcwd(), '..'))
+
     loader_module = load_module(cfg=data['loader'])
 
     ds_loc = data['location']
     ds_name = data['name']
     data_params = data['parameters']
+    model_loc = params["model_location"]
 
-    root = os.path.abspath(os.path.join(os.getcwd(), '..'))
     ds_dir = utils.get_dir(root, ds_loc)
-    
     loader_params = {'dir': ds_dir, 'name': ds_name}
     loader_params.update(data_params)
 
     dls = loader_module.preprocess(**loader_params)
 
-    model_path = os.path.join(params['model_location'], params['model_name'])
-
+    model_path = utils.get_dir(root, model_loc)
+    
     model_params = params['model'] if 'model' in params else {}
     process_params = params['process'] if 'process' in params else {}
 
