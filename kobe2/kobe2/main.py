@@ -29,36 +29,43 @@ def gather_configs(dir):
 
     return configs
 
-def load_module(module_url, target_dir=None):
+def load_module(cfg, target_dir=None):
     """
-    Download & install a Python module from an explicit URL, then import it.
+    Install and import a Python module given config.
     
-    :param module_url: Full URL to the wheel/tar.gz (from YAML).
-    :param target_dir: Where to install the package (defaults to temp dir).
-    :return: Imported Python module.
+    cfg should be a dict with:
+        - package: name of the package (required)
+        - version: version string (optional)
+        - index_url: extra index URL (optional)
     """
     if target_dir is None:
         target_dir = os.path.join(tempfile.gettempdir(), "remote_modules")
     os.makedirs(target_dir, exist_ok=True)
 
-    filename = os.path.basename(urlparse(module_url).path)
-    module_name = filename.split("-")[0]
+    package = cfg["package"]
+    version = cfg.get("version") or ""
+    index_url = cfg.get("index_url")
+
+    spec = f"{package}=={version}" if version else package
 
     try:
-        return importlib.import_module(module_name)
+        return importlib.import_module(package)
     except ImportError:
-        logger.info(f"{module_name} not found locally. Installing from {module_url}...")
+        logger.info(f"{package} not found locally. Installing {spec}...")
 
-    subprocess.check_call([
+    cmd = [
         sys.executable, "-m", "pip", "install", "--upgrade",
-        "--target", target_dir, module_url
-    ])
+        "--target", target_dir, spec,
+        "--extra-index-url", index_url
+    ]
+
+    subprocess.check_call(cmd)
 
     if target_dir not in sys.path:
         sys.path.insert(0, target_dir)
 
-    module = importlib.import_module(module_name)
-    logger.info(f"Module {module_name} loaded successfully from {module_url}.")
+    module = importlib.import_module(package)
+    logger.info(f"Module {package} loaded successfully from {spec}.")
 
     return module
 
@@ -76,7 +83,7 @@ def load_impl_params(step, id):
     data = step['data']
     metrics = step['metrics']
 
-    loader_module = load_module(module_url=data['loader'])
+    loader_module = load_module(cfg=data['loader'])
 
     ds_loc = data['location']
     ds_name = data['name']
@@ -141,7 +148,7 @@ def main(configs, dir='static'):
 
             logger.info(f"Processing step {step['id']} for {method}ing benchmarking.")
 
-            impl = load_module(module_url=cfg['implementation']['module'])
+            impl = load_module(cfg=cfg['implementation'])
             params = load_impl_params(step, id)
 
             call = lambda impl=impl, m=method, p=params: getattr(impl, m)(p)
