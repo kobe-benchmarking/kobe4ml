@@ -8,7 +8,7 @@ metadata:
 implementation:
   package: attn_ae       
   version: "0.1"             
-  index_url: https://kobe-benchmarking.github.io/kobe4ml
+  index_url: https://kobe-benchmarking.github.io/kobe4ml/simple
 
 steps:
   - id: dcoss_01_01
@@ -43,7 +43,7 @@ steps:
       loader:
         package: torch_loader       
         version: "0.28"              
-        index_url: https://kobe-benchmarking.github.io/kobe4ml
+        index_url: https://kobe-benchmarking.github.io/kobe4ml/simple
 
       name: bitbrain
       location: bitbrain_conv
@@ -91,7 +91,7 @@ steps:
       loader:
         package: torch_loader       
         version: "0.28"              
-        index_url: https://kobe-benchmarking.github.io/kobe4ml
+        index_url: https://kobe-benchmarking.github.io/kobe4ml/simple
 
       name: bitbrain
       location: bitbrain_conv

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="torch_loader",
-    version="0.29",
+    version="0.30",
     author="Natalia Koliou",
     author_email="nataliakoliou@iit.demokritos.gr",
     description="Torch Loader",
