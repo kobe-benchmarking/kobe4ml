@@ -3,7 +3,6 @@ import importlib
 import pandas as pd
 import sys
 import subprocess
-import tempfile
 from urllib.parse import urlparse
 
 from . import utils
@@ -86,7 +85,7 @@ def load_impl_params(step):
     dls = loader_module.preprocess(**loader_params)
 
     model_path = utils.get_dir(root, model_loc)
-    
+
     model_params = params['model'] if 'model' in params else {}
     process_params = params['process'] if 'process' in params else {}
 
