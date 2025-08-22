@@ -96,7 +96,7 @@ def train(data, model, save_url, model_params, process_params, metrics):
 
         model.train()
 
-        for _, (X, _) in enumerate(train_data):
+        for _, (X, _, _) in enumerate(train_data):
             X = X.to(device)
 
             X_dec, _, _ = model(X)
@@ -115,7 +115,7 @@ def train(data, model, save_url, model_params, process_params, metrics):
         total_val_loss = 0.0
 
         with torch.no_grad():
-            for _, (X, _) in enumerate(val_data):
+            for _, (X, _, _) in enumerate(val_data):
                 X = X.to(device)
 
                 X_dec, _, _ = model(X)

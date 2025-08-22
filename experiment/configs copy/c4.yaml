@@ -1,36 +1,34 @@
 metadata:
   parent_id: dcoss
-  id: dcoss_02
+  id: dcoss_04
   version: v1
-  name: BitBrain-ConvLSTM-Autoencoder
-  description: This run applies an Convolutional LSTM autoencoder architecture that learns to reconstruct the BitBrain time series dataset.   
+  name: BitBrain-Classifier
+  description: This run applies a Classifier that classifies time series into sleep stages on the BitBrain dataset.
 
 implementation:
-  package: conv_lstm_ae          
+  package: classifier          
   index_url: https://kobe-benchmarking.github.io/kobe4ml/
 
 steps:
-  - id: dcoss_02_01
+  - id: dcoss_04_01
     type: prepare
 
     parameters:
-      save_url: models/conv_lstm_ae.pth 
+      save_url: models/classifier.pth 
 
       model:
         seq_len: 240
-        num_feats: 3
-        latent_seq_len: 1
-        latent_num_feats: 8
-        hidden_size: 4
-        num_layers: 1
-        dropout: 0.05
+        in_size: 3
+        out_size: 5
+        num_heads: 1
+        dropout: 0.5
 
       process:
-        loss: BlendedLoss
+        loss: WeightedCrossEntropyLoss
         epochs: 3
         patience: 30
         lr: 0.0001
-        optimizer: Adam
+        optimizer: AdamW
         scheduler:
           name: ReduceLROnPlateau
           params:
@@ -55,6 +53,7 @@ steps:
         norm_include: ['HB_1', 'HB_2', 'time']
         full_epoch: 7680
         per_epoch: True
+        include_time: True
         shifted: True
         splitted: True
         weighted: True
@@ -66,14 +65,12 @@ steps:
       - train_time
       - best_train_loss
       - best_val_loss
-      - mae
-      - mse
 
-  - id: dcoss_02_02
+  - id: dcoss_04_02
     type: work
 
     parameters:
-      model_url: models/conv_lstm_ae.zip
+      model_url: models/classifier.zip
 
     data:
       loader:
@@ -93,6 +90,7 @@ steps:
         norm_include: ['HB_1', 'HB_2', 'time']
         full_epoch: 7680
         per_epoch: True
+        include_time: True
         shifted: True
         splitted: True
         weighted: True
@@ -100,6 +98,6 @@ steps:
         normalized: True
 
     metrics:
-      - BlendedLoss
+      - WeightedCrossEntropyLoss
       - mae
       - mse

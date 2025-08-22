@@ -1,36 +1,33 @@
 metadata:
   parent_id: dcoss
-  id: dcoss_03
+  id: dcoss_05
   version: v1
-  name: BitBrain-Attn-Autoencoder
-  description: This run applies an Attention-based autoencoder architecture that learns to reconstruct the BitBrain time series dataset.   
+  name: BitBrain-Predictor
+  description: This run applies a Predictor that forecasts time series on the BitBrain dataset.
 
 implementation:
-  package: attn_ae          
+  package: predictor          
   index_url: https://kobe-benchmarking.github.io/kobe4ml/
 
 steps:
-  - id: dcoss_03_01
+  - id: dcoss_05_01
     type: prepare
 
     parameters:
-      save_url: models/attn_ae.pth 
+      save_url: models/predictor.pth 
 
       model:
         seq_len: 240
         num_feats: 3
-        latent_seq_len: 1
-        latent_num_feats: 8
         num_heads: 1
-        num_layers: 1
-        dropout: 0.05
+        dropout: 0.5
 
       process:
         loss: BlendedLoss
         epochs: 3
         patience: 30
-        lr: 0.0001
-        optimizer: Adam
+        lr: 0.00005
+        optimizer: AdamW
         scheduler:
           name: ReduceLROnPlateau
           params:
@@ -70,11 +67,11 @@ steps:
       - mae
       - mse
 
-  - id: dcoss_03_02
+  - id: dcoss_05_02
     type: work
 
     parameters:
-      model_url: models/attn_ae.zip
+      model_url: models/predictor.zip
 
     data:
       loader:

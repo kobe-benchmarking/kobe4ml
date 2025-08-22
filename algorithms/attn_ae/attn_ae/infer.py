@@ -73,7 +73,7 @@ def infer(data, model, model_pth, metrics):
     criterion = utils.BlendedLoss()
 
     with torch.no_grad():
-        for _, (X, _) in enumerate(data):
+        for _, (X, _, _) in enumerate(data):
             X = X.to(device)
 
             X_dec, _, _ = model(X)
