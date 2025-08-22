@@ -76,7 +76,7 @@ def infer(data, model, model_pth, metrics):
         for _, (X, _, _) in enumerate(data):
             X = X.to(device)
 
-            X_dec, _, _ = model(X)
+            X_dec, _ = model(X)
 
             infer_loss = criterion(X_dec, X)
             total_infer_loss += infer_loss.item()
