@@ -1,5 +1,8 @@
 import torch
 import time
+import json
+import zipfile
+import os
 
 from . import utils
 from .loader import *
@@ -28,22 +31,48 @@ def mse(X, X_dec):
     """
     return torch.mean((X - X_dec) ** 2).item()
 
-def train(data, model_path, criterion, model, epochs, patience, lr, optimizer, scheduler, metrics):
+def zip_model(model, save_url, model_params):
     """
-    Train the model on the provided data and calculate the test loss, MAE, and MSE.
+    Package the trained model weights and parameters into a zip file for inference.
+
+    :param model: Trained PyTorch model.
+    :param save_url: Path to the pth file where the model weights are saved, e.g., models/attn_ae.pth.
+    :param model_params: Dictionary of model configuration parameters.
+    """
+    zip_path = save_url.replace('.pth', '.zip')
+    json_url = save_url.replace('.pth', '_params.json')
+
+    utils.save_pth(model=model, path=save_url)
+    utils.save_json(data=model_params, path=json_url)
+    
+    with zipfile.ZipFile(zip_path, 'w') as zipf:
+        zipf.write(save_url, os.path.basename(save_url))
+        zipf.write(json_url, os.path.basename(json_url))
+
+    os.remove(save_url)
+    os.remove(json_url)
+
+    logger.info(f"Packaged {save_url} and {json_url} into {zip_path}.")
+
+def train(data, model, save_url, model_params, process_params, metrics):
+    """
+    Train the model on the provided data and calculate the train loss, MAE, and MSE.
 
     :param data: Tuple containing (train_data, val_data), where each is a DataLoader.
-    :param model_path: Path to save the trained model.
-    :param criterion: Loss function used to compute training and validation loss.
     :param model: The model to be trained.
-    :param epochs: Maximum number of training epochs.
-    :param patience: Number of epochs to wait for validation loss improvement before early stopping.
-    :param lr: Learning rate for optimization.
-    :param optimizer: Optimizer type or configuration for training.
-    :param scheduler: Learning rate scheduler configuration.
+    :param save_url: Path to save the trained model.
+    :param model_params: Dictionary containing model configuration parameters.
+    :param process_params: Dictionary containing process parameters.
     :param metrics: List of metric names to calculate (e.g., ['mae', 'mse']).
     :return: Dictionary containing metrics as defined in the input metrics list.
     """
+    loss, epochs, patience, lr, optimizer, scheduler = process_params.values()
+
+    if hasattr(utils, loss):
+        criterion = getattr(utils, loss)()
+    else:
+        raise ValueError(f"Loss function '{loss}' not found in utils")
+
     model.to(device)
 
     train_data, val_data = data
@@ -114,7 +143,7 @@ def train(data, model_path, criterion, model, epochs, patience, lr, optimizer, s
             best_val_loss = avg_val_loss
             best_train_loss = avg_train_loss
 
-            utils.save_model_local(model, model_path)
+            zip_model(model, save_url, model_params)
         else:
             stationary += 1
 
@@ -138,35 +167,17 @@ def train(data, model_path, criterion, model, epochs, patience, lr, optimizer, s
 
 def main(params):
     """
-    Main function to execute the testing workflow, including data preparation and model evaluation.
+    Main function to execute the training workflow, including data preparation and model evaluation.
     """
-    model_path, dls, num_feats, latent_seq_len, latent_num_feats, num_heads, num_layers, dropout, seq_len, loss, epochs, patience, lr, optimizer, scheduler, metrics = params.values()
+    model_params, dls, metrics, process_params, save_url = params.values()
 
-    samples, chunks = 7680, 32
-    seq_len = samples // chunks
-
-    model = Attn_Autoencoder(seq_len=seq_len, 
-                             num_feats=num_feats, 
-                             latent_seq_len=latent_seq_len,
-                             latent_num_feats=latent_num_feats,
-                             num_heads=num_heads,
-                             num_layers=num_layers,
-                             dropout=dropout)
-
-    if hasattr(utils, loss):
-        criterion = getattr(utils, loss)()
-    else:
-        raise ValueError(f"Loss function '{loss}' not found in utils")
+    model = Attn_Autoencoder(**model_params)
  
-    metrics = train(data=dls,
-                    model_path=model_path,
-                    criterion=criterion,
+    results = train(data=dls,
                     model=model,
-                    epochs=epochs,
-                    patience=patience,
-                    lr=lr,
-                    optimizer=optimizer,
-                    scheduler=scheduler,
+                    save_url=save_url,
+                    model_params=model_params,
+                    process_params=process_params,
                     metrics=metrics)
     
-    return metrics
+    return results

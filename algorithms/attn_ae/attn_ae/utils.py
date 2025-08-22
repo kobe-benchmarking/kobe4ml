@@ -114,28 +114,8 @@ class BlendedLoss(nn.Module):
         loss = median_diff + mean_diff
         
         return loss
-    
-def load_model_from_s3(url):
-    """
-    Load a PyTorch model's state_dict from S3 into memory.
-    
-    :param url: S3 URL of the model (e.g., 's3://bucket-name/path/to/model.pth')
-    :return: Loaded PyTorch model.
-    """
-    s3 = boto3.client('s3')
-    s3_parts = url.replace('s3://', '').split('/', 1)
-    bucket_name = s3_parts[0]
-    key = s3_parts[1]
 
-    model_byte_stream = BytesIO()
-    s3.download_fileobj(bucket_name, key, model_byte_stream)
-    model_byte_stream.seek(0)
-
-    model_state_dict = torch.load(model_byte_stream, map_location='cpu')
-
-    return model_state_dict
-
-def load_model_local(path):
+def load_pth(path):
     """
     Load a PyTorch model's state_dict from a local file.
 
@@ -146,25 +126,7 @@ def load_model_local(path):
 
     return model_state_dict
 
-def save_model_to_s3(model, url):
-    """
-    Save a PyTorch model's state_dict directly to an S3 location.
-
-    :param model: PyTorch model to save.
-    :param url: S3 URL where the model will be saved (e.g., 's3://bucket-name/path/to/model.pth').
-    """
-    s3 = boto3.client('s3')
-    s3_parts = url.replace('s3://', '').split('/', 1)
-    bucket_name = s3_parts[0]
-    key = s3_parts[1]
-
-    buffer = BytesIO()
-    torch.save(model.state_dict(), buffer)
-    buffer.seek(0)
-
-    s3.upload_fileobj(buffer, bucket_name, key)
-
-def save_model_local(model, path):
+def save_pth(model, path):
     """
     Save a PyTorch model's state_dict locally.
 
@@ -172,3 +134,23 @@ def save_model_local(model, path):
     :param path: Local path where the model will be saved (e.g., 'models/attn_ae.pth').
     """
     torch.save(model.state_dict(), path)
+
+def load_json(path):
+    """
+    Load a JSON file from the given path.
+
+    :param path: Full path to the .json file.
+    :return: Parsed JSON as a Python dict.
+    """
+    with open(path, 'r') as f:
+        return json.load(f)
+
+def save_json(data, path):
+    """
+    Save a Python dict to a JSON file at the specified path.
+
+    :param data: Data to save as JSON.
+    :param path: Full path to the .json file.
+    """
+    with open(path, 'w') as f:
+        json.dump(data, f, indent=4)

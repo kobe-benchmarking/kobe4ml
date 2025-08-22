@@ -54,47 +54,69 @@ def load_module(cfg):
 
     module = importlib.import_module(package)
     logger.info(f"{package} loaded successfully.")
+
     return module
 
-def load_impl_params(step):
+def prepare_dls(data, root_dir=None):
+    """
+    Prepare data loaders based on the provided data configuration.
+
+    :param data: Dictionary containing data configuration.
+    :param root_dir: Root directory for data storage.
+    :return: Data loaders.
+    """
+    loader = data['loader']
+    loc = data['location']
+    name = data['name']
+    params = data['parameters']
+
+    ds_dir = utils.get_dir(root_dir, loc)
+
+    loader_params = {
+        "dir": ds_dir,
+        "name": name,
+        **params
+    }
+
+    loader_module = load_module(cfg=loader)
+    dls = loader_module.preprocess(**loader_params)
+
+    return dls
+
+def load_params(step):
     """
     Load parameters that configure the implementation for a specific step.
 
     :param step: Dictionary containing step information.
     :return: Dictionary of parameters.
     """
-    logger.info(f"Loading parameters for step {step['id']}.")
+    root_dir = os.path.abspath(os.path.join(os.getcwd(), '..'))
 
+    step_id = step["id"]
     params = step['parameters']
     data = step['data']
     metrics = step['metrics']
 
-    root = os.path.abspath(os.path.join(os.getcwd(), '..'))
+    model_params = params['model']
+    process_params = params['process']
+    save_url = params["save_url"]
 
-    loader_module = load_module(cfg=data['loader'])
+    logger.info(f"Loading parameters for step {step_id}.")
 
-    ds_loc = data['location']
-    ds_name = data['name']
-    data_params = data['parameters']
-    model_loc = params["model_location"]
+    dls = prepare_dls(data, root_dir)
+    logger.info(f"Data loaders prepared for step {step_id}.")
 
-    ds_dir = utils.get_dir(root, ds_loc)
-    loader_params = {'dir': ds_dir, 'name': ds_name}
-    loader_params.update(data_params)
+    save_path = utils.get_dir(root_dir, save_url)
 
-    dls = loader_module.preprocess(**loader_params)
+    impl_params = {
+        **model_params,
+        "dls": dls,
+        "metrics": metrics,
+        **process_params,
+        "save_url": save_path
+    }
 
-    model_path = utils.get_dir(root, model_loc)
-
-    model_params = params['model'] if 'model' in params else {}
-    process_params = params['process'] if 'process' in params else {}
-
-    impl_params = {'pth': model_path, 'dls': dls}
-    impl_params.update(model_params)
-    impl_params.update(process_params)
-    impl_params["metrics"] = metrics
-
-    logger.info(f"Parameters for step {step['id']} loaded successfully.")
+    logger.info(f"Parameters for step {step_id} loaded successfully.")
 
     return impl_params
 
@@ -107,8 +129,8 @@ def main(configs, dir='static'):
     """
     logger.info("Starting KOBE benchmarking experiments...")
     
-    experiments_data = {}
-    methods_dict = {"prepare": "train", "work": "test"}
+    exp_data = {}
+    methods_dict = {"prepare": "train", "work": "infer"}
 
     for cfg in configs:
         metadata = cfg["metadata"]
@@ -122,30 +144,33 @@ def main(configs, dir='static'):
 
         exp_dir = utils.get_dir(dir, parent_id)
 
-        if parent_id not in experiments_data:
-            experiments_data[parent_id] = {
+        if parent_id not in exp_data:
+            exp_data[parent_id] = {
                 "steps": [],
                 "results": []
             }
+        
+        exp_data_parent = exp_data[parent_id]
 
         for step in steps:
+            step_id = step['id']
             process = step['type']
             method = methods_dict[process]
 
-            logger.info(f"Processing step {step['id']} for {method}ing benchmarking.")
+            logger.info(f"Processing step {step_id} for {method}ing benchmarking.")
 
             impl = load_module(cfg=cfg['implementation'])
-            params = load_impl_params(step)
+            params = load_params(step)
 
             call = lambda impl=impl, m=method, p=params: getattr(impl, m)(p)
             metrics = call()
 
-            experiments_data[parent_id]["results"].append(metrics)
-            experiments_data[parent_id]["steps"].append(step['id'])
+            exp_data_parent["results"].append(metrics)
+            exp_data_parent["steps"].append(step_id)
 
-            logger.info(f"Metrics for step {step['id']}: {metrics}.")
+            logger.info(f"Metrics for step {step_id}: {metrics}.")
 
-    for parent_id, data in experiments_data.items():
+    for parent_id, data in exp_data.items():
         if data["results"]:
             df = pd.DataFrame(data["results"])
 

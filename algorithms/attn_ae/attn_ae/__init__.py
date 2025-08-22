@@ -1,4 +1,4 @@
 from .train import main as train
-from .test import main as test
+from .infer import main as infer
 
-__all__ = ["train", "test"]
+__all__ = ["train", "infer"]

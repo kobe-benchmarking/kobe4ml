@@ -27,7 +27,7 @@ def mse(X, X_dec):
     """
     return torch.mean((X - X_dec) ** 2).item()
 
-def test(data, pth, criterion, model, metrics):
+def infer(data, pth, criterion, model, metrics):
     """
     Test the model on the provided data and calculate the test loss, MAE, and MSE.
 
@@ -42,7 +42,7 @@ def test(data, pth, criterion, model, metrics):
     model.eval()
 
     batches = len(data)
-    total_test_loss = 0.0
+    total_infer_loss = 0.0
     total_mae = 0.0
     total_mse = 0.0
 
@@ -52,18 +52,18 @@ def test(data, pth, criterion, model, metrics):
 
             X_dec, _, _ = model(X)
 
-            test_loss = criterion(X_dec, X)
-            total_test_loss += test_loss.item()
+            infer_loss = criterion(X_dec, X)
+            total_infer_loss += infer_loss.item()
 
             total_mae += mae(X, X_dec)
             total_mse += mse(X, X_dec)
 
-    avg_test_loss = total_test_loss / batches
+    avg_infer_loss = total_infer_loss / batches
     avg_mae = total_mae / batches
     avg_mse = total_mse / batches
 
     all_metrics = {
-        'test_loss': avg_test_loss,
+        'infer_loss': avg_infer_loss,
         'mae': avg_mae,
         'mse': avg_mse
     }
@@ -76,7 +76,9 @@ def main(params):
     """
     Main function to execute the testing workflow, including data preparation and model evaluation.
     """
-    model_path, dls, num_feats, latent_seq_len, latent_num_feats, num_heads, num_layers, dropout, seq_len, loss, metrics = params.values()
+    save_url, dls, num_feats, latent_seq_len, latent_num_feats, num_heads, num_layers, dropout, seq_len, loss, metrics = params.values()
+
+    seq_len, num_feats, latent_seq_len, latent_num_feats, num_heads, num_layers, dropout, dls, metrics, loss, metrics = params.values()
 
     samples, chunks = 7680, 32
     seq_len = samples // chunks
@@ -94,9 +96,9 @@ def main(params):
     else:
         raise ValueError(f"Loss function '{loss}' not found in utils")
     
-    pth = utils.load_model_local(model_path)
+    pth = utils.load_model_local(save_url)
  
-    metrics = test(data=dls[0],
+    metrics = infer(data=dls[0],
                    pth=pth,
                    criterion=criterion,
                    model=model,
