@@ -1,4 +1,6 @@
 import torch
+import zipfile
+import os
 
 from . import utils
 from .loader import *
@@ -27,24 +29,46 @@ def mse(X, X_dec):
     """
     return torch.mean((X - X_dec) ** 2).item()
 
-def infer(data, pth, criterion, model, metrics):
+def unzip_model(path):
+    """
+    Extract a model zip file into the model weights and parameters for inference.
+
+    :param path: Path to the zip file created by zip_model, e.g., models/attn_ae.zip
+    :return: Tuple (model_pth_path, model_params_dict)
+    """
+    extract_dir = os.path.dirname(path)
+
+    with zipfile.ZipFile(path, 'r') as zipf:
+        zipf.extractall(extract_dir)
+
+    model_pth = path.replace('.zip', '.pth')
+    json_path = path.replace('.zip', '_params.json')
+
+    model_params = utils.load_json(path=json_path)
+
+    return model_pth, model_params
+
+def infer(data, model, model_pth, metrics):
     """
     Test the model on the provided data and calculate the test loss, MAE, and MSE.
 
     :param data: Data to test the model on.
-    :param criterion: Loss function used to compute the test loss.
     :param model: The model to be evaluated.
+    :param model_pth: Path to the pth file where the model weights are saved, e.g., models/attn_ae.pth.
     :param metrics: List of metric names to calculate (e.g., ['mae', 'mse']).
     :return: Dictionary containing metrics as defined in the input metrics list.
     """
-    model.load_state_dict(pth)
+    state_dict = utils.load_pth(path=model_pth)
+    model.load_state_dict(state_dict)
     model.to(device)
-    model.eval()
 
     batches = len(data)
+
     total_infer_loss = 0.0
     total_mae = 0.0
     total_mse = 0.0
+
+    model.eval()
 
     with torch.no_grad():
         for _, (X, _) in enumerate(data):
@@ -52,7 +76,7 @@ def infer(data, pth, criterion, model, metrics):
 
             X_dec, _, _ = model(X)
 
-            infer_loss = criterion(X_dec, X)
+            infer_loss = utils.BlendedLoss(X_dec, X)
             total_infer_loss += infer_loss.item()
 
             total_mae += mae(X, X_dec)
@@ -63,7 +87,7 @@ def infer(data, pth, criterion, model, metrics):
     avg_mse = total_mse / batches
 
     all_metrics = {
-        'infer_loss': avg_infer_loss,
+        'BlendedLoss': avg_infer_loss,
         'mae': avg_mae,
         'mse': avg_mse
     }
@@ -76,32 +100,15 @@ def main(params):
     """
     Main function to execute the testing workflow, including data preparation and model evaluation.
     """
-    save_url, dls, num_feats, latent_seq_len, latent_num_feats, num_heads, num_layers, dropout, seq_len, loss, metrics = params.values()
+    model_url, dls, metrics = params.values()
 
-    seq_len, num_feats, latent_seq_len, latent_num_feats, num_heads, num_layers, dropout, dls, metrics, loss, metrics = params.values()
+    model_pth, model_params = unzip_model(path=model_url)
 
-    samples, chunks = 7680, 32
-    seq_len = samples // chunks
-
-    model = Attn_Autoencoder(seq_len=seq_len, 
-                             num_feats=num_feats, 
-                             latent_seq_len=latent_seq_len,
-                             latent_num_feats=latent_num_feats,
-                             num_heads=num_heads,
-                             num_layers=num_layers,
-                             dropout=dropout)
-
-    if hasattr(utils, loss):
-        criterion = getattr(utils, loss)()
-    else:
-        raise ValueError(f"Loss function '{loss}' not found in utils")
-    
-    pth = utils.load_model_local(save_url)
+    model = Attn_Autoencoder(**model_params)
  
     metrics = infer(data=dls[0],
-                   pth=pth,
-                   criterion=criterion,
-                   model=model,
-                   metrics=metrics)
+                    model=model,
+                    model_pth=model_pth,
+                    metrics=metrics)
     
     return metrics

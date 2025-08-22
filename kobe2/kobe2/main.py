@@ -85,7 +85,7 @@ def prepare_dls(data, root_dir=None):
 
 def load_params(step):
     """
-    Load parameters that configure the implementation for a specific step.
+    Load parameters that configure the implementation for a specific step. Handles optional keys: 'model', 'process', 'save_url', 'model_url'.
 
     :param step: Dictionary containing step information.
     :return: Dictionary of parameters.
@@ -97,28 +97,33 @@ def load_params(step):
     data = step['data']
     metrics = step['metrics']
 
-    model_params = params['model']
-    process_params = params['process']
-    save_url = params["save_url"]
+    model_params = params.get('model')
+    process_params = params.get('process')
+    save_url = params.get('save_url')
+    model_url = params.get('model_url')
 
     logger.info(f"Loading parameters for step {step_id}.")
 
     dls = prepare_dls(data, root_dir)
     logger.info(f"Data loaders prepared for step {step_id}.")
 
-    save_path = utils.get_dir(root_dir, save_url)
+    save_path = utils.get_dir(root_dir, save_url) if save_url else None
+    model_path = utils.get_path(root_dir, model_url) if model_url else None
 
     impl_params = {
-        **model_params,
+        "model_params": model_params if model_params else {},
+        "model_url": model_path if model_path else {},
         "dls": dls,
         "metrics": metrics,
-        **process_params,
-        "save_url": save_path
+        "process_params": process_params if process_params else {},
+        "save_url": save_path if save_path else {}
     }
+
+    step_impl_params = {k: v for k, v in impl_params.items() if v}
 
     logger.info(f"Parameters for step {step_id} loaded successfully.")
 
-    return impl_params
+    return step_impl_params
 
 def main(configs, dir='static'):
     """

@@ -1,6 +1,5 @@
 import os
-import boto3
-from io import BytesIO
+import json
 import logging
 import torch
 import torch.nn as nn
@@ -122,9 +121,9 @@ def load_pth(path):
     :param path: Local path of the model (e.g., 'models/attn_ae.pth')
     :return: Loaded state_dict
     """
-    model_state_dict = torch.load(path, map_location='cpu')
+    state_dict = torch.load(path, map_location='cpu')
 
-    return model_state_dict
+    return state_dict
 
 def save_pth(model, path):
     """

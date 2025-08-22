@@ -75,9 +75,6 @@ steps:
     parameters:
       model_url: models/attn_ae.zip
 
-      process:
-        loss: BlendedLoss
-
     data:
       loader:
         package: torch_loader          
@@ -103,5 +100,6 @@ steps:
         normalized: True
 
     metrics:
+      - BlendedLoss
       - mae
       - mse
