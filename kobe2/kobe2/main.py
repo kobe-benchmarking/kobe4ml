@@ -51,8 +51,6 @@ def load_module(cfg):
            "pip", 
            "install", 
            "--upgrade",
-           "--force-reinstall",
-           "--no-cache-dir", 
            package]
     
     if index_url:
