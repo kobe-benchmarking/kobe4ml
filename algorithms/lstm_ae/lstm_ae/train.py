@@ -1,6 +1,5 @@
 import torch
 import time
-import json
 import zipfile
 import os
 
@@ -37,7 +36,7 @@ def zip_model(model, save_url, model_params):
     Package the trained model weights and parameters into a zip file for inference.
 
     :param model: Trained PyTorch model.
-    :param save_url: Path to the pth file where the model weights are saved, e.g., models/attn_ae.pth.
+    :param save_url: Path to the pth file where the model weights are saved, e.g., models/lstm_ae.pth.
     :param model_params: Dictionary of model configuration parameters.
     """
     zip_path = save_url.replace('.pth', '.zip')
@@ -96,7 +95,7 @@ def train(data, model, save_url, model_params, process_params, metrics):
 
         model.train()
 
-        for _, (X, _) in enumerate(train_data):
+        for _, (X, _, _) in enumerate(train_data):
             X = X.to(device)
 
             X_dec, _, _ = model(X)
@@ -115,7 +114,7 @@ def train(data, model, save_url, model_params, process_params, metrics):
         total_val_loss = 0.0
 
         with torch.no_grad():
-            for _, (X, _) in enumerate(val_data):
+            for _, (X, _, _) in enumerate(val_data):
                 X = X.to(device)
 
                 X_dec, _, _ = model(X)
@@ -172,7 +171,7 @@ def main(params):
     """
     model_params, dls, metrics, process_params, save_url = params.values()
 
-    model = Attn_Autoencoder(**model_params)
+    model = LSTM_Autoencoder(**model_params)
  
     results = train(data=dls,
                     model=model,

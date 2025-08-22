@@ -34,7 +34,7 @@ def unzip_model(path):
     """
     Extract a model zip file into the model weights and parameters for inference.
 
-    :param path: Path to the zip file created by zip_model, e.g., models/attn_ae.zip
+    :param path: Path to the zip file created by zip_model, e.g., models/lstm_ae.zip
     :return: Tuple (model_pth_path, model_params_dict)
     """
     extract_dir = os.path.dirname(path)
@@ -55,7 +55,7 @@ def infer(data, model, model_pth, metrics):
 
     :param data: Data to test the model on.
     :param model: The model to be evaluated.
-    :param model_pth: Path to the pth file where the model weights are saved, e.g., models/attn_ae.pth.
+    :param model_pth: Path to the pth file where the model weights are saved, e.g., models/lstm_ae.pth.
     :param metrics: List of metric names to calculate (e.g., ['mae', 'mse']).
     :return: Dictionary containing metrics as defined in the input metrics list.
     """
@@ -73,7 +73,7 @@ def infer(data, model, model_pth, metrics):
     criterion = utils.BlendedLoss()
 
     with torch.no_grad():
-        for _, (X, _) in enumerate(data):
+        for _, (X, _, _) in enumerate(data):
             X = X.to(device)
 
             X_dec, _, _ = model(X)
@@ -106,7 +106,7 @@ def main(params):
 
     model_pth, model_params = unzip_model(path=model_url)
 
-    model = Attn_Autoencoder(**model_params)
+    model = LSTM_Autoencoder(**model_params)
  
     metrics = infer(data=dls[0],
                     model=model,
