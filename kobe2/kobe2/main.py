@@ -39,12 +39,12 @@ def load_module(cfg):
     package = cfg["package"]
     index_url = cfg.get("index_url")
 
-    try:
-        module = importlib.import_module(package)
-        logger.info(f"{package} already installed, using it.")
-        return module
-    except ImportError:
-        logger.info(f"{package} not found, installing...")
+    # try:
+    #     module = importlib.import_module(package)
+    #     logger.info(f"{package} already installed, using it.")
+    #     return module
+    # except ImportError:
+    #     logger.info(f"{package} not found, installing...")
 
     cmd = [sys.executable, "-m", "pip", "install", "--upgrade", package]
     if index_url:
