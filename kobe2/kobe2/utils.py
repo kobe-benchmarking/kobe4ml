@@ -59,3 +59,11 @@ def load_yaml(path):
     """
     with open(path, 'r') as file:
         return yaml.safe_load(file)
+
+def split_path(path):
+    """
+    Split a path into (directories, filename), based on the last '/'.
+    """
+    dirs, filename = os.path.split(path)
+    
+    return dirs, filename

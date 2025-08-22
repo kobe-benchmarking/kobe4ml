@@ -83,6 +83,21 @@ def prepare_dls(data, root_dir=None):
 
     return dls
 
+def resolve_path(root_dir, path):
+    """
+    Resolve a relative path to an absolute path based on the root directory.
+
+    :param root_dir: Root directory.
+    :param path: Relative path to resolve.
+    :return: Absolute path or None if the input path is None.
+    """
+    if not path:
+        return None
+    dirs, filename = utils.split_path(path)
+    full_path = utils.get_path(root_dir, dirs, filename=filename)
+
+    return full_path
+
 def load_params(step):
     """
     Load parameters that configure the implementation for a specific step. Handles optional keys: 'model', 'process', 'save_url', 'model_url'.
@@ -107,8 +122,8 @@ def load_params(step):
     dls = prepare_dls(data, root_dir)
     logger.info(f"Data loaders prepared for step {step_id}.")
 
-    save_path = utils.get_dir(root_dir, save_url) if save_url else None
-    model_path = utils.get_path(root_dir, model_url) if model_url else None
+    save_path = resolve_path(root_dir, save_url)
+    model_path = resolve_path(root_dir, model_url)
 
     impl_params = {
         "model_params": model_params if model_params else {},
