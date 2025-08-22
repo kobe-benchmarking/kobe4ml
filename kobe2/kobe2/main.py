@@ -46,7 +46,15 @@ def load_module(cfg):
     # except ImportError:
     #     logger.info(f"{package} not found, installing...")
 
-    cmd = [sys.executable, "-m", "pip", "install", "--upgrade", package]
+    cmd = [sys.executable, 
+           "-m", 
+           "pip", 
+           "install", 
+           "--upgrade",
+           "--force-reinstall",
+           "--no-cache-dir", 
+           package]
+    
     if index_url:
         cmd += ["--extra-index-url", index_url]
 
