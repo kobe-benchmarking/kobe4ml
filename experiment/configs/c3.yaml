@@ -1,27 +1,27 @@
 metadata:
   parent_id: dcoss
-  id: dcoss_01
+  id: dcoss_03
   version: v1
-  name: BitBrain-LSTM-Autoencoder
-  description: This run applies an LSTM autoencoder architecture that learns to reconstruct the BitBrain time series dataset.   
+  name: BitBrain-Attn-Autoencoder
+  description: This run applies an Attention-based autoencoder architecture that learns to reconstruct the BitBrain time series dataset.   
 
 implementation:
-  package: lstm_ae          
+  package: attn_ae          
   index_url: https://kobe-benchmarking.github.io/kobe4ml/
 
 steps:
-  - id: dcoss_01_01
+  - id: dcoss_03_01
     type: prepare
 
     parameters:
-      save_url: models/lstm_ae.pth 
+      save_url: models/attn_ae.pth 
 
       model:
         seq_len: 240
         num_feats: 3
         latent_seq_len: 1
         latent_num_feats: 8
-        hidden_size: 4
+        num_heads: 1
         num_layers: 1
         dropout: 0.05
 
@@ -69,11 +69,11 @@ steps:
       - mae
       - mse
 
-  - id: dcoss_01_02
+  - id: dcoss_03_02
     type: work
 
     parameters:
-      model_url: models/lstm_ae.zip
+      model_url: models/attn_ae.zip
 
     data:
       loader:
