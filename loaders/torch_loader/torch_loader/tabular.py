@@ -154,7 +154,7 @@ class TSDataset(Dataset):
         self.data_path = utils.get_path(dir, filename=f"{name}.npz")
         self.data = utils.load_npz(self.data_path)
         
-        if self.time_include:
+        if time_include:
             self.X = np.concatenate([self.data["features"], self.data["time"]], axis=1)
         else:
             self.X = self.data["features"]
