@@ -61,6 +61,7 @@ def infer(data, model, model_pth, metrics):
     state_dict = utils.load_pth(path=model_pth)
     model.load_state_dict(state_dict)
     model.to(device)
+    model.eval()
 
     batches = len(data)
 
@@ -68,7 +69,7 @@ def infer(data, model, model_pth, metrics):
     total_mae = 0.0
     total_mse = 0.0
 
-    model.eval()
+    criterion = utils.BlendedLoss()
 
     with torch.no_grad():
         for _, (X, _) in enumerate(data):
@@ -76,7 +77,7 @@ def infer(data, model, model_pth, metrics):
 
             X_dec, _, _ = model(X)
 
-            infer_loss = utils.BlendedLoss(X_dec, X)
+            infer_loss = criterion(X_dec, X)
             total_infer_loss += infer_loss.item()
 
             total_mae += mae(X, X_dec)
