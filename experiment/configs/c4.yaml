@@ -6,7 +6,7 @@ metadata:
   description: This run applies a Classifier that classifies time series into sleep stages on the BitBrain dataset.
 
 implementation:
-  package: classifier          
+  package: clf
   index_url: https://kobe-benchmarking.github.io/kobe4ml/
 
 steps:
@@ -14,7 +14,7 @@ steps:
     type: prepare
 
     parameters:
-      save_url: models/classifier.pth 
+      save_url: models/clf.pth 
 
       model:
         seq_len: 240
@@ -71,7 +71,7 @@ steps:
     type: work
 
     parameters:
-      model_url: models/classifier.zip
+      model_url: models/clf.zip
 
     data:
       loader:
