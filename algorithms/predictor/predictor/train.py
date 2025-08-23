@@ -76,7 +76,7 @@ def train(dls, model, save_url, model_params, process_params, metrics):
         for _, (X, Xn, _) in enumerate(train_data):
             X, Xn = X.to(device), Xn.to(device)
 
-            X_dec, _, _ = model(X)
+            X_dec, _ = model(X)
 
             X_dec, _ = utils.separate(src=X_dec, c=[0,1], t=[2])
             Xn, _ = utils.separate(src=Xn, c=[0,1], t=[2])
@@ -98,7 +98,7 @@ def train(dls, model, save_url, model_params, process_params, metrics):
             for _, (X, Xn, _) in enumerate(val_data):
                 X, Xn = X.to(device), Xn.to(device)
 
-                X_dec, _, _ = model(X)
+                X_dec, _ = model(X)
 
                 X_dec, _ = utils.separate(src=X_dec, c=[0,1], t=[2])
                 Xn, _ = utils.separate(src=Xn, c=[0,1], t=[2])
