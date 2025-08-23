@@ -96,135 +96,56 @@ class MultiHeadAttention(nn.Module):
 
         return output, attn_matrix
 
-class Attn_Encoder(nn.Module):
-    def __init__(self, in_size, out_size, num_heads, num_layers, seq_len, dropout):
+class Classifier(nn.Module):
+    def __init__(self, in_size=3, out_size=5, num_heads=1, dropout=0.5, num_layers=1):
         """
-        Multi-Head Attention Encoder module.
-        
+        Classifier model for classification, combining an embedding layer with multi-head attention 
+        and a classifier. The embedding captures complex dependencies in the input data, while the 
+        classifier produces logits for classification.
+
         :param in_size: Size of the input features.
-        :param out_size: Size of the output feature vector.
+        :param out_size: Size of the output classes.
         :param num_heads: Number of attention heads.
-        :param num_layers: Number of attention layers.
-        :param seq_len: Length of the input sequence.
         :param dropout: Dropout rate for regularization.
+        :param num_layers: Number of attention layers.
         """
-        super(Attn_Encoder, self).__init__()
+        super(Classifier, self).__init__()
         
         self.attn_layers = nn.ModuleList([
             MultiHeadAttention(d_model=in_size, num_heads=num_heads) for _ in range(num_layers)
         ])
 
-        self.conv = nn.Conv1d(in_size, out_size, kernel_size=seq_len)
+        self.relu = nn.LeakyReLU()
         self.dropout = nn.Dropout(dropout)
-        
-    def forward(self, x):
-        """
-        Forward pass for Attention Encoder.
-        
-        :param x: Input tensor of shape (batch_size, seq_len, in_size).
-        :return: Encoded output tensor of shape (batch_size, out_size) and attention matrix of shape (batch_size, seq_len, in_size).
-        """
-        for attn_layer in self.attn_layers:
-            output, attn_matrix = attn_layer(Q=x, K=x, V=x)
-            x = x + output
+        self.linear = nn.Linear(in_size, out_size)
 
-        x = self.dropout(x)
-        
-        x = x.transpose(1, 2)
-        x = self.conv(x)
-        x = x.squeeze(2)
-        
-        return x, attn_matrix
+        self.init_weights()
 
-class Attn_Decoder(nn.Module):
-    def __init__(self, in_size, out_size, num_heads, num_layers, seq_len, dropout):
+    def init_weights(self):
         """
-        Multi-Head Attention Decoder module.
-        
-        :param in_size: Size of the input features.
-        :param out_size: Size of the output feature vector.
-        :param num_heads: Number of attention heads.
-        :param num_layers: Number of attention layers.
-        :param seq_len: Length of the output sequence.
-        :param dropout: Dropout rate for regularization.
+        Initialize the weights and biases of the classifier linear layer:
+        - Set the bias of the classifier linear layer to zero.
+        - Initialize the weights with values drawn from a Xavier uniform distribution.
         """
-        super(Attn_Decoder, self).__init__()
-        
-        self.seq_len = seq_len
-
-        self.attn_layers = nn.ModuleList([
-            MultiHeadAttention(d_model=in_size, num_heads=num_heads) for _ in range(num_layers)
-        ])
-        
-        self.conv_transpose = nn.ConvTranspose1d(in_channels=out_size, out_channels=in_size, kernel_size=seq_len)
-        self.dropout = nn.Dropout(dropout)
+        self.linear.bias.data.zero_()
+        nn.init.xavier_uniform_(self.linear.weight.data)             
     
     def forward(self, x):
         """
-        Forward pass for Attention Decoder.
-        
-        :param x: Encoded input tensor of shape (batch_size, out_size).
-        :return: Decoded output tensor and attention matrix, both of shape (batch_size, seq_len, in_size).
-        """
-        x = x.unsqueeze(1)
-        x = x.transpose(1, 2)
-        x = self.conv_transpose(x)
-        x = x.transpose(1, 2)
-
-        x = self.dropout(x)
-
-        for attn_layer in self.attn_layers:
-            output, attn_matrix = attn_layer(Q=x, K=x, V=x)
-            x = x + output
-        
-        return x, attn_matrix
-
-class Attn_Autoencoder(nn.Module):
-    def __init__(self, seq_len, num_feats, latent_seq_len, latent_num_feats, num_heads, num_layers, dropout=0.5):
-        """
-        Multi-Head Attention-based Autoencoder module combining an encoder and a decoder. This module 
-        uses multi-head attention mechanisms to capture complex dependencies in the input data, and 
-        applies 1D convolutional layers to reduce the sequence length.
-        
-        :param seq_len: Length of the input sequence.
-        :param num_feats: Number of features in the input.
-        :param latent_seq_len: Length of the latent sequence.
-        :param latent_num_feats: Number of features in the latent representation.
-        :param num_heads: Number of attention heads.
-        :param num_layers: Number of attention layers.
-        :param dropout: Dropout rate for regularization.
-        """
-        super(Attn_Autoencoder, self).__init__()
-
-        self.latent_seq_len = latent_seq_len
-        self.latent_num_feats = latent_num_feats
-        
-        self.encoder = Attn_Encoder(in_size=num_feats,
-                                    out_size=latent_seq_len * latent_num_feats,
-                                    num_heads=num_heads,
-                                    num_layers=num_layers,
-                                    seq_len=seq_len,
-                                    dropout=dropout)
-
-        self.decoder = Attn_Decoder(in_size=num_feats,
-                                    out_size=latent_seq_len * latent_num_feats,
-                                    num_heads=num_heads,
-                                    num_layers=num_layers,
-                                    seq_len=seq_len,
-                                    dropout=dropout)                       
-    
-    def forward(self, x):
-        """
-        Forward pass for Attention Autoencoder.
+        Forward pass for Classifier.
         
         :param x: Input tensor of shape (batch_size, seq_len, num_feats).
-        :return: Decoded output, latent representation, and averaged attention matrix.
+        :return: Tuple containing:
+            - Logits of shape (batch_size, seq_len, out_size) for classification.
+            - Attention matrix tensor of shape (batch_size, seq_length, in_size).
         """
-        enc_x, enc_attn_matrix = self.encoder(x)
-        dec_x, dec_attn_matrix = self.decoder(enc_x)
+        for attn_layer in self.attn_layers:
+            output, attn_matrix = attn_layer(Q=x, K=x, V=x)
+            x = x + output
+        
+        x = self.dropout(x)
+        x = self.relu(x)
 
-        latent = enc_x.view(enc_x.size(0), self.latent_seq_len, self.latent_num_feats)
-
-        attn_matrix = (enc_attn_matrix + dec_attn_matrix) / 2
-
-        return dec_x, latent, attn_matrix
+        logits = self.linear(x)
+        
+        return logits, attn_matrix

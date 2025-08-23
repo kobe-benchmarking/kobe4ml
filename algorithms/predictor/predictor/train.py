@@ -11,32 +11,12 @@ logger = utils.get_logger(level='CRITICAL')
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 logger.info(f'Device is {device}')
 
-def mae(X, X_dec):
-    """
-    Compute Mean Absolute Error (MAE) manually.
-
-    :param X: Original input tensor.
-    :param X_dec: Reconstructed output tensor.
-    :return: MAE value.
-    """
-    return torch.mean(torch.abs(X - X_dec)).item()
-
-def mse(X, X_dec):
-    """
-    Compute Mean Squared Error (MSE) manually.
-
-    :param X: Original input tensor.
-    :param X_dec: Reconstructed output tensor.
-    :return: MSE value.
-    """
-    return torch.mean((X - X_dec) ** 2).item()
-
 def zip_model(model, save_url, model_params):
     """
     Package the trained model weights and parameters into a zip file for inference.
 
     :param model: Trained PyTorch model.
-    :param save_url: Path to the pth file where the model weights are saved, e.g., models/attn_ae.pth.
+    :param save_url: Path to the pth file where the model weights are saved, e.g., models/classifier.pth.
     :param model_params: Dictionary of model configuration parameters.
     """
     zip_path = save_url.replace('.pth', '.zip')
@@ -56,14 +36,14 @@ def zip_model(model, save_url, model_params):
 
 def train(data, model, save_url, model_params, process_params, metrics):
     """
-    Train the model on the provided data and calculate the train loss, MAE, and MSE.
+    Train the model on the provided data and calculate the training metrics.
 
     :param data: Tuple containing (train_data, val_data), where each is a DataLoader.
     :param model: The model to be trained.
     :param save_url: Path to save the trained model.
     :param model_params: Dictionary containing model configuration parameters.
     :param process_params: Dictionary containing process parameters.
-    :param metrics: List of metric names to calculate (e.g., ['mae', 'mse']).
+    :param metrics: List of metric names to calculate (e.g., train_loss).
     :return: Dictionary containing metrics as defined in the input metrics list.
     """
     loss, epochs, patience, lr, optimizer, scheduler = process_params.values()
@@ -84,23 +64,24 @@ def train(data, model, save_url, model_params, process_params, metrics):
     train_time = 0.0
     best_val_loss = float('inf')
     stationary = 0
-    train_losses, val_losses, maes, mses = [], [], [], []
+    train_losses, val_losses = [], []
 
     for epoch in range(epochs):
         start = time.time()
-
         total_train_loss = 0.0
-        total_mae = 0.0
-        total_mse = 0.0
 
         model.train()
 
-        for _, (X, _, _) in enumerate(train_data):
-            X = X.to(device)
+        for _, (X, _, y) in enumerate(train_data):
+            X, y = X.to(device), y.to(device)
 
-            X_dec, _, _ = model(X)
+            y_pred, _ = model(X)
 
-            train_loss = criterion(X_dec, X)
+            batch_size, seq_len, num_classes = y_pred.size()
+            y_pred = y_pred.reshape(batch_size * seq_len, num_classes)
+            y = y.reshape(batch_size * seq_len)
+
+            train_loss = criterion(y_pred, y)
             optimizer.zero_grad()
             train_loss.backward()
             optimizer.step()
@@ -114,24 +95,20 @@ def train(data, model, save_url, model_params, process_params, metrics):
         total_val_loss = 0.0
 
         with torch.no_grad():
-            for _, (X, _, _) in enumerate(val_data):
-                X = X.to(device)
+            for _, (X, _, y) in enumerate(val_data):
+                X, y = X.to(device), y.to(device)
 
-                X_dec, _, _ = model(X)
+                y_pred, _ = model(X)
 
-                val_loss = criterion(X_dec, X)
+                batch_size, seq_len, num_classes = y_pred.size()
+                y_pred = y_pred.reshape(batch_size * seq_len, num_classes)
+                y = y.reshape(batch_size * seq_len)
+
+                val_loss = criterion(y_pred, y)
                 total_val_loss += val_loss.item()
 
-                total_mae += mae(X, X_dec)
-                total_mse += mse(X, X_dec)
-
         avg_val_loss = total_val_loss / batches
-        avg_mae = total_mae / batches
-        avg_mse = total_mse / batches
-
         val_losses.append(avg_val_loss)
-        maes.append(avg_mae)
-        mses.append(avg_mse)
 
         end = time.time()
         duration = end - start
@@ -156,9 +133,7 @@ def train(data, model, save_url, model_params, process_params, metrics):
         'epochs': epoch + 1,
         'train_time': train_time,
         'best_train_loss': best_train_loss,
-        'best_val_loss': best_val_loss,
-        'mae': avg_mae,
-        'mse': avg_mse
+        'best_val_loss': best_val_loss
     }
 
     filtered_metrics = {metric: all_metrics[metric] for metric in metrics if metric in all_metrics}
@@ -171,7 +146,7 @@ def main(params):
     """
     model_params, dls, metrics, process_params, save_url = params.values()
 
-    model = Attn_Autoencoder(**model_params)
+    model = Classifier(**model_params)
  
     results = train(data=dls,
                     model=model,

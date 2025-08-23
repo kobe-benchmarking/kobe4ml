@@ -11,26 +11,6 @@ logger = utils.get_logger(level='CRITICAL')
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 logger.info(f'Device is {device}')
 
-def mae(X, X_dec):
-    """
-    Compute Mean Absolute Error (MAE) manually.
-
-    :param X: Original input tensor.
-    :param X_dec: Reconstructed output tensor.
-    :return: MAE value.
-    """
-    return torch.mean(torch.abs(X - X_dec)).item()
-
-def mse(X, X_dec):
-    """
-    Compute Mean Squared Error (MSE) manually.
-
-    :param X: Original input tensor.
-    :param X_dec: Reconstructed output tensor.
-    :return: MSE value.
-    """
-    return torch.mean((X - X_dec) ** 2).item()
-
 def zip_model(model, save_url, model_params):
     """
     Package the trained model weights and parameters into a zip file for inference.
@@ -84,14 +64,11 @@ def train(data, model, save_url, model_params, process_params, metrics):
     train_time = 0.0
     best_val_loss = float('inf')
     stationary = 0
-    train_losses, val_losses, maes, mses = [], [], [], []
+    train_losses, val_losses = [], []
 
     for epoch in range(epochs):
         start = time.time()
-
         total_train_loss = 0.0
-        total_mae = 0.0
-        total_mse = 0.0
 
         model.train()
 
@@ -122,16 +99,8 @@ def train(data, model, save_url, model_params, process_params, metrics):
                 val_loss = criterion(X_dec, X)
                 total_val_loss += val_loss.item()
 
-                total_mae += mae(X, X_dec)
-                total_mse += mse(X, X_dec)
-
         avg_val_loss = total_val_loss / batches
-        avg_mae = total_mae / batches
-        avg_mse = total_mse / batches
-
         val_losses.append(avg_val_loss)
-        maes.append(avg_mae)
-        mses.append(avg_mse)
 
         end = time.time()
         duration = end - start
@@ -156,9 +125,7 @@ def train(data, model, save_url, model_params, process_params, metrics):
         'epochs': epoch + 1,
         'train_time': train_time,
         'best_train_loss': best_train_loss,
-        'best_val_loss': best_val_loss,
-        'mae': avg_mae,
-        'mse': avg_mse
+        'best_val_loss': best_val_loss
     }
 
     filtered_metrics = {metric: all_metrics[metric] for metric in metrics if metric in all_metrics}

@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.optim.lr_scheduler as sched
+import torch.nn.functional as F
 
 def get_logger(level='DEBUG'):
     """
@@ -82,36 +83,40 @@ def get_sched(optimizer, name, **params):
 
     return scheduler
     
-class BlendedLoss(nn.Module):
-    def __init__(self, p=1.0, epsilon=1e-6, blend=0.8):
+class WeightedCrossEntropyLoss(nn.Module):
+    def __init__(self, weights):
         """
-        Initialize the BlendedLoss module.
+        Initialize the WeightedCrossEntropyLoss module.
 
-        :param p: Power to which the differences are raised.
-        :param epsilon: Small value added for numerical stability.
-        :param blend: Blend factor between median and mean.
+        :param weights: dictionary
         """
-        super(BlendedLoss, self).__init__()
-        self.p = p
-        self.epsilon = epsilon
-        self.blend = blend
+        super(WeightedCrossEntropyLoss, self).__init__()
+        self.weights = self.get_weights(weights)
 
-    def forward(self, input, target):
+    def get_weights(self, weights):
         """
-        Compute the blended loss between the input and target.
+        Extract weights from the given dictionary and convert them to a tensor.
 
-        :param input: Tensor containing the predicted values.
-        :param target: Tensor containing the target values.
-        :return: Computed blended loss.
+        :param weights: dictionary
+        :return: tensor
         """
-        diff = torch.abs(input - target) + self.epsilon
+        weights = [weights[i] for i in range(len(weights))]
 
-        powered_diff = diff ** self.p
-        median_diff = (1 - self.blend) * torch.median(powered_diff)
-        mean_diff = self.blend * torch.mean(powered_diff)
-        
-        loss = median_diff + mean_diff
-        
+        return torch.tensor(weights, dtype=torch.float)
+
+    def forward(self, pred, true):
+        """
+        Compute the weighted cross-entropy loss.
+
+        :param pred: tensor (batch_size * seq_len, num_classes)
+        :param true: tensor (batch_size * seq_len)
+        :return: tensor
+        """
+        if true.size(0) == 0 or pred.size(0) == 0:
+            return torch.tensor(0.0, requires_grad=True, device=pred.device)
+
+        loss = F.cross_entropy(pred, true, weight=self.weights.to(pred.device))
+
         return loss
 
 def load_pth(path):

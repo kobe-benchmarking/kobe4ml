@@ -100,3 +100,6 @@ steps:
 
     metrics:
       - WeightedCrossEntropyLoss
+      - precision
+      - recall
+      - f1_score
