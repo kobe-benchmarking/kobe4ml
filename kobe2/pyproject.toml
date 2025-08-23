@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "kobe2"
-version = "0.25"
+version = "0.26"
 packages = [
     { include = "kobe2" }
 ]
@@ -12,8 +12,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.9,<3.14"        
 pandas = "^2.1"
-numpy = "^1.26"
-mne = "^1.7"      
+numpy = "^1.26"    
 
 [build-system]
 requires = ["poetry-core"]
