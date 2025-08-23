@@ -34,11 +34,11 @@ def zip_model(model, save_url, model_params):
 
     logger.info(f"Packaged {save_url} and {json_url} into {zip_path}.")
 
-def train(data, model, save_url, model_params, process_params, metrics):
+def train(dls, model, save_url, model_params, process_params, metrics):
     """
     Train the model on the provided data and calculate the training metrics.
 
-    :param data: Tuple containing (train_data, val_data), where each is a DataLoader.
+    :param dls: Tuple containing (loaders, weights).
     :param model: The model to be trained.
     :param save_url: Path to save the trained model.
     :param model_params: Dictionary containing model configuration parameters.
@@ -48,15 +48,16 @@ def train(data, model, save_url, model_params, process_params, metrics):
     """
     loss, epochs, patience, lr, optimizer, scheduler = process_params.values()
 
-    if hasattr(utils, loss):
-        criterion = getattr(utils, loss)()
-    else:
-        raise ValueError(f"Loss function '{loss}' not found in utils")
-
     model.to(device)
 
+    data, weights = dls
     train_data, val_data = data
     batches = len(train_data)
+
+    if hasattr(utils, loss):
+        criterion = getattr(utils, loss)(weights)
+    else:
+        raise ValueError(f"Loss function '{loss}' not found in utils")
     
     optimizer = utils.get_optim(optimizer, model, lr)
     scheduler = utils.get_sched(optimizer, scheduler['name'], **scheduler['params'])
@@ -148,7 +149,7 @@ def main(params):
 
     model = Classifier(**model_params)
  
-    results = train(data=dls,
+    results = train(dls=dls,
                     model=model,
                     save_url=save_url,
                     model_params=model_params,

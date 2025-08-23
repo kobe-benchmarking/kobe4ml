@@ -41,6 +41,7 @@ steps:
 
       name: bitbrain
       location: datasets/bitbrain_conv
+      weight: majority
 
       parameters:
         process: prepare
@@ -78,6 +79,7 @@ steps:
 
       name: bitbrain
       location: datasets/bitbrain_conv
+      weight: majority
 
       parameters:
         process: work

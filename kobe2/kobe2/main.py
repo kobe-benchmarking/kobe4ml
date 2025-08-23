@@ -65,15 +65,16 @@ def load_module(cfg):
 
 def prepare_dls(data, root_dir=None):
     """
-    Prepare data loaders based on the provided data configuration.
+    Prepare loaders and weights based on the provided data configuration.
 
     :param data: Dictionary containing data configuration.
     :param root_dir: Root directory for data storage.
-    :return: Data loaders.
+    :return: Tuple (loaders, weights).
     """
     loader = data['loader']
     loc = data['location']
     name = data['name']
+    label = data['weight']
     params = data['parameters']
 
     ds_dir = utils.get_dir(root_dir, loc)
@@ -85,9 +86,12 @@ def prepare_dls(data, root_dir=None):
     }
 
     loader_module = load_module(cfg=loader)
-    dls = loader_module.preprocess(**loader_params)
+    loaders = loader_module.preprocess(**loader_params)
 
-    return dls
+    weights_path = utils.get_path(ds_dir, filename=f"{name}-weights.json")
+    weights = utils.load_json(weights_path)
+
+    return (loaders, weights[label])
 
 def resolve_path(root_dir, path):
     """

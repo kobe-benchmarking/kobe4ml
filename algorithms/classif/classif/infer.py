@@ -59,11 +59,11 @@ def unzip_model(path):
 
     return model_pth, model_params
 
-def infer(data, model, model_pth, metrics):
+def infer(dls, model, model_pth, metrics):
     """
     Test the model on the provided data and calculate the inference metrics.
 
-    :param data: Data to test the model on.
+    :param dls: Tuple containing (loaders, weights).
     :param model: The model to be evaluated.
     :param model_pth: Path to the pth file where the model weights are saved, e.g., models/classifier.pth.
     :param metrics: List of metric names to calculate (e.g., WeightedCrossEntropyLoss).
@@ -74,6 +74,8 @@ def infer(data, model, model_pth, metrics):
     model.to(device)
     model.eval()
 
+    data, weights = dls
+    data = data[0]
     batches = len(data)
 
     total_infer_loss = 0.0
@@ -81,7 +83,7 @@ def infer(data, model, model_pth, metrics):
     total_recall = 0.0
     total_f1 = 0.0
 
-    criterion = utils.WeightedCrossEntropyLoss()
+    criterion = utils.WeightedCrossEntropyLoss(weights)
 
     with torch.no_grad():
         for _, (X, _, y) in enumerate(data):
@@ -126,7 +128,7 @@ def main(params):
 
     model = Classifier(**model_params)
  
-    metrics = infer(data=dls[0],
+    metrics = infer(dls=dls,
                     model=model,
                     model_pth=model_pth,
                     metrics=metrics)
