@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "conv_lstm_ae"
-version = "0.3"
+name = "classifier"
+version = "0.1"
 packages = [
-    { include = "conv_lstm_ae" }
+    { include = "classifier" }
 ]
-description = "Convolutional LSTM Autoencoder"
+description = "Classifier"
 authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
 	        "Stasinos Konstantopoulos <konstant@iit.demokritos.gr>" ]
 readme = "README.md"

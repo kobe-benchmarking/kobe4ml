@@ -6,7 +6,7 @@ packages = [
 ]
 description = "Attention-based Autoencoder"
 authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
-	    "Stasinos Konstantopoulos <konstant@iit.demokritos.gr>" ]
+	        "Stasinos Konstantopoulos <konstant@iit.demokritos.gr>" ]
 readme = "README.md"
 
 [tool.poetry.dependencies]

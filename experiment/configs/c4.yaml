@@ -22,6 +22,7 @@ steps:
         out_size: 5
         num_heads: 1
         dropout: 0.5
+        num_layers: 1
 
       process:
         loss: WeightedCrossEntropyLoss
@@ -99,5 +100,3 @@ steps:
 
     metrics:
       - WeightedCrossEntropyLoss
-      - mae
-      - mse
