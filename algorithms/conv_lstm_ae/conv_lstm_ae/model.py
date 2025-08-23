@@ -53,8 +53,6 @@ class ConvLSTM_Decoder(nn.Module):
 
         lstm_dropout = 0 if num_layers == 1 else dropout
         
-        self.seq_len = seq_len
-        
         self.lstm = nn.LSTM(hidden_size, in_size, num_layers, batch_first=True, dropout=lstm_dropout)
         self.conv_transpose = nn.ConvTranspose1d(in_channels=out_size, out_channels=hidden_size, kernel_size=seq_len)
         self.dropout = nn.Dropout(dropout)

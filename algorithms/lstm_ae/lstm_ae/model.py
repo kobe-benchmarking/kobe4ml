@@ -36,7 +36,7 @@ class LSTM_Encoder(nn.Module):
         return x
 
 class LSTM_Decoder(nn.Module):
-    def __init__(self, in_size, hidden_size, out_size, num_layers, seq_len, dropout):
+    def __init__(self, in_size, hidden_size, out_size, num_layers, dropout):
         """
         LSTM Decoder module.
         
@@ -44,14 +44,11 @@ class LSTM_Decoder(nn.Module):
         :param hidden_size: Number of features in the hidden state.
         :param out_size: Size of the output feature vector.
         :param num_layers: Number of stacked LSTM layers.
-        :param seq_len: Length of the output sequence.
         :param dropout: Dropout rate for regularization.
         """
         super(LSTM_Decoder, self).__init__()
 
         lstm_dropout = 0 if num_layers == 1 else dropout
-        
-        self.seq_len = seq_len
         
         self.fc = nn.Linear(out_size, hidden_size)
         self.lstm = nn.LSTM(hidden_size, in_size, num_layers, batch_first=True, dropout=lstm_dropout)
@@ -64,22 +61,23 @@ class LSTM_Decoder(nn.Module):
         :param x: Encoded input tensor of shape (batch_size, out_size).
         :return: Decoded output tensor of shape (batch_size, seq_len, in_size).
         """
+        _, seq_len, _ = x.size()
+
         x = self.fc(x)
         x = self.dropout(x)
-        x = x.unsqueeze(1).repeat(1, self.seq_len, 1)
+        x = x.unsqueeze(1).repeat(1, seq_len, 1)
 
         x, _ = self.lstm(x)
         
         return x
 
 class LSTM_Autoencoder(nn.Module):
-    def __init__(self, seq_len, num_feats, latent_seq_len, latent_num_feats, hidden_size, num_layers, dropout=0.5):
+    def __init__(self, num_feats, latent_seq_len, latent_num_feats, hidden_size, num_layers, dropout=0.5):
         """
         LSTM-based Autoencoder module combining an encoder and a decoder. This module uses LSTM layers 
         to capture temporal dependencies in sequential data and reduces the sequence length by taking 
         the last element of the sequence.
         
-        :param seq_len: Length of the input sequence.
         :param num_feats: Number of features in the input.
         :param latent_seq_len: Length of the latent sequence.
         :param latent_num_feats: Number of features in the latent representation.
@@ -102,7 +100,6 @@ class LSTM_Autoencoder(nn.Module):
                                     hidden_size=hidden_size, 
                                     out_size=latent_seq_len * latent_num_feats, 
                                     num_layers=num_layers,
-                                    seq_len=seq_len,
                                     dropout=dropout)                       
     
     def forward(self, x):

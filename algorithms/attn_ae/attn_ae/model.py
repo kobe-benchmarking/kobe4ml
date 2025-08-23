@@ -6,7 +6,7 @@ class MultiHeadAttention(nn.Module):
     def __init__(self, d_model, num_heads):
         """
         Initialize the Multi-Head Attention module. The module computes the attention matrix 
-        with shape torch.Size([batch_size, seq_length, d_model]), which can be accessed 
+        with shape torch.Size([batch_size, seq_len, d_model]), which can be accessed 
         as model.encoder[layer_id].self_attn.attn_matrix.
 
         :param d_model: dimension of the input and output features
@@ -52,12 +52,12 @@ class MultiHeadAttention(nn.Module):
         """
         Split the input into multiple heads.
 
-        :param x: Tensor (batch_size, seq_length, d_model).
-        :return: Tensor (batch_size, num_heads, seq_length, d_k).
+        :param x: Tensor (batch_size, seq_len, d_model).
+        :return: Tensor (batch_size, num_heads, seq_len, d_k).
         """
-        batch_size, seq_length, _ = x.size()
+        batch_size, seq_len, _ = x.size()
 
-        x = x.view(batch_size, seq_length, self.num_heads, self.d_k)
+        x = x.view(batch_size, seq_len, self.num_heads, self.d_k)
         x = x.transpose(1, 2)
         
         return x
@@ -66,13 +66,13 @@ class MultiHeadAttention(nn.Module):
         """
         Combine multiple heads into a single tensor.
 
-        :param x: Tensor (batch_size, num_heads, seq_length, d_k).
-        :return: Tensor (batch_size, seq_length, d_model).
+        :param x: Tensor (batch_size, num_heads, seq_len, d_k).
+        :return: Tensor (batch_size, seq_len, d_model).
         """
-        batch_size, _, seq_length, _ = x.size()
+        batch_size, _, seq_len, _ = x.size()
 
         x = x.transpose(1, 2).contiguous()
-        x = x.view(batch_size, seq_length, self.d_model)
+        x = x.view(batch_size, seq_len, self.d_model)
         
         return x
         
@@ -149,8 +149,6 @@ class Attn_Decoder(nn.Module):
         :param dropout: Dropout rate for regularization.
         """
         super(Attn_Decoder, self).__init__()
-        
-        self.seq_len = seq_len
 
         self.attn_layers = nn.ModuleList([
             MultiHeadAttention(d_model=in_size, num_heads=num_heads) for _ in range(num_layers)
