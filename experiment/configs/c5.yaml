@@ -65,8 +65,6 @@ steps:
       - train_time
       - best_train_loss
       - best_val_loss
-      - mae
-      - mse
 
   - id: dcoss_05_02
     type: work
