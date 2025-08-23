@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "classifier"
-version = "0.1"
+version = "0.2"
 packages = [
     { include = "classifier" }
 ]
