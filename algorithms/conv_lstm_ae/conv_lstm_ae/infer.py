@@ -110,7 +110,7 @@ def main(params):
 
     model = ConvLSTM_Autoencoder(**model_params)
  
-    metrics = infer(data=dls,
+    metrics = infer(dls=dls,
                     model=model,
                     model_pth=model_pth,
                     metrics=metrics)
