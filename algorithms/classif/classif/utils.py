@@ -100,9 +100,10 @@ class WeightedCrossEntropyLoss(nn.Module):
         :param weights: dictionary
         :return: tensor
         """
-        weights = [weights[i] for i in range(len(weights))]
+        weights = {int(k): v for k, v in weights.items()}
+        weights_list = [weights[i] for i in range(len(weights))]
 
-        return torch.tensor(weights, dtype=torch.float)
+        return torch.tensor(weights_list, dtype=torch.float)
 
     def forward(self, pred, true):
         """
