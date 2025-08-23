@@ -26,14 +26,15 @@ class LSTM_Encoder(nn.Module):
         :param x: Input tensor of shape (batch_size, seq_len, in_size).
         :return: Encoded output tensor of shape (batch_size, out_size).
         """
+        _, seq_len, _ = x.size()
+
         x, _ = self.lstm(x)
-
         x = x[:, -1, :]
-        x = self.dropout(x)
 
+        x = self.dropout(x)
         x = self.fc(x)
         
-        return x
+        return x, seq_len
 
 class LSTM_Decoder(nn.Module):
     def __init__(self, in_size, hidden_size, out_size, num_layers, dropout):
@@ -54,15 +55,13 @@ class LSTM_Decoder(nn.Module):
         self.lstm = nn.LSTM(hidden_size, in_size, num_layers, batch_first=True, dropout=lstm_dropout)
         self.dropout = nn.Dropout(dropout)
     
-    def forward(self, x):
+    def forward(self, x, seq_len):
         """
         Forward pass for LSTM Decoder.
         
         :param x: Encoded input tensor of shape (batch_size, out_size).
         :return: Decoded output tensor of shape (batch_size, seq_len, in_size).
         """
-        _, seq_len, _ = x.size()
-
         x = self.fc(x)
         x = self.dropout(x)
         x = x.unsqueeze(1).repeat(1, seq_len, 1)
@@ -109,8 +108,8 @@ class LSTM_Autoencoder(nn.Module):
         :param x: Input tensor of shape (batch_size, seq_len, num_feats).
         :return: Decoded output and latent representation.
         """
-        enc_x = self.encoder(x)
-        dec_x = self.decoder(enc_x)
+        enc_x, seq_len = self.encoder(x)
+        dec_x = self.decoder(enc_x, seq_len)
 
         latent = enc_x.view(enc_x.size(0), self.latent_seq_len, self.latent_num_feats)
         
