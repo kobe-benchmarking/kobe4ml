@@ -78,6 +78,9 @@ def infer(data, model, model_pth, metrics):
 
             X_dec, _, _ = model(X)
 
+            X_dec = utils.separate(src=X_dec, c=[0,1], t=[2])
+            X = utils.separate(src=X, c=[0,1], t=[2])
+
             infer_loss = criterion(X_dec, X)
             total_infer_loss += infer_loss.item()
 

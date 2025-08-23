@@ -77,6 +77,9 @@ def train(data, model, save_url, model_params, process_params, metrics):
 
             X_dec, _, _ = model(X)
 
+            X_dec = utils.separate(src=X_dec, c=[0,1], t=[2])
+            X = utils.separate(src=X, c=[0,1], t=[2])
+
             train_loss = criterion(X_dec, X)
             optimizer.zero_grad()
             train_loss.backward()
@@ -95,6 +98,9 @@ def train(data, model, save_url, model_params, process_params, metrics):
                 X = X.to(device)
 
                 X_dec, _, _ = model(X)
+
+                X_dec = utils.separate(src=X_dec, c=[0,1], t=[2])
+                X = utils.separate(src=X, c=[0,1], t=[2])
 
                 val_loss = criterion(X_dec, X)
                 total_val_loss += val_loss.item()

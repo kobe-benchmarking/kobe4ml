@@ -96,48 +96,33 @@ class MultiHeadAttention(nn.Module):
 
         return output, attn_matrix
 
-class Classifier(nn.Module):
-    def __init__(self, in_size=3, out_size=5, num_heads=1, dropout=0.5, num_layers=1):
+class Predictor(nn.Module):
+    def __init__(self, num_feats=3, num_heads=1, dropout=0.5, num_layers=1):
         """
-        Classifier model for classification, combining an embedding layer with multi-head attention 
-        and a classifier. The embedding captures complex dependencies in the input data, while the 
-        classifier produces logits for classification.
+        Predictor model for sequence-to-sequence prediction, combining an embedding layer with 
+        multi-head attention mechanisms. The embedding extracts features from the input sequence.
 
-        :param in_size: Size of the input features.
-        :param out_size: Size of the output classes.
+        :param num_feats: Number of features in the input data.
         :param num_heads: Number of attention heads.
         :param dropout: Dropout rate for regularization.
-        :param num_layers: Number of attention layers.
         """
-        super(Classifier, self).__init__()
-        
+        super(Predictor, self).__init__()    
+
         self.attn_layers = nn.ModuleList([
-            MultiHeadAttention(d_model=in_size, num_heads=num_heads) for _ in range(num_layers)
+            MultiHeadAttention(d_model=num_feats, num_heads=num_heads) for _ in range(num_layers)
         ])
 
         self.relu = nn.LeakyReLU()
         self.dropout = nn.Dropout(dropout)
-        self.linear = nn.Linear(in_size, out_size)
-
-        self.init_weights()
-
-    def init_weights(self):
-        """
-        Initialize the weights and biases of the classifier linear layer:
-        - Set the bias of the classifier linear layer to zero.
-        - Initialize the weights with values drawn from a Xavier uniform distribution.
-        """
-        self.linear.bias.data.zero_()
-        nn.init.xavier_uniform_(self.linear.weight.data)             
     
     def forward(self, x):
         """
-        Forward pass for Classifier.
+        Forward pass for the Predictor model.
         
         :param x: Input tensor of shape (batch_size, seq_len, num_feats).
         :return: Tuple containing:
-            - Logits of shape (batch_size, seq_len, out_size) for classification.
-            - Attention matrix tensor of shape (batch_size, seq_length, in_size).
+            - Output tensor of shape (batch_size, seq_len, num_feats).
+            - Attention matrix tensor of shape (batch_size, seq_length, num_feats).
         """
         for attn_layer in self.attn_layers:
             output, attn_matrix = attn_layer(Q=x, K=x, V=x)
@@ -145,7 +130,5 @@ class Classifier(nn.Module):
         
         x = self.dropout(x)
         x = self.relu(x)
-
-        logits = self.linear(x)
         
-        return logits, attn_matrix
+        return x, attn_matrix

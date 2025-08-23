@@ -16,7 +16,7 @@ def zip_model(model, save_url, model_params):
     Package the trained model weights and parameters into a zip file for inference.
 
     :param model: Trained PyTorch model.
-    :param save_url: Path to the pth file where the model weights are saved, e.g., models/classifier.pth.
+    :param save_url: Path to the pth file where the model weights are saved, e.g., models/attn_ae.pth.
     :param model_params: Dictionary of model configuration parameters.
     """
     zip_path = save_url.replace('.pth', '.zip')
@@ -36,14 +36,14 @@ def zip_model(model, save_url, model_params):
 
 def train(data, model, save_url, model_params, process_params, metrics):
     """
-    Train the model on the provided data and calculate the training metrics.
+    Train the model on the provided data and calculate the train loss, MAE, and MSE.
 
     :param data: Tuple containing (train_data, val_data), where each is a DataLoader.
     :param model: The model to be trained.
     :param save_url: Path to save the trained model.
     :param model_params: Dictionary containing model configuration parameters.
     :param process_params: Dictionary containing process parameters.
-    :param metrics: List of metric names to calculate (e.g., train_loss).
+    :param metrics: List of metric names to calculate (e.g., ['mae', 'mse']).
     :return: Dictionary containing metrics as defined in the input metrics list.
     """
     loss, epochs, patience, lr, optimizer, scheduler = process_params.values()
@@ -72,16 +72,15 @@ def train(data, model, save_url, model_params, process_params, metrics):
 
         model.train()
 
-        for _, (X, _, y) in enumerate(train_data):
-            X, y = X.to(device), y.to(device)
+        for _, (X, Xn, _) in enumerate(train_data):
+            X, Xn = X.to(device), Xn.to(device)
 
-            y_pred, _ = model(X)
+            X_dec, _, _ = model(X)
 
-            batch_size, seq_len, num_classes = y_pred.size()
-            y_pred = y_pred.reshape(batch_size * seq_len, num_classes)
-            y = y.reshape(batch_size * seq_len)
+            X_dec = utils.separate(src=X_dec, c=[0,1], t=[2])
+            Xn = utils.separate(src=Xn, c=[0,1], t=[2])
 
-            train_loss = criterion(y_pred, y)
+            train_loss = criterion(X_dec, Xn)
             optimizer.zero_grad()
             train_loss.backward()
             optimizer.step()
@@ -95,16 +94,15 @@ def train(data, model, save_url, model_params, process_params, metrics):
         total_val_loss = 0.0
 
         with torch.no_grad():
-            for _, (X, _, y) in enumerate(val_data):
-                X, y = X.to(device), y.to(device)
+            for _, (X, Xn, _) in enumerate(val_data):
+                X, Xn = X.to(device), Xn.to(device)
 
-                y_pred, _ = model(X)
+                X_dec, _, _ = model(X)
 
-                batch_size, seq_len, num_classes = y_pred.size()
-                y_pred = y_pred.reshape(batch_size * seq_len, num_classes)
-                y = y.reshape(batch_size * seq_len)
+                X_dec = utils.separate(src=X_dec, c=[0,1], t=[2])
+                Xn = utils.separate(src=Xn, c=[0,1], t=[2])
 
-                val_loss = criterion(y_pred, y)
+                val_loss = criterion(X_dec, Xn)
                 total_val_loss += val_loss.item()
 
         avg_val_loss = total_val_loss / batches
@@ -146,7 +144,7 @@ def main(params):
     """
     model_params, dls, metrics, process_params, save_url = params.values()
 
-    model = Classifier(**model_params)
+    model = Predictor(**model_params)
  
     results = train(data=dls,
                     model=model,

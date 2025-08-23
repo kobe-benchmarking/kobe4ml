@@ -10,6 +10,26 @@ logger = utils.get_logger(level='CRITICAL')
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 logger.info(f'Device is {device}')
 
+def mae(X, X_dec):
+    """
+    Compute Mean Absolute Error (MAE) manually.
+
+    :param X: Original input tensor.
+    :param X_dec: Reconstructed output tensor.
+    :return: MAE value.
+    """
+    return torch.mean(torch.abs(X - X_dec)).item()
+
+def mse(X, X_dec):
+    """
+    Compute Mean Squared Error (MSE) manually.
+
+    :param X: Original input tensor.
+    :param X_dec: Reconstructed output tensor.
+    :return: MSE value.
+    """
+    return torch.mean((X - X_dec) ** 2).item()
+
 def unzip_model(path):
     """
     Extract a model zip file into the model weights and parameters for inference.
@@ -31,12 +51,12 @@ def unzip_model(path):
 
 def infer(data, model, model_pth, metrics):
     """
-    Test the model on the provided data and calculate the inference metrics.
+    Test the model on the provided data and calculate the test loss, MAE, and MSE.
 
     :param data: Data to test the model on.
     :param model: The model to be evaluated.
-    :param model_pth: Path to the pth file where the model weights are saved, e.g., models/classifier.pth.
-    :param metrics: List of metric names to calculate (e.g., WeightedCrossEntropyLoss).
+    :param model_pth: Path to the pth file where the model weights are saved, e.g., models/attn_ae.pth.
+    :param metrics: List of metric names to calculate (e.g., ['mae', 'mse']).
     :return: Dictionary containing metrics as defined in the input metrics list.
     """
     state_dict = utils.load_pth(path=model_pth)
@@ -45,27 +65,36 @@ def infer(data, model, model_pth, metrics):
     model.eval()
 
     batches = len(data)
-    total_infer_loss = 0.0
 
-    criterion = utils.WeightedCrossEntropyLoss()
+    total_infer_loss = 0.0
+    total_mae = 0.0
+    total_mse = 0.0
+
+    criterion = utils.BlendedLoss()
 
     with torch.no_grad():
-        for _, (X, _, y) in enumerate(data):
-            X, y = X.to(device), y.to(device)
+        for _, (X, Xn, _) in enumerate(data):
+            X, Xn = X.to(device), Xn.to(device)
 
-            y_pred, _ = model(X)
+            X_dec, _, _ = model(X)
 
-            batch_size, seq_len, num_classes = y_pred.size()
-            y_pred = y_pred.reshape(batch_size * seq_len, num_classes)
-            y = y.reshape(batch_size * seq_len)
+            X_dec = utils.separate(src=X_dec, c=[0,1], t=[2])
+            Xn = utils.separate(src=Xn, c=[0,1], t=[2])
 
-            infer_loss = criterion(y_pred, y)
+            infer_loss = criterion(X_dec, Xn)
             total_infer_loss += infer_loss.item()
 
+            total_mae += mae(Xn, X_dec)
+            total_mse += mse(Xn, X_dec)
+
     avg_infer_loss = total_infer_loss / batches
+    avg_mae = total_mae / batches
+    avg_mse = total_mse / batches
 
     all_metrics = {
-        'WeightedCrossEntropyLoss': avg_infer_loss
+        'BlendedLoss': avg_infer_loss,
+        'mae': avg_mae,
+        'mse': avg_mse
     }
 
     filtered_metrics = {metric: all_metrics[metric] for metric in metrics if metric in all_metrics}
@@ -80,7 +109,7 @@ def main(params):
 
     model_pth, model_params = unzip_model(path=model_url)
 
-    model = Classifier(**model_params)
+    model = Predictor(**model_params)
  
     metrics = infer(data=dls[0],
                     model=model,
