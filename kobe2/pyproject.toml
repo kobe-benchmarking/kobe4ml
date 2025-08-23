@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "kobe2"
-version = "0.24"
+version = "0.25"
 packages = [
     { include = "kobe2" }
 ]
