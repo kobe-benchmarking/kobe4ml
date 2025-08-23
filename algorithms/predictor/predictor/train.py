@@ -77,8 +77,8 @@ def train(data, model, save_url, model_params, process_params, metrics):
 
             X_dec, _, _ = model(X)
 
-            X_dec = utils.separate(src=X_dec, c=[0,1], t=[2])
-            Xn = utils.separate(src=Xn, c=[0,1], t=[2])
+            X_dec, _ = utils.separate(src=X_dec, c=[0,1], t=[2])
+            Xn, _ = utils.separate(src=Xn, c=[0,1], t=[2])
 
             train_loss = criterion(X_dec, Xn)
             optimizer.zero_grad()
@@ -99,8 +99,8 @@ def train(data, model, save_url, model_params, process_params, metrics):
 
                 X_dec, _, _ = model(X)
 
-                X_dec = utils.separate(src=X_dec, c=[0,1], t=[2])
-                Xn = utils.separate(src=Xn, c=[0,1], t=[2])
+                X_dec, _ = utils.separate(src=X_dec, c=[0,1], t=[2])
+                Xn, _ = utils.separate(src=Xn, c=[0,1], t=[2])
 
                 val_loss = criterion(X_dec, Xn)
                 total_val_loss += val_loss.item()
