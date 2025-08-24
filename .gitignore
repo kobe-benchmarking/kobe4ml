@@ -1,4 +1,5 @@
 *.pem
+.DS_Store
 
 creds.json
 guide.txt
