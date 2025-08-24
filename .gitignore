@@ -1,0 +1,4 @@
+*.pem
+
+creds.json
+guide.txt
