@@ -33,7 +33,7 @@ class AuthHandler(http.server.SimpleHTTPRequestHandler):
 
 if __name__ == "__main__":
     PORT = 48031
-    DIRECTORY = "/home/ec2-user/webshare/content"
+    DIRECTORY = "/home/ec2-user/kobe4ml/webshare/content"
 
     handler_class = partial(AuthHandler, directory=DIRECTORY)
 
