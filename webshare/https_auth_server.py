@@ -1,10 +1,14 @@
 import http.server
 import ssl
+import os
 import json
 import base64
 from functools import partial
 
-with open("credentials.json", "r") as f:
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CREDS_PATH = os.path.join(BASE_DIR, "creds.json")
+
+with open(CREDS_PATH, "r") as f:
     creds = json.load(f)
 
 USERNAME = creds["username"]
