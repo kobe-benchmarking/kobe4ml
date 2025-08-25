@@ -7,7 +7,7 @@ metadata:
 
 implementation:
   package: classif
-  index_url: https://kobe-benchmarking.github.io/kobe4ml/
+  url: http://16.171.214.46:48034/run   
 
 steps:
   - id: dcoss_04_01

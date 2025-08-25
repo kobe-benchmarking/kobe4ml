@@ -10,10 +10,15 @@ authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.14"      # Python version for the project
-torch = "^2.7.0"            # Needed for the PyTorch imports (torch, torch.nn, torch.optim)
-boto3 = "^1.37.1"           # Needed for the boto3 import (for interacting with AWS S3)
+python = ">=3.9,<3.14"   
+torch = "^2.7.0"         
+boto3 = "^1.37.1"       
+fastapi = "^0.115.0"
+uvicorn = "^0.23.2"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+api = "lstm_ae.api:setup"

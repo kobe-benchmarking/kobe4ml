@@ -6,8 +6,8 @@ metadata:
   description: This run applies an LSTM autoencoder architecture that learns to reconstruct the BitBrain time series dataset.   
 
 implementation:
-  package: lstm_ae          
-  index_url: https://kobe-benchmarking.github.io/kobe4ml/
+  package: lstm_ae   
+  url: http://16.171.214.46:48031/run       
 
 steps:
   - id: dcoss_01_01

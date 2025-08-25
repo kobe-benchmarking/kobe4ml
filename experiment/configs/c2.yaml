@@ -7,7 +7,7 @@ metadata:
 
 implementation:
   package: conv_lstm_ae          
-  index_url: https://kobe-benchmarking.github.io/kobe4ml/
+  url: http://16.171.214.46:48032/run   
 
 steps:
   - id: dcoss_02_01

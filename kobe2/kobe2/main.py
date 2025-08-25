@@ -3,7 +3,7 @@ import importlib
 import pandas as pd
 import sys
 import subprocess
-from urllib.parse import urlparse
+import requests
 
 from . import utils
 
@@ -28,9 +28,9 @@ def gather_configs(dir):
 
     return configs
 
-def load_module(cfg):
+def load_pypi_module(cfg):
     """
-    Install and import a Python module directly in the active environment.
+    Install and import a Python package from PyPI based on the provided configuration.
 
     cfg should be a dict with:
         - package: name of the package (required)
@@ -85,7 +85,7 @@ def prepare_dls(data, root_dir=None):
         **params
     }
 
-    loader_module = load_module(cfg=loader)
+    loader_module = load_pypi_module(cfg=loader)
     loaders = loader_module.preprocess(**loader_params)
 
     weights_path = utils.get_path(ds_dir, filename=f"{name}-weights.json")
@@ -113,7 +113,6 @@ def load_params(step):
     Load parameters that configure the implementation for a specific step. Handles optional keys: 'model', 'process', 'save_url', 'model_url'.
 
     :param step: Dictionary containing step information.
-    :return: Dictionary of parameters.
     """
     root_dir = os.path.abspath(os.path.join(os.getcwd(), '..'))
 
@@ -145,10 +144,38 @@ def load_params(step):
     }
 
     step_impl_params = {k: v for k, v in impl_params.items() if v}
+    params_path = utils.get_path(root_dir, "models", filename=f"{step_id}_params.pkl")
+    utils.save_pickle(step_impl_params, params_path)
 
     logger.info(f"Parameters for step {step_id} loaded successfully.")
 
-    return step_impl_params
+def remote_call(cfg, method, step_id):
+    """
+    Make a remote call to a specified URL with given configuration and method.
+
+    :param cfg: Configuration dictionary containing 'package' and 'url'.
+    :param method: Method name to be called remotely (e.g., 'train', 'infer').
+    :param step_id: Step identifier used for parameter file naming.
+    :return: Result from the remote call.
+    """
+    root_dir = os.path.abspath(os.path.join(os.getcwd(), '..'))
+
+    package = cfg["package"]
+    url = cfg["url"]
+
+    params_path = utils.get_path(root_dir, "models", filename=f"{step_id}_params.pkl")
+
+    response = requests.get(
+        url,
+        params={
+            "package": package,
+            "func": method,
+            "params": params_path
+        }
+    )
+    api_response = response.json()
+    
+    return api_response["result"]
 
 def main(configs, dir='static'):
     """
@@ -185,15 +212,13 @@ def main(configs, dir='static'):
         for step in steps:
             step_id = step['id']
             process = step['type']
+            impl = step['implementation']
             method = methods_dict[process]
 
             logger.info(f"Processing step {step_id} for {method}ing benchmarking.")
 
-            impl = load_module(cfg=cfg['implementation'])
-            params = load_params(step)
-
-            call = lambda impl=impl, m=method, p=params: getattr(impl, m)(p)
-            metrics = call()
+            load_params(step)
+            metrics = remote_call(cfg=impl, method=method, step_id=step_id)
 
             exp_data_parent["results"].append(metrics)
             exp_data_parent["steps"].append(step_id)

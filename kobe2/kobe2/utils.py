@@ -1,6 +1,7 @@
 import yaml
 import logging
 import json
+import pickle
 import os
 
 def get_logger(level='DEBUG'):
@@ -88,3 +89,23 @@ def save_json(data, path):
     """
     with open(path, 'w') as f:
         json.dump(data, f, indent=4)
+    
+def save_pickle(obj, path):
+    """
+    Save a Python object to a pickle file.
+
+    :param obj: Python object to save.
+    :param path: File path where to save the pickle.
+    """
+    with open(path, "wb") as f:
+        pickle.dump(obj, f)
+
+def load_pickle(path):
+    """
+    Load a Python object from a pickle file.
+
+    :param path: File path of the pickle.
+    :return: Python object loaded from pickle.
+    """
+    with open(path, "rb") as f:
+        return pickle.load(f)
