@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import pickle
-import importlib
 import uvicorn
+import importlib
 
 app = FastAPI(title="Dynamic Executor API")
 
@@ -18,7 +18,9 @@ def execute(package, func, params):
     with open(params, "rb") as f:
         params = pickle.load(f)
 
-    module = importlib.import_module(package)
+    full_module_name = f"{package}.{func}"
+
+    module = importlib.import_module(full_module_name)
     func = getattr(module, func)
 
     result = func(**params)
@@ -30,16 +32,3 @@ def setup():
     Entry point to run the FastAPI server.
     """
     uvicorn.run("attn_ae.api:app", host="0.0.0.0", port=48033, reload=True)
-
-##############################################################################
-# import requests
-
-# response = requests.get(
-#     "http://16.171.214.46:48033/run",
-#     params={
-#         "package": "attn_ae",
-#         "func": "train",
-#         "params": "models/attn_ae_train_params.pkl"
-#     }
-# )
-# print(response.json())

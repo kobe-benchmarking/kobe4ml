@@ -173,6 +173,8 @@ def remote_call(cfg, method, step_id):
             "params": params_path
         }
     )
+    print(response)
+    print("###############################################################")
     api_response = response.json()
     
     return api_response["result"]
@@ -191,6 +193,7 @@ def main(configs, dir='static'):
 
     for cfg in configs:
         metadata = cfg["metadata"]
+        impl = cfg["implementation"]
         
         parent_id = metadata['parent_id']
         id = metadata['id']
@@ -212,7 +215,6 @@ def main(configs, dir='static'):
         for step in steps:
             step_id = step['id']
             process = step['type']
-            impl = step['implementation']
             method = methods_dict[process]
 
             logger.info(f"Processing step {step_id} for {method}ing benchmarking.")

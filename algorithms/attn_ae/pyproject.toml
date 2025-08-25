@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "attn_ae"
-version = "0.14"
+version = "0.15"
 packages = [
     { include = "attn_ae" }
 ]

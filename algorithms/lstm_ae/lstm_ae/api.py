@@ -18,7 +18,9 @@ def execute(package, func, params):
     with open(params, "rb") as f:
         params = pickle.load(f)
 
-    module = importlib.import_module(package)
+    full_module_name = f"{package}.{func}"
+
+    module = importlib.import_module(full_module_name)
     func = getattr(module, func)
 
     result = func(**params)
