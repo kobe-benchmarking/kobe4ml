@@ -5,6 +5,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.optim.lr_scheduler as sched
+import multiprocessing
+from torch.utils.data import DataLoader
 
 def get_logger(level='DEBUG'):
     """
@@ -167,3 +169,29 @@ def separate(src, c, t):
     time = src[:, :, t]
 
     return channels, time
+
+def create_dataloader(ds, batch_size, shuffle=False, num_workers=None, drop_last=False):
+    """
+    Create DataLoader object for the specified dataset.
+
+    :param ds: Dataset object.
+    :param batch_size: Batch size for the DataLoader.
+    :param shuffle: Whether to shuffle the data at every epoch.
+    :param num_workers: Number of subprocesses to use for data loading (default is all available CPU cores).
+    :param drop_last: Whether to drop the last incomplete batch.
+    :return: DataLoader object.
+    """
+    cpu_cores = multiprocessing.cpu_count()
+
+    if num_workers is None:
+        num_workers = cpu_cores
+
+    dl = DataLoader(
+        dataset=ds,
+        batch_size=batch_size,
+        shuffle=shuffle,
+        num_workers=num_workers,
+        drop_last=drop_last
+    )
+
+    return dl

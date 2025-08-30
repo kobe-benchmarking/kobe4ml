@@ -69,7 +69,7 @@ def prepare_dls(data, root_dir=None):
 
     :param data: Dictionary containing data configuration.
     :param root_dir: Root directory for data storage.
-    :return: Tuple (loaders, weights).
+    :return: Dictionary with prepared data loaders and weights.
     """
     loader = data['loader']
     loc = data['location']
@@ -91,7 +91,10 @@ def prepare_dls(data, root_dir=None):
     weights_path = utils.get_path(ds_dir, filename=f"{name}-weights.json")
     weights = utils.load_json(weights_path)
 
-    return (loaders, weights[label])
+    data_id_params = {"data": loaders, 
+                      "weights": weights[label]}
+
+    return loaders, weights[label]
 
 def resolve_path(root_dir, path):
     """
@@ -128,26 +131,27 @@ def load_params(step):
 
     logger.info(f"Loading parameters for step {step_id}.")
 
-    dls = prepare_dls(data, root_dir)
-    logger.info(f"Data loaders prepared for step {step_id}.")
+    loaders, weights = prepare_dls(data, root_dir)
+    data_id_params = {"data": loaders, "weights": weights}
+    data_id_params_path = utils.get_path(root_dir, "models", filename=f"{step_id}_data_id.pkl")
+    utils.save_pickle(data_id_params, data_id_params_path)
 
-    save_path = resolve_path(root_dir, save_url)
-    model_path = resolve_path(root_dir, model_url)
+    model_pth = resolve_path(root_dir, save_url)
+    model_zip = resolve_path(root_dir, model_url)
 
-    impl_params = {
-        "model_params": model_params if model_params else {},
-        "model_url": model_path if model_path else {},
-        "dls": dls,
-        "metrics": metrics,
-        "process_params": process_params if process_params else {},
-        "save_url": save_path if save_path else {}
-    }
+    if save_url:
+        model_params = {"model_params": model_params, "model_pth": model_pth}
+    elif model_url:
+        model_params = model_zip
 
-    step_impl_params = {k: v for k, v in impl_params.items() if v}
-    params_path = utils.get_path(root_dir, "models", filename=f"{step_id}_params.pkl")
-    utils.save_pickle(step_impl_params, params_path)
+    model_path = utils.get_path(root_dir, "models", filename=f"{step_id}_model.pkl")
+    utils.save_pickle(model_params, model_path)
 
-    logger.info(f"Parameters for step {step_id} loaded successfully.")
+    options_params = {"process_params": process_params, "metrics": metrics}
+    options_path = utils.get_path(root_dir, "models", filename=f"{step_id}_options.pkl")
+    utils.save_pickle(options_params, options_path)
+
+    logger.info(f"Parameters (data_id, model, options) for step {step_id} loaded successfully.")
 
 def remote_call(cfg, method, step_id):
     """
@@ -160,24 +164,27 @@ def remote_call(cfg, method, step_id):
     """
     root_dir = os.path.abspath(os.path.join(os.getcwd(), '..'))
 
+    params = ["data_id", "model", "options"]
     package = cfg["package"]
     url = cfg["url"]
 
-    params_path = utils.get_path(root_dir, "models", filename=f"{step_id}_params.pkl")
+    param_files = {
+        key: utils.get_path(root_dir, "models", filename=f"{step_id}_{key}.pkl")
+        for key in params
+    }
 
     response = requests.get(
         url,
         params={
-            "package": package,
-            "func": method,
-            "params": params_path
-        }
+            "package": package, 
+            "method": method, 
+            **param_files
+            }
     )
-    print(response)
-    print("###############################################################")
+
     api_response = response.json()
     
-    return api_response["result"]
+    return api_response["results"]
 
 def main(configs, dir='static'):
     """

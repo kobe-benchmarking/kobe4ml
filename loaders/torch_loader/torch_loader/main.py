@@ -5,7 +5,7 @@ from . import shared as sh
 
 logger = utils.get_logger(level='INFO')
 
-def main(dir, name, process, batch_size, train_size, val_size, test_size, seq_len, norm_include, full_epoch, per_epoch, time_include, shifted, splitted, weighted, analyzed, normalized):
+def main(dir, name, process, train_size, val_size, test_size, seq_len, norm_include, full_epoch, per_epoch, time_include, shifted, splitted, weighted, analyzed, normalized):
     """
     Main function to create torch loaders from the Bitbrain dataset, suitable for machine learning tasks.
     """

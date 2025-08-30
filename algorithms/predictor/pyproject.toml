@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "predictor"
-version = "0.9"
+version = "0.10"
 packages = [
     { include = "predictor" }
 ]

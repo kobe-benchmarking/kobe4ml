@@ -6,24 +6,23 @@ import uvicorn
 app = FastAPI(title="Dynamic Executor API")
 
 @app.get("/run")
-def execute(package, func, params):
+def execute(package: str, method: str, params: str):
     """
     Dynamically import a package and run a function with parameters from a pickle file.
 
     :param package: Name of the package to import.
-    :param func: Name of the function to execute.
+    :param method): Name of the method) to execute.
     :param params: Path to the pickle file containing function parameters.
     :return: Result of the function execution.
     """
     with open(params, "rb") as f:
         params = pickle.load(f)
 
-    full_module_name = f"{package}.{func}"
-
+    full_module_name = f"{package}.{method}"
     module = importlib.import_module(full_module_name)
-    func = getattr(module, func)
 
-    result = func(**params)
+    function= getattr(module, "main")
+    result = function(**params)
 
     return {"status": "success", "result": result}
 

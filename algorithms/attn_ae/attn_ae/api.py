@@ -6,29 +6,34 @@ import importlib
 app = FastAPI(title="Dynamic Executor API")
 
 @app.get("/run")
-def execute(package, func, params):
+def execute(package: str, method: str, data_id: str, model: str, options: str):
     """
-    Dynamically import a package and run a function with parameters from a pickle file.
+    Dynamically import a package and run its 'main' function with parameters loaded from pickle files.
 
     :param package: Name of the package to import.
-    :param func: Name of the function to execute.
-    :param params: Path to the pickle file containing function parameters.
+    :param method: Name of the method to execute.
+    :param data_id: Pickle file containing the dataset.
+    :param model: Pickle file containing the model parameters.
+    :param options: Pickle file containing process parameters and metrics.
     :return: Result of the function execution.
     """
-    with open(params, "rb") as f:
-        params = pickle.load(f)
+    args = {}
+    arg_files = {"data_id": data_id, "model": model, "options": options}
 
-    full_module_name = f"{package}.{func}"
+    for arg_name, file_name in arg_files.items():
+        with open(file_name, "rb") as f:
+            args[arg_name] = pickle.load(f)
 
+    full_module_name = f"{package}.{method}"
     module = importlib.import_module(full_module_name)
-    func = getattr(module, func)
+    function= getattr(module, "main")
+    
+    results = function(**args)
 
-    result = func(**params)
-
-    return {"status": "success", "result": result}
+    return {"status": "success", "results": results}
 
 def setup():
     """
     Entry point to run the FastAPI server.
     """
-    uvicorn.run("attn_ae.api:app", host="0.0.0.0", port=48033, reload=True)
+    uvicorn.run("attn_ae.api:app", host="0.0.0.0", port=48033, reload=False)
