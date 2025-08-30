@@ -1,8 +1,6 @@
 import random
-import multiprocessing
 import numpy as np
 import os
-from torch.utils.data import DataLoader
 
 from . import utils
 
@@ -209,31 +207,3 @@ def extract_weights(dir, name, done=False):
     logger.info(f"Saved class weights to {weights_path}: {weights}")
 
     return weights
-
-def create_dataloader(ds, batch_size, shuffle=[True, False, False], num_workers=None, drop_last=False):
-    """
-    Create DataLoader object for the specified dataset.
-
-    :param ds: Dataset object.
-    :param batch_size: Batch size for the DataLoader.
-    :param shuffle: Whether to shuffle the data at every epoch.
-    :param num_workers: Number of subprocesses to use for data loading (default is all available CPU cores).
-    :param drop_last: Whether to drop the last incomplete batch.
-    :return: DataLoader object.
-    """
-    cpu_cores = multiprocessing.cpu_count()
-
-    if num_workers is None:
-        num_workers = cpu_cores
-
-    logger.info(f'System has {cpu_cores} CPU cores. Using {num_workers}/{cpu_cores} workers for data loading.')
-
-    dl = DataLoader(
-        dataset=ds,
-        batch_size=batch_size,
-        shuffle=shuffle,
-        num_workers=num_workers,
-        drop_last=drop_last
-    )
-
-    return dl

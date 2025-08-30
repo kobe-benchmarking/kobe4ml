@@ -48,19 +48,12 @@ def main(dir, name, process, batch_size, train_size, val_size, test_size, seq_le
                             done=normalized)
         
         logger.info(f"Creating TSDataset for {p} data.")
-        ds = tl.TSDataset(dir=dir, 
-                          name=f'{name}-{p}-rbst-norm',
-                          seq_len=seq_len,
-                          full_epoch=full_epoch,
-                          per_epoch=per_epoch,
-                          time_include=time_include)
-        
-        logger.info(f"Creating dataloader for {p} data.")
-        dls[p] = sh.create_dataloader(ds=ds, 
-                                      batch_size=batch_size, 
-                                      shuffle=[True, False, False], 
-                                      num_workers=None, 
-                                      drop_last=False)
+        dls[p] = tl.TSDataset(dir=dir, 
+                              name=f'{name}-{p}-rbst-norm',
+                              seq_len=seq_len,
+                              full_epoch=full_epoch,
+                              per_epoch=per_epoch,
+                              time_include=time_include)
     
     return tuple(dls[p] for p in process_map[process])
 
