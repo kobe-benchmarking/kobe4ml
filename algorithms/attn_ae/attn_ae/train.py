@@ -70,7 +70,7 @@ def train(data, model, model_params, model_pth, criterion, epochs, patience, opt
             X = X.to(device)
 
             X_dec, _, _ = model(X)
-
+            
             X_dec, _ = utils.separate(src=X_dec, c=[0,1], t=[2])
             X, _ = utils.separate(src=X, c=[0,1], t=[2])
 
@@ -83,6 +83,8 @@ def train(data, model, model_params, model_pth, criterion, epochs, patience, opt
 
         avg_train_loss = total_train_loss / batches
         train_losses.append(avg_train_loss)
+
+        # print(f"Epoch [{epoch+1}/{epochs}], Time: {time.time() - start:.2f}s.")
 
         model.eval()
         total_val_loss = 0.0

@@ -7,7 +7,7 @@ metadata:
 
 implementation:
   package: lstm_ae   
-  url: http://16.171.214.46:48031/run       
+  url: http://127.0.0.1:48031/run       
 
 steps:
   - id: dcoss_01_01
@@ -25,6 +25,7 @@ steps:
         dropout: 0.05
 
       process:
+        batch_size: 512
         loss: BlendedLoss
         epochs: 3
         patience: 30
@@ -47,7 +48,6 @@ steps:
 
       parameters:
         process: prepare
-        batch_size: 512
         train_size: 0.65
         val_size: 0.15
         test_size: 0.20
@@ -74,6 +74,10 @@ steps:
     parameters:
       model_url: models/lstm_ae.zip
 
+      process:
+        batch_size: 512
+        loss: BlendedLoss
+
     data:
       loader:
         package: torch_loader          
@@ -85,7 +89,6 @@ steps:
 
       parameters:
         process: work
-        batch_size: 512
         train_size: 0.65
         val_size: 0.15
         test_size: 0.20
@@ -101,6 +104,6 @@ steps:
         normalized: True
 
     metrics:
-      - BlendedLoss
+      - infer_loss
       - mae
       - mse

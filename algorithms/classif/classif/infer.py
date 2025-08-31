@@ -45,28 +45,29 @@ def unzip_model(path):
     Extract a model zip file into the model weights and parameters for inference.
 
     :param path: Path to the zip file created by zip_model, e.g., models/attn_ae.zip
-    :return: Tuple (model_pth_path, model_params_dict)
+    :return: Tuple (model_params_dict, model_pth_path)
     """
     extract_dir = os.path.dirname(path)
 
     with zipfile.ZipFile(path, 'r') as zipf:
         zipf.extractall(extract_dir)
 
-    model_pth = path.replace('.zip', '.pth')
+    pth_path = path.replace('.zip', '.pth')
     json_path = path.replace('.zip', '_params.json')
 
     model_params = utils.load_json(path=json_path)
 
-    return model_pth, model_params
+    return model_params, pth_path
 
-def infer(dls, model, model_pth, metrics):
+def infer(data, model, model_pth, criterion, metrics):
     """
-    Test the model on the provided data and calculate the inference metrics.
+    Test the model on the provided data and calculate the test loss, MAE, and MSE.
 
-    :param dls: Tuple containing (loaders, weights).
-    :param model: The model to be evaluated.
-    :param model_pth: Path to the pth file where the model weights are saved, e.g., models/classifier.pth.
-    :param metrics: List of metric names to calculate (e.g., WeightedCrossEntropyLoss).
+    :param data: DataLoader for inference.
+    :param model: The model to be tested.
+    :param model_pth: Path to the pth file where the model weights are saved, e.g., models/attn_ae.pth.
+    :param criterion: Loss function to be used during inference.
+    :param metrics: List of metric names to calculate (e.g., ['mae', 'mse']).
     :return: Dictionary containing metrics as defined in the input metrics list.
     """
     state_dict = utils.load_pth(path=model_pth)
@@ -74,16 +75,12 @@ def infer(dls, model, model_pth, metrics):
     model.to(device)
     model.eval()
 
-    data, weights = dls
-    data = data[0]
-    batches = len(data)
-
     total_infer_loss = 0.0
     total_precision = 0.0
     total_recall = 0.0
     total_f1 = 0.0
 
-    criterion = utils.WeightedCrossEntropyLoss(weights)
+    batches = len(data)
 
     with torch.no_grad():
         for _, (X, _, y) in enumerate(data):
@@ -108,7 +105,7 @@ def infer(dls, model, model_pth, metrics):
     avg_f1 = total_f1 / batches
 
     all_metrics = {
-        'WeightedCrossEntropyLoss': avg_infer_loss,
+        'infer_loss': avg_infer_loss,
         'precision': avg_precision,
         'recall': avg_recall,
         'f1_score': avg_f1
@@ -118,19 +115,37 @@ def infer(dls, model, model_pth, metrics):
 
     return filtered_metrics
 
-def main(params):
+def main(data_id, model, options):
     """
-    Main function to execute the testing workflow, including data preparation and model evaluation.
-    """
-    model_url, dls, metrics = params.values()
+    Main function to execute the testing workflow.
 
-    model_pth, model_params = unzip_model(path=model_url)
+    :param data_id: Dictionary containing dataset and its parameters.
+    :param model: Path to the model zip file containing model weights and parameters.
+    :param options: Dictionary containing process parameters and metrics to calculate.
+    :return: Dictionary containing calculated metrics.
+    """
+    data, weights = data_id.values()
+    model_params, model_pth = unzip_model(path=model)
+    process_params, metrics = options.values()
+    batch_size, loss = process_params.values()
 
     model = Classifier(**model_params)
  
-    metrics = infer(dls=dls,
+    if hasattr(utils, loss):
+        criterion = getattr(utils, loss)(weights)
+    else:
+        raise ValueError(f"Loss function '{loss}' not found in utils")
+
+    dl = utils.create_dataloader(ds=data[0],
+                                 batch_size=batch_size,
+                                 shuffle=False,
+                                 num_workers=None,
+                                 drop_last=False)
+ 
+    results = infer(data=dl,
                     model=model,
                     model_pth=model_pth,
+                    criterion=criterion,
                     metrics=metrics)
     
-    return metrics
+    return results

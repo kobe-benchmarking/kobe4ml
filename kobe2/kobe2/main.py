@@ -91,9 +91,6 @@ def prepare_dls(data, root_dir=None):
     weights_path = utils.get_path(ds_dir, filename=f"{name}-weights.json")
     weights = utils.load_json(weights_path)
 
-    data_id_params = {"data": loaders, 
-                      "weights": weights[label]}
-
     return loaders, weights[label]
 
 def resolve_path(root_dir, path):

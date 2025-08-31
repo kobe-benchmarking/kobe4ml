@@ -7,7 +7,7 @@ metadata:
 
 implementation:
   package: predictor          
-  url: http://16.171.214.46:48035/run   
+  url: http://127.0.0.1:48035/run 
 
 steps:
   - id: dcoss_05_01
@@ -23,6 +23,7 @@ steps:
         num_layers: 1
 
       process:
+        batch_size: 512
         loss: BlendedLoss
         epochs: 3
         patience: 30
@@ -45,7 +46,6 @@ steps:
 
       parameters:
         process: prepare
-        batch_size: 512
         train_size: 0.65
         val_size: 0.15
         test_size: 0.20
@@ -72,6 +72,10 @@ steps:
     parameters:
       model_url: models/predictor.zip
 
+      process:
+        batch_size: 512
+        loss: BlendedLoss
+
     data:
       loader:
         package: torch_loader          
@@ -83,7 +87,6 @@ steps:
 
       parameters:
         process: work
-        batch_size: 512
         train_size: 0.65
         val_size: 0.15
         test_size: 0.20
@@ -99,6 +102,6 @@ steps:
         normalized: True
 
     metrics:
-      - BlendedLoss
+      - infer_loss
       - mae
       - mse

@@ -11,61 +11,54 @@ logger = utils.get_logger(level='CRITICAL')
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 logger.info(f'Device is {device}')
 
-def zip_model(model, save_url, model_params):
+def zip_model(model, model_pth, model_params):
     """
     Package the trained model weights and parameters into a zip file for inference.
 
     :param model: Trained PyTorch model.
-    :param save_url: Path to the pth file where the model weights are saved, e.g., models/conv_lstm_ae.pth.
+    :param model_pth: Path to the pth file where the model weights are saved, e.g., models/attn_ae.pth.
     :param model_params: Dictionary of model configuration parameters.
     """
-    zip_path = save_url.replace('.pth', '.zip')
-    json_url = save_url.replace('.pth', '_params.json')
+    zip_path = model_pth.replace('.pth', '.zip')
+    json_path = model_pth.replace('.pth', '_params.json')
 
-    utils.save_pth(model=model, path=save_url)
-    utils.save_json(data=model_params, path=json_url)
+    utils.save_pth(model=model, path=model_pth)
+    utils.save_json(data=model_params, path=json_path)
     
     with zipfile.ZipFile(zip_path, 'w') as zipf:
-        zipf.write(save_url, os.path.basename(save_url))
-        zipf.write(json_url, os.path.basename(json_url))
+        zipf.write(model_pth, os.path.basename(model_pth))
+        zipf.write(json_path, os.path.basename(json_path))
 
-    os.remove(save_url)
-    os.remove(json_url)
+    os.remove(model_pth)
+    os.remove(json_path)
 
-    logger.info(f"Packaged {save_url} and {json_url} into {zip_path}.")
+    logger.info(f"Packaged {model_pth} and {json_path} into {zip_path}.")
 
-def train(dls, model, save_url, model_params, process_params, metrics):
+def train(data, model, model_params, model_pth, criterion, epochs, patience, optimizer, scheduler, metrics):
     """
     Train the model on the provided data and calculate the train loss, MAE, and MSE.
 
-    :param dls: Tuple containing (loaders, weights).
+    :param data: List containing training and validation DataLoaders.
     :param model: The model to be trained.
-    :param save_url: Path to save the trained model.
     :param model_params: Dictionary containing model configuration parameters.
-    :param process_params: Dictionary containing process parameters.
+    :param model_pth: Path to save the trained model.
+    :param criterion: Loss function to be used during training.
+    :param epochs: Maximum number of training epochs.
+    :param patience: Number of epochs with no improvement after which training will be stopped.
+    :param optimizer: Optimizer for training.
+    :param scheduler: Learning rate scheduler.
     :param metrics: List of metric names to calculate (e.g., ['mae', 'mse']).
     :return: Dictionary containing metrics as defined in the input metrics list.
     """
-    loss, epochs, patience, lr, optimizer, scheduler = process_params.values()
-
-    if hasattr(utils, loss):
-        criterion = getattr(utils, loss)()
-    else:
-        raise ValueError(f"Loss function '{loss}' not found in utils")
-
     model.to(device)
-
-    data, _ = dls
-    train_data, val_data = data
-    batches = len(train_data)
-    
-    optimizer = utils.get_optim(optimizer, model, lr)
-    scheduler = utils.get_sched(optimizer, scheduler['name'], **scheduler['params'])
 
     train_time = 0.0
     best_val_loss = float('inf')
     stationary = 0
     train_losses, val_losses = [], []
+
+    train_data, val_data = data
+    batches = len(train_data)
 
     for epoch in range(epochs):
         start = time.time()
@@ -113,7 +106,7 @@ def train(dls, model, save_url, model_params, process_params, metrics):
             best_val_loss = avg_val_loss
             best_train_loss = avg_train_loss
 
-            zip_model(model, save_url, model_params)
+            zip_model(model, model_pth, model_params)
         else:
             stationary += 1
 
@@ -133,19 +126,48 @@ def train(dls, model, save_url, model_params, process_params, metrics):
 
     return filtered_metrics
 
-def main(params):
+def main(data_id, model, options):
     """
-    Main function to execute the training workflow, including data preparation and model evaluation.
+    Main function to execute the training workflow.
+
+    :param data_id: Dictionary containing dataset and its parameters.
+    :param model: Dictionary containing model parameters and save URL.
+    :param options: Dictionary containing process parameters and metrics to calculate.
+    :return: Dictionary containing calculated metrics.
     """
-    model_params, dls, metrics, process_params, save_url = params.values()
+    data, _ = data_id.values()
+    model_params, model_pth = model.values()
+    process_params, metrics = options.values()
+    batch_size, loss, epochs, patience, lr, optimizer, scheduler = process_params.values()
 
     model = ConvLSTM_Autoencoder(**model_params)
  
-    results = train(dls=dls,
+    if hasattr(utils, loss):
+        criterion = getattr(utils, loss)()
+    else:
+        raise ValueError(f"Loss function '{loss}' not found in utils")
+
+    dls = []
+    for ds, shuffle in zip(data, [True, False]):
+        dl = utils.create_dataloader(ds=ds,
+                                     batch_size=batch_size,
+                                     shuffle=shuffle,
+                                     num_workers=None,
+                                     drop_last=False)
+        dls.append(dl)
+
+    optimizer = utils.get_optim(optimizer, model, lr)
+    scheduler = utils.get_sched(optimizer, scheduler['name'], **scheduler['params'])
+
+    results = train(data=dls,
                     model=model,
-                    save_url=save_url,
                     model_params=model_params,
-                    process_params=process_params,
+                    model_pth=model_pth,
+                    criterion=criterion,
+                    epochs=epochs,
+                    patience=patience,
+                    optimizer=optimizer,
+                    scheduler=scheduler,
                     metrics=metrics)
     
     return results
