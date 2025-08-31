@@ -158,7 +158,7 @@ def main(data_id, model, options):
         dl = utils.create_dataloader(ds=ds,
                                      batch_size=batch_size,
                                      shuffle=shuffle,
-                                     num_workers=None,
+                                     num_workers=0,
                                      drop_last=False)
         dls.append(dl)
 

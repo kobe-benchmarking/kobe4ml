@@ -124,7 +124,7 @@ def main(data_id, model, options):
     dl = utils.create_dataloader(ds=data[0],
                                  batch_size=batch_size,
                                  shuffle=False,
-                                 num_workers=None,
+                                 num_workers=0,
                                  drop_last=False)
  
     results = infer(data=dl,

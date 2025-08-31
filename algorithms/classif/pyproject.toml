@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "classif"
-version = "0.16"
+version = "0.17"
 packages = [
     { include = "classif" }
 ]
