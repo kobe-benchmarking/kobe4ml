@@ -8,7 +8,7 @@ from .model import *
 
 logger = utils.get_logger(level='CRITICAL')
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = utils.detect_device()
 logger.info(f'Device is {device}')
 
 def precision(y, y_pred):

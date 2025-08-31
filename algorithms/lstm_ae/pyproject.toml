@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lstm_ae"
-version = "0.12"
+version = "0.17"
 packages = [
     { include = "lstm_ae" }
 ]

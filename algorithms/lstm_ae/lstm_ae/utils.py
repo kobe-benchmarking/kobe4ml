@@ -181,3 +181,16 @@ def create_dataloader(ds, batch_size, shuffle=False, num_workers=None, drop_last
     )
 
     return dl
+
+def detect_device():
+    """
+    Detects the best available device for PyTorch. Works for CPU, CUDA, and Apple MPS (Metal).
+
+    :return: torch.device object.
+    """
+    if torch.backends.mps.is_available() and torch.backends.mps.is_built():
+        return torch.device("mps")
+    elif torch.cuda.is_available():
+        return torch.device("cuda")
+    else:
+        return torch.device("cpu")
