@@ -20,7 +20,7 @@ def precision(y, y_pred):
     y_true = y.detach().cpu().numpy()
     y_hat = torch.argmax(y_pred, dim=1).detach().cpu().numpy()
 
-    return precision_score(y_true, y_hat, average="macro")
+    return precision_score(y_true, y_hat, average="macro", zero_division=0)
 
 def recall(y, y_pred):
     """
@@ -29,7 +29,7 @@ def recall(y, y_pred):
     y_true = y.detach().cpu().numpy()
     y_hat = torch.argmax(y_pred, dim=1).detach().cpu().numpy()
 
-    return recall_score(y_true, y_hat, average="macro")
+    return recall_score(y_true, y_hat, average="macro", zero_division=0)
 
 def f1_score(y, y_pred):
     """
@@ -38,7 +38,7 @@ def f1_score(y, y_pred):
     y_true = y.detach().cpu().numpy()
     y_hat = torch.argmax(y_pred, dim=1).detach().cpu().numpy()
 
-    return sk_f1(y_true, y_hat, average="macro")
+    return sk_f1(y_true, y_hat, average="macro", zero_division=0)
 
 def unzip_model(path):
     """

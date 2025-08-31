@@ -141,7 +141,7 @@ def main(data_id, model, options):
     :param options: Dictionary containing process parameters and metrics to calculate.
     :return: Dictionary containing calculated metrics.
     """
-    data, weights = data_id.values()
+    data, _ = data_id.values()
     model_params, model_pth = model.values()
     process_params, metrics = options.values()
     batch_size, loss, epochs, patience, lr, optimizer, scheduler = process_params.values()
@@ -149,7 +149,7 @@ def main(data_id, model, options):
     model = Predictor(**model_params)
  
     if hasattr(utils, loss):
-        criterion = getattr(utils, loss)(weights)
+        criterion = getattr(utils, loss)()
     else:
         raise ValueError(f"Loss function '{loss}' not found in utils")
 
