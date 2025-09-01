@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "conv_lstm_ae"
-version = "0.13"
+version = "0.14"
 packages = [
     { include = "conv_lstm_ae" }
 ]
@@ -11,8 +11,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.14"  
-torch = "^2.7.0"         
-boto3 = "^1.37.1"     
+torch = "^2.7.0"      
 fastapi = "^0.115.0"
 uvicorn = "^0.23.2"
 

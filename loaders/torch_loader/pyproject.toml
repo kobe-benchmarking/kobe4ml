@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "torch_loader"
-version = "0.41"
+version = "0.42"
 packages = [
     { include = "torch_loader" }
 ]
@@ -10,14 +10,9 @@ authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
 readme = "README.md"
 
 [tool.poetry.dependencies]
-
-# Python version for the project
 python = ">=3.9,<3.14"  
-
-# Loading and creating dataloaders
-pandas = "^2.1"         # For data manipulation and analysis
-numpy = "^1.26"         # For numerical computations (e.g., tensor operations)
-torch = "^2.7.0"        # For creating PyTorch dataloaders
+numpy = "^1.26"
+torch = "^2.7.0"
 
 [build-system]
 requires = ["poetry-core"]

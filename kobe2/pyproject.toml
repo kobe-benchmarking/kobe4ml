@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "kobe2"
-version = "0.40"
+version = "0.41"
 packages = [
     { include = "kobe2" }
 ]
@@ -10,11 +10,9 @@ authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.14"        
+python = ">=3.9,<3.14"
 pandas = "^2.1"
-numpy = "^1.26"    
 requests = "^2.32"
-packaging = "^25.0"
 pyyaml = "^6.0"
 
 [build-system]

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "predictor"
-version = "0.14"
+version = "0.15"
 packages = [
     { include = "predictor" }
 ]
@@ -11,8 +11,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.14"    
-torch = "^2.7.0"          
-boto3 = "^1.37.1"         
+torch = "^2.7.0"         
 fastapi = "^0.115.0"
 uvicorn = "^0.23.2"
 
