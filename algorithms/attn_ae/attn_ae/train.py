@@ -84,8 +84,6 @@ def train(data, model, model_params, model_pth, criterion, epochs, patience, opt
         avg_train_loss = total_train_loss / batches
         train_losses.append(avg_train_loss)
 
-        # print(f"Epoch [{epoch+1}/{epochs}], Time: {time.time() - start:.2f}s.")
-
         model.eval()
         total_val_loss = 0.0
 
