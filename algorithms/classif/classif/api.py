@@ -10,9 +10,10 @@ app = FastAPI(title="Dynamic Executor API")
 
 def install_and_import(package: str, index_url: str = None):
     """
-    Ensure a package is installed and importable.
-    - If not installed, installs from PyPI (or custom index).
-    - Returns the imported module.
+    Install and import a Python package.
+    
+    :param package: Name of the package to install/import.
+    :param index_url: Optional extra index URL for pip installation.
     """
     cmd = [sys.executable, "-m", "pip", "install", "--upgrade", package]
 
