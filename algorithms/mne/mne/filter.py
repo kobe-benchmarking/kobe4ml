@@ -28,8 +28,5 @@ def main():
     for col in data_columns:
         df[f'noise_{col}'] = df[col] - filtered_df[col]
 
-    df.to_csv(mne_csv_path, index=False)
-    logger.info(f"Filtered data and noise columns saved to {mne_csv_path}.")
-
 if __name__ == '__main__':
     main()

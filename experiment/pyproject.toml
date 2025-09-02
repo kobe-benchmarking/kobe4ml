@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "exp"
-version = "0.4"
+version = "0.6"
 packages = [
     { include = "src" }
 ]
@@ -11,8 +11,6 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.14"
-
-kobe2 = { path = "../kobe2", develop = true }
 
 [build-system]
 requires = ["poetry-core"]
