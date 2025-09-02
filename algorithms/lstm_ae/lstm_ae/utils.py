@@ -7,6 +7,7 @@ import torch.optim as optim
 import torch.optim.lr_scheduler as sched
 import multiprocessing
 from torch.utils.data import DataLoader
+import pickle
 
 def get_logger(level='DEBUG'):
     """
@@ -194,3 +195,23 @@ def detect_device():
         return torch.device("cuda")
     else:
         return torch.device("cpu")
+    
+def save_pickle(obj, path):
+    """
+    Save a Python object to a pickle file.
+
+    :param obj: Python object to save.
+    :param path: File path where to save the pickle.
+    """
+    with open(path, "wb") as f:
+        pickle.dump(obj, f)
+
+def load_pickle(path):
+    """
+    Load a Python object from a pickle file.
+
+    :param path: File path of the pickle.
+    :return: Python object loaded from pickle.
+    """
+    with open(path, "rb") as f:
+        return pickle.load(f)
