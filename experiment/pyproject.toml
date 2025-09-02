@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "exp"
-version = "0.6"
+version = "0.7"
 packages = [
     { include = "src" }
 ]
@@ -11,6 +11,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.14"
+requests = "^2.32"
 
 [build-system]
 requires = ["poetry-core"]

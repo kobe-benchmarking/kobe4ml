@@ -23,7 +23,7 @@ def install_and_import(package: str, index_url: str = None):
         return importlib.import_module(package)
 
 def main():
-    kobe2 = install_and_import("kobe2", index_url="https://kobe-benchmarking.github.io/kobe4ml/")
+    kobe2 = install_and_import("kobe2", index_url='https://kobe-benchmarking.github.io/kobe4ml/')
 
     configs = kobe2.gather_configs(dir='configs')
     kobe2.benchmark(configs, dir='static')
