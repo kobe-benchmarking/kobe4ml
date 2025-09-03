@@ -10,17 +10,13 @@ def install_and_import(package: str, index_url: str = None):
     :param index_url: Optional extra index URL for pip installation.
     :return: The imported module.
     """
-    try:
-        return importlib.import_module(package)
-    
-    except ImportError:
-        cmd = [sys.executable, "-m", "pip", "install", "--upgrade", package]
-        if index_url:
-            cmd += ["--extra-index-url", index_url]
+    cmd = [sys.executable, "-m", "pip", "install", "--upgrade", package]
+    if index_url:
+        cmd += ["--extra-index-url", index_url]
 
-        subprocess.check_call(cmd)
+    subprocess.check_call(cmd)
 
-        return importlib.import_module(package)
+    return importlib.import_module(package)
 
 def main():
     kobe2 = install_and_import("kobe2", index_url='https://kobe-benchmarking.github.io/kobe4ml/')
