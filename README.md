@@ -1,111 +1,100 @@
-# Repo Structure Overview
+# KOBE Benchmarking Framework
 
-```python
-kobe4ml/
-│
-├── algorithms/           
-│   ├── lstm_ae/       
-│   │   ├── lstm_ae/     
-│   │   │   ├── __init__.py  
-│   │   │   ├── model.py   
-│   │   │   ├── loader.py     
-│   │   │   ├── train.py 
-│   │   │   ├── test.py   
-│   │   │   ├── utils.py    
-│   │   │── pyproject.toml 
-│   │   │── README.md
-│   ├── conv_lstm_ae/       
-│   │   ├── conv_lstm_ae/     
-│   │   │   ├── __init__.py  
-│   │   │   ├── model.py     
-│   │   │   ├── loader.py       
-│   │   │   ├── train.py 
-│   │   │   ├── test.py   
-│   │   │   ├── utils.py     
-│   │   │── pyproject.toml 
-│   │   │── README.md
-│   ├── rf/       
-│   │   ├── rf/     
-│   │   │   ├── __init__.py     
-│   │   │   ├── train.py 
-│   │   │   ├── test.py   
-│   │   │   ├── utils.py     
-│   │   │── pyproject.toml 
-│   │   │── README.md
-│   ├── svm/       
-│   │   ├── svm/     
-│   │   │   ├── __init__.py     
-│   │   │   ├── train.py 
-│   │   │   ├── test.py   
-│   │   │   ├── utils.py     
-│   │   │── pyproject.toml 
-│   │   │── README.md
-│   ├── ...   
-│
-├── experiment/         
-│   ├── src/              
-│   │   ├── __init__.py   
-│   │   ├── main.py     
-│   │   ├── utils.py     
-│   ├── configs/      
-│   │   ├── c1.yaml 
-│   │   ├── c2.yaml    
-│   │   ├── c3.yaml    
-│   │   ├── c4.yaml  
-│   │   ├── ...
-│   │   
-│   ├── static/ 
-│   │   ├── kn7fej4o
-│   │   │   ├── results.csv
-│   │   ├── ae2jrt8m  
-│   │   │   ├── results.csv
-│   │   ├── ...
-│   │   
-│   ├── pyproject.toml 
-│   │── README.md   
-│
-├── kobe2/         
-│   ├── kobe2/              
-│   │   ├── __init__.py   
-│   │   ├── main.py    
-│   │   ├── utils.py   
-│   ├── pyproject.toml   
-│   │── README.md    
-│
-├── loaders/         
-│   ├── bitbrain-torch-loader/    
-│   │   ├── bitbrain-torch-loader/           
-│   │   │   ├── __init__.py   
-│   │   │   ├── main.py    
-│   │   │   ├── utils.py   
-│   │   ├── pyproject.toml   
-│   │   │── README.md    
-│   ├── bitbrain-trad-loader/    
-│   │   ├── bitbrain-trad-loader/           
-│   │   │   ├── __init__.py   
-│   │   │   ├── main.py    
-│   │   │   ├── utils.py   
-│   │   ├── pyproject.toml   
-│   │   │── README.md   
-│   ├── ... 
-│   
-│── README.md    
-```
+KOBE is a Python framework used to benchmark algorithms against various datasets in a standardized and reproducible way. It automates:
 
-# Build and Upload Packages
+- **data preparation** (normalization, splitting, weights),
+- **model execution** (training and inference), and
+- **metrics collection** (saving results in a structured format).
 
-### 1. Build the Package
+With KOBE, you can run multiple experiments defined in YAML files and directly compare their results.
 
-Navigate to the package directory and build the wheel:
+## How to set up
+
+**1. Create a Conda Environment**
+
+KOBE requires Python ≥ 3.9. We recommend using a Conda environment.
 
 ```bash
-cd algorithms/lstm_ae
-poetry build
+conda create -n kobe python=3.12
+conda activate kobe
 ```
 
-### 2. Upload to S3
-Once the wheel file (.whl) is created inside the dist/ folder, upload it to S3:
+**2. Install Poetry**
+
+KOBE uses Poetry to manage dependencies and execution.
 
 ```bash
-aws s3 cp dist/lstm_ae-0.1-py3-none-any.whl s3://manolo-data/algorithms/lstm_ae-0.1-py3-none-any.whl
+pip install poetry
 ```
+
+This installs Poetry inside your Conda environment. You’ll use it to install dependencies and run the benchmark command.
+
+**3. Define Your Experiment Folder**
+
+Your project should follow this structure:
+
+```graphql
+experiment/
+├── configs/            # YAML files defining experiments
+│   ├── c1.yaml         # experiment 1
+│   ├── c2.yaml         # experiment 2
+│   └── ...
+├── src/                # Source code for your experiments
+│   ├── __init__.py
+│   ├── main.py         # entrypoint script
+│   └── pyproject.toml  
+└── README.md         
+```
+
+**4. Install Dependencies with Poetry**
+
+Navigate into your experiment folder and run:
+
+```bash
+cd experiment
+poetry install
+```
+
+This will create a virtual environment with all dependencies defined in `pyproject.toml`.
+
+**5. Define Experiment YAMLs**
+
+Each YAML file in `configs/` represents one benchmark experiment. For example, `c1.yaml` might look like this:
+
+```yaml
+metadata:
+  parent_id: dcoss
+  id: dcoss_01
+  version: v1
+  name: BitBrain-LSTM-Autoencoder
+  description: This run applies an LSTM autoencoder architecture that learns to reconstruct the BitBrain time series dataset.   
+
+implementation: ...
+
+steps:
+  - id: dcoss_01_01
+    type: prepare
+
+    parameters: ...
+    data: ...
+    metrics: ...
+
+  - id: dcoss_01_02
+    type: work
+
+    parameters: ...
+    data: ...
+    metrics: ...
+```
+
+You can use these [YAML templates](https://github.com/kobe-benchmarking/kobe4ml/tree/phase1/experiment/configs) as a reference to create your own experiment configurations.
+
+**6. Run the Benchmark**
+
+From inside the experiment folder run:
+
+```bash
+poetry run benchmark
+```
+
+This will create a virtual environment with all dependencies defined in `pyproject.toml`.
