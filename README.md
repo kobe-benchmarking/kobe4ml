@@ -98,3 +98,33 @@ poetry run benchmark
 ```
 
 This will create a virtual environment with all dependencies defined in `pyproject.toml`.
+
+**7. View Results**
+
+To view the results of the benchmarking experiments:
+
+Open a terminal and navigate to the folder where the results were saved, then go into the experiment folder (`parent_id`) and open `results.csv`. For example:
+
+```bash
+cd static
+cd dcoss
+nano results.csv
+```
+
+The table below summarizes the results of all benchmarking experiments for the five YAML configurations (`lstm_ae`, `conv_lstm_ae`, `attn_ae`, `classif` and `predictor`).
+
+- Metrics include training performance (`epochs`, `train_time`, `best_train_loss`, `best_val_loss`) and inference evaluation (`infer_loss`, `mae`, `mse`, `precision`, `recall`, `f1_score`).
+- Empty cells indicate metrics that are not applicable for that step (e.g., training metrics for inference steps).
+
+| id          | epochs | train_time | best_train_loss | best_val_loss | infer_loss | mae   | mse   | precision | recall | f1_score |
+|-------------|--------|------------|----------------|---------------|------------|-------|-------|-----------|--------|----------|
+| conv_lstm_ae_train | 3  | 12.865     | 0.428          | 0.084         |            |       |       |           |        |          |
+| conv_lstm_ae_infer |        |            |                |               | 1.838      | 1.852 | 4.585 |           |        |          |
+| attn_ae_train | 3  | 28.884     | 0.151          | 0.121         |            |       |       |           |        |          |
+| attn_ae_infer |        |            |                |               | 0.194      | 0.200 | 0.105 |           |        |          |
+| classif_train | 3  | 15.416     | 1.605          | 0.857         |            |       |       |           |        |          |
+| classif_infer |        |            |                |               | 1.629      |       |       | 0.114     | 0.133  | 0.106    |
+| predictor_train | 3  | 16.330     | 0.564          | 0.075         |            |       |       |           |        |          |
+| predictor_infer |        |            |                |               | 1.969      | 2.018 | 5.344 |           |        |          |
+| lstm_ae_train | 3  | 10.975     | 0.536          | 0.085         |            |       |       |           |        |          |
+| lstm_ae_infer |        |            |                |               | 1.958      | 2.013 | 5.446 |           |        |          |
