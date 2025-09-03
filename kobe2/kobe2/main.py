@@ -229,6 +229,7 @@ def main(configs, dir='static'):
     for parent_id, data in exp_data.items():
         if data["results"]:
             df = pd.DataFrame(data["results"])
+            df.insert(0, "id", data["steps"])
 
             exp_dir = os.path.join(dir, parent_id)
             csv_path = os.path.join(exp_dir, "results.csv")
