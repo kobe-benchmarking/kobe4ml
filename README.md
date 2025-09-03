@@ -8,7 +8,7 @@ KOBE is a Python framework used to benchmark algorithms against various datasets
 
 With KOBE, you can run multiple experiments defined in YAML files and directly compare their results.
 
-## How to set up
+## Setup Instructions
 
 **1. Create a Conda Environment**
 
