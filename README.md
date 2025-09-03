@@ -113,6 +113,7 @@ nano results.csv
 
 The table below summarizes the results of all benchmarking experiments for the five YAML configurations (`lstm_ae`, `conv_lstm_ae`, `attn_ae`, `classif` and `predictor`).
 
+- Each row corresponds to a single step: training (\*_train) or inference (\*_infer).
 - Metrics include training performance (`epochs`, `train_time`, `best_train_loss`, `best_val_loss`) and inference evaluation (`infer_loss`, `mae`, `mse`, `precision`, `recall`, `f1_score`).
 - Empty cells indicate metrics that are not applicable for that step (e.g., training metrics for inference steps).
 
