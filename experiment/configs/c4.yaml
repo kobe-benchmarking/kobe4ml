@@ -1,0 +1,109 @@
+metadata:
+  parent_id: dcoss
+  id: dcoss_04
+  version: v1
+  name: BitBrain-Classifier
+  description: This run applies a Classifier that classifies time series into sleep stages on the BitBrain dataset.
+
+implementation:
+  package: classif
+  url: http://127.0.0.1:48034/run   
+
+steps:
+  - id: dcoss_04_01
+    type: prepare
+
+    parameters:
+      save_url: models/classif.pth 
+
+      model:
+        in_size: 3
+        out_size: 5
+        num_heads: 1
+        dropout: 0.5
+        num_layers: 1
+
+      process:
+        batch_size: 512
+        loss: WeightedCrossEntropyLoss
+        epochs: 3
+        patience: 30
+        lr: 0.0001
+        optimizer: AdamW
+        scheduler:
+          name: ReduceLROnPlateau
+          params:
+            factor: 0.99
+            patience: 3
+
+    data:
+      loader:
+        package: torch_loader          
+        index_url: https://kobe-benchmarking.github.io/kobe4ml/
+
+      name: bitbrain
+      location: datasets/bitbrain_conv
+      weight: majority
+
+      parameters:
+        process: prepare
+        train_size: 0.65
+        val_size: 0.15
+        test_size: 0.20
+        seq_len: 240
+        norm_include: ['HB_1', 'HB_2', 'time']
+        full_epoch: 7680
+        per_epoch: True
+        time_include: True
+        shifted: True
+        splitted: True
+        weighted: True
+        analyzed: True
+        normalized: True
+
+    metrics:
+      - epochs
+      - train_time
+      - best_train_loss
+      - best_val_loss
+
+  - id: dcoss_04_02
+    type: work
+
+    parameters:
+      model_url: models/classif.zip
+
+      process:
+        batch_size: 512
+        loss: WeightedCrossEntropyLoss
+
+    data:
+      loader:
+        package: torch_loader          
+        index_url: https://kobe-benchmarking.github.io/kobe4ml/
+
+      name: bitbrain
+      location: datasets/bitbrain_conv
+      weight: majority
+
+      parameters:
+        process: work
+        train_size: 0.65
+        val_size: 0.15
+        test_size: 0.20
+        seq_len: 240
+        norm_include: ['HB_1', 'HB_2', 'time']
+        full_epoch: 7680
+        per_epoch: True
+        time_include: True
+        shifted: True
+        splitted: True
+        weighted: True
+        analyzed: True
+        normalized: True
+
+    metrics:
+      - infer_loss
+      - precision
+      - recall
+      - f1_score

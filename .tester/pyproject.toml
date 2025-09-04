@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "tester"
+version = "0.1"
+description = "Tester: Converts Bitbrain's dataset to MANOLO format (npy + metadata json)."
+authors = [
+    "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
+    "Stasinos Konstantopoulos <konstant@iit.demokritos.gr>"
+]
+readme = "README.md"
+packages = [
+    { include = "tester" }
+]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.14"
+pandas = "^2.1"
+numpy = "^1.26"
+mne = "^1.7"
+
+converter = { path = "../manolo/data/converter", develop = true }
+torch_loader = { path = "../manolo/data/loaders/torch_loader", develop = true }
+sklearn_loader = { path = "../manolo/data/loaders/sklearn_loader", develop = true }
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+bitbrain-conv = "tester.bitbrain-conv:main"
+bitbrain-tl = "tester.bitbrain-torch-load:main"
+bitbrain-sl = "tester.bitbrain-sklearn-load:main"

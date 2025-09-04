@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "torch_loader"
+version = "0.42"
+packages = [
+    { include = "torch_loader" }
+]
+description = "Torch Loader"
+authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
+	        "Stasinos Konstantopoulos <konstant@iit.demokritos.gr>" ]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.14"  
+numpy = "^1.26"
+torch = "^2.7.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

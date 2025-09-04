@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "exp"
+version = "0.8"
+packages = [
+    { include = "src" }
+]
+description = "Experiment: ML Benchmarking"
+authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
+	    "Stasinos Konstantopoulos <konstant@iit.demokritos.gr>" ]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.14"
+requests = "^2.32"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+benchmark = "src.main:main"

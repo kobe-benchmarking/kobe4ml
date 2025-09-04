@@ -1,0 +1,266 @@
+metadata:
+  parent_id: kn7fej4o
+  id: kn7fej4o_01
+  version: v1
+  name: BitBrain-LSTM-Autoencoder
+  description: This run applies a LSTM autoencoder architecture that learns to reconstruct the BitBrain time series dataset.   
+
+  references:
+    access_point_0:
+      location: https://00.000.000.00:00000/
+      username: xxxx
+      password: yyyy   
+
+    access_point_1:
+      location: https://11.111.111.11:11111/
+      username: xxxx
+      password: yyyy   
+
+    access_point_2:
+      location: https://22.222.222.22:22222/
+      username: vvvv
+      password: wwww 
+
+    access_point_3:
+      location: https://33.333.333.33:33333/
+      username: vvvv
+      password: wwww 
+
+steps:
+  - id: kn7fej4o_01_01
+    type: prepare
+
+    nodes:
+      - id: ec2-00
+        type: cloud
+
+        communication:          
+          ssh:
+            host: 44.444.444.44
+            user: ec2-user
+            port: 22
+
+            key: 
+              filename: manolo.pem
+              access: access_point_0
+
+        deployment:
+          docker_image: lstm_ae:latest
+          filename: lstm_ae.tar
+          access: access_point_1
+
+      - id: ec2-01
+        type: edge
+
+        communication:          
+          ssh:
+            host: 55.555.555.55
+            user: ec2-user
+            port: 22
+
+            key: 
+              filename: manolo.pem
+              access: access_point_0
+
+        deployment:
+          docker_image: lstm_ae:latest
+          filename: lstm_ae.tar
+          access: access_point_2
+        
+      - id: ec2-02
+        type: edge
+
+        communication:          
+          ssh:
+            host: 66.666.666.66
+            user: ec2-user
+            port: 22
+
+            key: 
+              filename: manolo.pem
+              access: access_point_0
+
+        deployment:
+          docker_image: lstm_ae:latest
+          filename: lstm_ae.tar
+          access: access_point_3
+
+    implementation:
+      model:
+        num_feats: 2
+        latent_seq_len: 1
+        latent_num_feats: 8
+        hidden_size: 4
+        num_layers: 1
+        dropout: 0.05
+
+      process:
+        seq_len: 240
+        loss: BlendedLoss
+        epochs: 3
+        patience: 30
+        lr: 0.0001
+        optimizer: Adam
+        
+        scheduler:
+          name: ReduceLROnPlateau
+          params:
+            factor: 0.99
+            patience: 3
+
+      weights: lstm_ae.pth 
+
+    data:
+      - id: tier-01
+        name: bitbrain-subject-a
+        access: access_point_2
+
+        loader: 
+          docker_image: torch_loader:latest
+          filename: torch_loader.tar
+          access: access_point_2
+
+        parameters:
+          batch_size: 512
+          train_size: 2
+          val_size: 1
+          test_size: 1
+          seq_len: 240
+          exist: True
+
+      - id: tier-02
+        name: bitbrain-subject-b
+        access: access_point_3
+
+        loader: 
+          docker_image: torch_loader:latest
+          filename: torch_loader.tar
+          access: access_point_3
+
+        parameters:
+          batch_size: 512
+          train_size: 2
+          val_size: 1
+          test_size: 1
+          seq_len: 240
+          exist: True
+
+    metrics:
+      - epochs
+      - train_time
+      - best_train_loss
+      - best_val_loss
+      - mae
+      - mse
+
+  - id: kn7fej4o_01_02
+    type: work
+
+    nodes:
+      - id: ec2-00
+        type: cloud
+
+        communication:          
+          ssh:
+            host: 44.444.444.44
+            user: ec2-user
+            port: 22
+
+            key: 
+              filename: manolo.pem
+              access: access_point_0
+
+        deployment:
+          docker_image: lstm_ae:latest
+          filename: lstm_ae.tar
+          access: access_point_1
+
+      - id: ec2-01
+        type: edge
+
+        communication:          
+          ssh:
+            host: 55.555.555.55
+            user: ec2-user
+            port: 22
+
+            key: 
+              filename: manolo.pem
+              access: access_point_0
+
+        deployment:
+          docker_image: lstm_ae:latest
+          filename: lstm_ae.tar
+          access: access_point_2
+        
+      - id: ec2-02
+        type: edge
+
+        communication:          
+          ssh:
+            host: 66.666.666.66
+            user: ec2-user
+            port: 22
+
+            key: 
+              filename: manolo.pem
+              access: access_point_0
+
+        deployment:
+          docker_image: lstm_ae:latest
+          filename: lstm_ae.tar
+          access: access_point_3
+
+    implementation:
+      model:
+        num_feats: 2
+        latent_seq_len: 1
+        latent_num_feats: 8
+        hidden_size: 4
+        num_layers: 1
+        dropout: 0.05
+
+      process:
+        seq_len: 240
+        loss: BlendedLoss
+
+      weights: lstm_ae.pth
+
+    data:
+      - id: tier-01
+        name: bitbrain-subject-a
+        access: access_point_2
+
+        loader: 
+          docker_image: torch_loader:latest
+          filename: torch_loader.tar
+          access: access_point_2
+
+        parameters:
+          batch_size: 512
+          train_size: 2
+          val_size: 1
+          test_size: 1
+          seq_len: 240
+          exist: True
+
+      - id: tier-02
+        name: bitbrain-subject-b
+        access: access_point_3
+
+        loader: 
+          docker_image: torch_loader:latest
+          filename: torch_loader.tar
+          access: access_point_3
+
+        parameters:
+          batch_size: 512
+          train_size: 2
+          val_size: 1
+          test_size: 1
+          seq_len: 240
+          exist: True
+
+    metrics:
+      - mae
+      - mse
