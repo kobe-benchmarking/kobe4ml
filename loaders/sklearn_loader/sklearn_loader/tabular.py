@@ -114,21 +114,3 @@ def standard_normalize(dir, name, process, include, stats):
     utils.save_npz(data_norm, norm_path)
 
     logger.info(f"Normalized data saved to {norm_path}.")
-
-def create_dataframe(dir, name):
-    """
-    Load a structured .npz dataset and return (X, y) for sklearn models.
-
-    :param dir: Directory containing the dataset.
-    :param name: Dataset base name without .npz extension (e.g., 'bitbrain-train-std-norm').
-    :return: Tuple (X, y) as numpy arrays.
-    """
-    data_path = utils.get_path(dir, filename=f"{name}.npz")
-    data = utils.load_npz(data_path)
-
-    X = data["features"]
-    y = data["labels"]
-
-    logger.debug(f"Created sklearn dataset from {name}: X={X.shape}, y={y.shape}")
-
-    return X, y

@@ -144,3 +144,26 @@ def extract_weights(dir, name):
     logger.info(f"Saved class weights to {weights_path}: {weights}")
 
     return weights
+
+def create_dataset(dir, name, time_included):
+    """
+    Load a structured .npz dataset and return (X, y) for sklearn models.
+
+    :param dir: Directory containing the dataset.
+    :param name: Dataset base name without .npz extension (e.g., 'bitbrain-train-std-norm').
+    :param time_include: Whether to include the time features in the input data.
+    :return: Tuple (X, y) as numpy arrays.
+    """
+    data_path = utils.get_path(dir, filename=f"{name}.npz")
+    data = utils.load_npz(data_path)
+
+    X = data["features"]
+    y = data["labels"]
+    t = data["time"]
+
+    if time_included:
+        X = np.concatenate([X, t], axis=1)
+
+    logger.debug(f"Created sklearn dataset from {name}: X={X.shape}, y={y.shape}")
+
+    return X, y

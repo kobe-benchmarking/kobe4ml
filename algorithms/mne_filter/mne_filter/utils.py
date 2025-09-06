@@ -1,5 +1,6 @@
 import os
 import logging
+import json
 
 def get_logger(level='DEBUG'):
     """
@@ -48,3 +49,23 @@ def get_path(*dirs, filename):
     path = os.path.join(dir_path, filename)
 
     return path
+
+def load_json(path):
+    """
+    Load a JSON file from the given path.
+
+    :param path: Full path to the .json file.
+    :return: Parsed JSON as a Python dict.
+    """
+    with open(path, 'r') as f:
+        return json.load(f)
+
+def save_json(data, path):
+    """
+    Save a Python dict to a JSON file at the specified path.
+
+    :param data: Data to save as JSON.
+    :param path: Full path to the .json file.
+    """
+    with open(path, 'w') as f:
+        json.dump(data, f, indent=4)

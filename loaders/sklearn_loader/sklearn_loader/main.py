@@ -19,7 +19,6 @@ def main(dir, name, process, train_size, test_size, norm_include, full_epoch, pe
     sh.split_data(dir=dir, 
                   name=name, 
                   train_size=train_size, 
-                  val_size=val_size, 
                   test_size=test_size,
                   done=splitted)
     
@@ -46,13 +45,10 @@ def main(dir, name, process, train_size, test_size, norm_include, full_epoch, pe
                             stats=stats,
                             done=normalized)
         
-        logger.info(f"Creating TSDataset for {p} data.")
-        dls[p] = tl.TSDataset(dir=dir, 
-                              name=f'{name}-{p}-rbst-norm',
-                              seq_len=seq_len,
-                              full_epoch=full_epoch,
-                              per_epoch=per_epoch,
-                              time_include=time_include)
+        logger.info(f"Creating dataset for {p} data.")
+        dls[p] = sh.create_dataset(dir=dir,
+                                   name=f'{name}-{p}-rbst-norm',
+                                   time_include=time_include)
     
     return tuple(dls[p] for p in process_map[process])
 
