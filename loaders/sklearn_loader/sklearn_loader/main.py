@@ -9,6 +9,7 @@ def main(dir, name, process, train_size, infer_size, norm_include, time_include,
     Main function to create sklearn loaders from the Bitbrain dataset, suitable for machine learning tasks.
     """
     dls = {}
+    stats = None
     process_map = {"prepare": ["train", "val"],
                    "work": ["infer"]}
 
