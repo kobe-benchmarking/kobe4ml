@@ -38,7 +38,7 @@ def execute(package: str, method: str, data_id: str, model: str, options: str):
     args = {}
     arg_files = {"data_id": data_id, "model": model, "options": options}
 
-    install_and_import(package='torch_loader', index_url='https://kobe-benchmarking.github.io/kobe4ml/')
+    install_and_import(package='sklearn_loader', index_url='https://kobe-benchmarking.github.io/kobe4ml/')
 
     for arg_name, file_name in arg_files.items():
         args[arg_name] = utils.load_pickle(file_name)
@@ -55,4 +55,4 @@ def setup():
     """
     Entry point to run the FastAPI server.
     """
-    uvicorn.run("lstm_ae.api:app", host="0.0.0.0", port=48031, reload=True)
+    uvicorn.run("mne_filter.api:app", host="0.0.0.0", port=48036, reload=True)
