@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mne_filter"
-version = "0.1"
+version = "0.2"
 packages = [
     { include = "mne_filter" }
 ]
@@ -21,4 +21,4 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-api = "mne.api:setup"
+api = "mne_filter.api:setup"
