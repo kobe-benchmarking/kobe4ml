@@ -47,15 +47,15 @@ def shift_labels(dir, name, done=False):
     utils.save_npz(data=data, path=data_path)
     logger.info(f"Shifted labels {label_cols} in {data_path} so values start at 0.")
 
-def split_data(dir, name, train_size=0.75, val_size=0.25, test_size=0, done=False):
+def split_data(dir, name, train_size=0.75, val_size=0.25, infer_size=0, done=False):
     """
-    Split structured .npz dataset into training, validation, and testing sets based on unique values in the split column.
+    Split structured .npz dataset into training, validation, and inference sets based on unique values in the split column.
 
     :param dir: Directory containing the dataset.
     :param name: Name of the dataset (e.g., 'bitbrain').
     :param train_size: Proportion of nights to use for training.
     :param val_size: Proportion of nights to use for validation.
-    :param test_size: Proportion of nights to use for testing.
+    :param infer_size: Proportion of nights to use for inference.
     :param done: If True, skip the splitting process.
     """
     data_path = utils.get_path(dir, filename=f'{name}.npz')
@@ -67,7 +67,7 @@ def split_data(dir, name, train_size=0.75, val_size=0.25, test_size=0, done=Fals
 
     train_path = utils.get_path(dir, filename=f'{name}-train.npz')
     val_path = utils.get_path(dir, filename=f'{name}-val.npz')
-    test_path = utils.get_path(dir, filename=f'{name}-test.npz')
+    infer_path = utils.get_path(dir, filename=f'{name}-infer.npz')
 
     data = utils.load_npz(data_path)
     metadata = utils.load_json(meta_path)
@@ -88,14 +88,14 @@ def split_data(dir, name, train_size=0.75, val_size=0.25, test_size=0, done=Fals
 
         train_idx = indices[:train_end]
         val_idx = indices[train_end:val_end]
-        test_idx = indices[val_end:]
+        infer_idx = indices[val_end:]
 
         def subset_data(idxs):
             return {k: v[idxs] for k, v in data.items()}
 
         train_data = subset_data(train_idx)
         val_data = subset_data(val_idx)
-        test_data = subset_data(test_idx)
+        infer_data = subset_data(infer_idx)
     
     else:
         split_values = data["split"].flatten() 
@@ -108,12 +108,12 @@ def split_data(dir, name, train_size=0.75, val_size=0.25, test_size=0, done=Fals
 
         n = len(unique_values)
 
-        if train_size + val_size + test_size == 0:
+        if train_size + val_size + infer_size == 0:
             raise ValueError("All sets have size 0, which is invalid.")
-        if train_size + val_size + test_size > 1:
-            raise ValueError("Sum of train, val, and test sizes must not exceed 1.")
+        if train_size + val_size + infer_size > 1:
+            raise ValueError("Sum of train, val, and infer sizes must not exceed 1.")
         
-        raw = {'train': round(n * train_size), 'val': round(n * val_size), 'test': round(n * test_size)}
+        raw = {'train': round(n * train_size), 'val': round(n * val_size), 'infer': round(n * infer_size)}
         total = sum(raw.values())
 
         while total > n:
@@ -131,7 +131,7 @@ def split_data(dir, name, train_size=0.75, val_size=0.25, test_size=0, done=Fals
 
         train_vals = set(unique_values[:train_end])
         val_vals = set(unique_values[train_end:val_end])
-        test_vals = set(unique_values[val_end:])
+        infer_vals = set(unique_values[val_end:])
 
         def filter_data(values):
             filtered = {}
@@ -144,34 +144,34 @@ def split_data(dir, name, train_size=0.75, val_size=0.25, test_size=0, done=Fals
 
         train_data = filter_data(train_vals)
         val_data = filter_data(val_vals)
-        test_data = filter_data(test_vals)
+        infer_data = filter_data(infer_vals)
 
         logger.info(f"Train values: {sorted(train_vals)}")
         logger.info(f"Validation values: {sorted(val_vals)}")
-        logger.info(f"Test values: {sorted(test_vals)}")
+        logger.info(f"Inference values: {sorted(infer_vals)}")
 
         assert train_vals.isdisjoint(val_vals), "Overlap in train and val nights!"
-        assert train_vals.isdisjoint(test_vals), "Overlap in train and test nights!"
-        assert val_vals.isdisjoint(test_vals), "Overlap in val and test nights!"   
+        assert train_vals.isdisjoint(infer_vals), "Overlap in train and infer nights!"
+        assert val_vals.isdisjoint(infer_vals), "Overlap in val and infer nights!"   
 
     utils.save_npz(train_data, train_path)
     utils.save_npz(val_data, val_path)
-    utils.save_npz(test_data, test_path)
+    utils.save_npz(infer_data, infer_path)
 
     logger.info(f"Data split into train ({len(next(iter(train_data.values())))} samples), "
         f"val ({len(next(iter(val_data.values())))} samples), "
-        f"test ({len(next(iter(test_data.values())))} samples).")
+        f"infer ({len(next(iter(infer_data.values())))} samples).")
 
-def extract_weights(dir, name, done=False):
+def extract_weights(dir, name, process, done=False):
     """
-    Calculate class weights from the training structured .npz dataset to handle class imbalance, and save them to a JSON file. Supports multiple weight columns.
+    Calculate class weights from the structured .npz dataset to handle class imbalance, and save them to a JSON file. Supports multiple weight columns.
 
     :param dir: Directory to save the weights file.
     :param name: Name of the dataset (e.g., 'bitbrain').
+    :param process: Process type (e.g., 'train', 'val', 'infer').
     :param done: If True, skip the weight extraction process.
-    :return: Dictionary of class weights.
     """
-    data_path = utils.get_path(dir, filename=f'{name}-train.npz')
+    data_path = utils.get_path(dir, filename=f'{name}-{process}.npz')
     meta_path = utils.get_path(dir, filename=f'{name}.json')
     
     weights_path = utils.get_path(dir, filename=f'{name}-weights.json')
@@ -181,7 +181,7 @@ def extract_weights(dir, name, done=False):
         return utils.load_json(weights_path)
 
     if not os.path.exists(data_path):
-        raise FileNotFoundError(f"Training data file not found: {data_path}. Cannot extract weights.")
+        raise FileNotFoundError(f"Data file not found: {data_path}. Cannot extract weights.")
 
     data = utils.load_npz(data_path)
     metadata = utils.load_json(meta_path)
@@ -204,6 +204,4 @@ def extract_weights(dir, name, done=False):
         weights[col] = dict(sorted(col_weights.items()))
 
     utils.save_json(data=weights, path=weights_path)
-    logger.info(f"Saved class weights to {weights_path}: {weights}")
-
-    return weights
+    logger.info(f"Saved class weights to {weights_path}: {weights}.")

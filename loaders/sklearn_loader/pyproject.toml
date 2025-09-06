@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sklearn_loader"
-version = "0.2"
+version = "0.4"
 packages = [
     { include = "sklearn_loader" }
 ]
@@ -12,6 +12,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.9,<3.14"  
 numpy = "^1.26"
+scikit-learn = "^1.4"
 
 [build-system]
 requires = ["poetry-core"]
