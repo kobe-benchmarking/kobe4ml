@@ -80,7 +80,7 @@ def split_data(dir, name, train_size=0.8, infer_size=0.2, done=False):
         indices = list(range(total))
 
         train_idx, infer_idx = train_test_split(
-            indices, train_size=train_size, infer_size=infer_size, random_state=42, shuffle=True
+            indices, train_size=train_size, test_size=infer_size, random_state=42, shuffle=True
         )
 
         def subset_data(idxs):
@@ -94,7 +94,7 @@ def split_data(dir, name, train_size=0.8, infer_size=0.2, done=False):
         unique_values = np.unique(split_values)
 
         train_vals, infer_vals = train_test_split(
-            unique_values, train_size=train_size, infer_size=infer_size, random_state=42, shuffle=True
+            unique_values, train_size=train_size, test_size=infer_size, random_state=42, shuffle=True
         )
 
         def filter_data(values):
