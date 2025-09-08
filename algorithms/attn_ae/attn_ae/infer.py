@@ -4,31 +4,12 @@ import os
 
 from . import utils
 from .model import *
+from .metrics import *
 
 logger = utils.get_logger(level='CRITICAL')
 
 device = utils.detect_device()
 logger.info(f'Device is {device}')
-
-def mae(X, X_dec):
-    """
-    Compute Mean Absolute Error (MAE) manually.
-
-    :param X: Original input tensor.
-    :param X_dec: Reconstructed output tensor.
-    :return: MAE value.
-    """
-    return torch.mean(torch.abs(X - X_dec)).item()
-
-def mse(X, X_dec):
-    """
-    Compute Mean Squared Error (MSE) manually.
-
-    :param X: Original input tensor.
-    :param X_dec: Reconstructed output tensor.
-    :return: MSE value.
-    """
-    return torch.mean((X - X_dec) ** 2).item()
 
 def unzip_model(path):
     """

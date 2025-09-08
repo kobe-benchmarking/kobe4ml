@@ -110,4 +110,4 @@ steps:
       - infer_loss
       - precision
       - recall
-      - f1_score
+      - f1

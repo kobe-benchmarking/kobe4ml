@@ -24,17 +24,17 @@ def infer(data, model, metrics):
     root_dir = os.path.abspath(os.path.join(os.getcwd(), '..', '..'))
     estims_path = utils.get_path(root_dir, "static", filename="estims.npy")
 
-    X_dec = model(X)
+    X_flt = model(X)
 
-    error = estimate.filter_error(x=X, x_f=X_dec)
-    estims_array = np.stack([X, X_dec, error], axis=0)
+    error = estimate.filter_error(X, X_flt)
+    estims_array = np.stack([X, X_flt, error], axis=0)
 
     utils.save_np(data=estims_array, path=estims_path)
     logger.info(f"Saved per-sample errors to {estims_path}.")
         
     all_metrics = {
-        'mae': mae(X, X_dec),
-        'mse': mse(X, X_dec)
+        'mae': mae(X, X_flt),
+        'mse': mse(X, X_flt)
     }
 
     filtered_metrics = {metric: all_metrics[metric] for metric in metrics if metric in all_metrics}
