@@ -158,7 +158,7 @@ def extract_weights(dir, name, process, done=False):
     utils.save_json(data=weights, path=weights_path)
     logger.info(f"Saved class weights to {weights_path}: {weights}")
 
-def create_dataset(dir, name, time_included):
+def create_dataset(dir, name, time_include):
     """
     Load a structured .npz dataset and return (X, y) for sklearn models.
 
@@ -174,7 +174,7 @@ def create_dataset(dir, name, time_included):
     y = data["labels"]
     t = data["time"]
 
-    if time_included:
+    if time_include:
         X = np.concatenate([X, t], axis=1)
 
     logger.debug(f"Created sklearn dataset from {name}: X={X.shape}, y={y.shape}")
