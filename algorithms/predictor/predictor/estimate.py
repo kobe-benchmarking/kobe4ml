@@ -9,3 +9,16 @@ def pred_error(X, X_pred):
     :return: Numpy array of errors, shape (batch_size, seq_len, num_feats).
     """
     return np.abs(X - X_pred)
+
+def attn_error(attn_matrix, absolute=True):
+    """
+    Compute per-sample error or magnitude using the attention matrix.
+
+    :param attn_matrix: Attention matrix output from the model, shape (batch_size, seq_len, num_feats).
+    :param absolute: If True, returns absolute values; if False, keeps original signed values.
+    :return: Numpy array of errors, same shape as attn_matrix.
+    """
+    if absolute:
+        return np.abs(attn_matrix)
+    else:
+        return attn_matrix
