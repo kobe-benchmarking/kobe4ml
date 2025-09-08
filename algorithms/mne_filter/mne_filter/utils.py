@@ -2,6 +2,7 @@ import os
 import logging
 import json
 import pickle
+import numpy as np
 
 def get_logger(level='DEBUG'):
     """
@@ -90,3 +91,21 @@ def load_pickle(path):
     """
     with open(path, "rb") as f:
         return pickle.load(f)
+    
+def save_np(data, path):
+    """
+    Save a NumPy array to a .npy file.
+
+    :param data: NumPy array to save.
+    :param path: Full path to save the array (should end with .npy).
+    """
+    np.save(path, data)
+
+def load_np(path):
+    """
+    Load a NumPy array from a .npy file.
+
+    :param path: Full path to the .npy file.
+    :return: Loaded NumPy array.
+    """
+    return np.load(path)

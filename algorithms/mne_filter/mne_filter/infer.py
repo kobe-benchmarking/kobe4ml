@@ -1,34 +1,14 @@
 import warnings
-import zipfile
 import os
-import numpy as np
 
+from . import estimate
 from . import utils
+from .metrics import *
 from .model import *
 
 logger = utils.get_logger(level='DEBUG')
 
 warnings.filterwarnings("ignore", category=FutureWarning)
-
-def mae(X, X_dec):
-    """
-    Compute Mean Absolute Error (MAE) manually.
-    
-    :param X: Original data, ndarray of shape (n_samples, n_features)
-    :param X_dec: Reconstructed/filtered data, same shape as X
-    :return: Scalar MAE value
-    """
-    return np.mean(np.abs(X - X_dec))
-
-def mse(X, X_dec):
-    """
-    Compute Mean Squared Error (MSE) manually.
-    
-    :param X: Original data, ndarray of shape (n_samples, n_features)
-    :param X_dec: Reconstructed/filtered data, same shape as X
-    :return: Scalar MSE value
-    """
-    return np.mean((X - X_dec)**2)
 
 def infer(data, model, metrics):
     """
@@ -40,8 +20,17 @@ def infer(data, model, metrics):
     :return: Dictionary containing metrics as defined in the input metrics list.
     """
     X, _ = data
+    
+    root_dir = os.path.abspath(os.path.join(os.getcwd(), '..', '..'))
+    estims_path = utils.get_path(root_dir, "static", filename="estims.npy")
 
     X_dec = model(X)
+
+    error = estimate.filter_error(x=X, x_f=X_dec)
+    estims_array = np.stack([X, X_dec, error], axis=0)
+
+    utils.save_np(data=estims_array, path=estims_path)
+    logger.info(f"Saved per-sample errors to {estims_path}.")
         
     all_metrics = {
         'mae': mae(X, X_dec),
