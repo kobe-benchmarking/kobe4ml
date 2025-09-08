@@ -14,7 +14,7 @@ steps:
     type: work
 
     parameters:
-      model_url: models/mne_filter.json
+      model_url: models/mne_filter_params.json
 
     data:
       loader:
@@ -31,11 +31,11 @@ steps:
         infer_size: 1
         norm_include: []
         time_include: False
-        shifted: False
-        splitted: False
-        weighted: False
-        analyzed: False
-        normalized: False
+        shifted: True
+        splitted: True
+        weighted: True
+        analyzed: True
+        normalized: True
         weights_from: infer
         stats_from: infer
 

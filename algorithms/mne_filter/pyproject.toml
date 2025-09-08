@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mne_filter"
-version = "0.3"
+version = "0.4"
 packages = [
     { include = "mne_filter" }
 ]

@@ -30,25 +30,6 @@ def mse(X, X_dec):
     """
     return np.mean((X - X_dec)**2)
 
-def unzip_model(path):
-    """
-    Extract a model zip file into the model weights and parameters for inference.
-
-    :param path: Path to the zip file created by zip_model, e.g., models/attn_ae.zip
-    :return: Tuple (model_params_dict, model_pth_path)
-    """
-    extract_dir = os.path.dirname(path)
-
-    with zipfile.ZipFile(path, 'r') as zipf:
-        zipf.extractall(extract_dir)
-
-    pth_path = path.replace('.zip', '.pth')
-    json_path = path.replace('.zip', '_params.json')
-
-    model_params = utils.load_json(path=json_path)
-
-    return model_params, pth_path
-
 def infer(data, model, metrics):
     """
     Test the model on the provided data and calculate the test loss, MAE, and MSE.
@@ -76,7 +57,7 @@ def main(data_id, model, options):
     Main function to execute the testing workflow.
 
     :param data_id: Dictionary containing dataset and its parameters.
-    :param model: Path to the model zip file containing model weights and parameters.
+    :param model: Path to the model JSON file containing model parameters.
     :param options: Dictionary containing process parameters and metrics to calculate.
     :return: Dictionary containing calculated metrics.
     """
