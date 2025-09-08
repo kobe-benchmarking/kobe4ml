@@ -27,8 +27,8 @@ steps:
 
       parameters:
         process: work
-        train_size: 0
-        infer_size: 1.00
+        train_size: null
+        infer_size: 1
         norm_include: []
         time_include: False
         shifted: False
