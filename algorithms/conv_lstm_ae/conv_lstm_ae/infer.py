@@ -53,7 +53,7 @@ def infer(data, model, model_pth, criterion, metrics):
     total_mse = 0.0
     X_all, X_dec_all = [], []
 
-    static_dir = os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'experiment', 'static'))
+    static_dir = os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'experiment', 'static', 'estims'))
     estims_path = utils.get_path(static_dir, filename="estims_conv_lstm_ae.npy")
 
     batches = len(data)
