@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mne_filter"
-version = "0.4"
+version = "0.7"
 packages = [
     { include = "mne_filter" }
 ]
@@ -15,6 +15,7 @@ torch = "^2.7.0"
 fastapi = "^0.115.0"
 uvicorn = "^0.23.2"
 mne = "^1.7"
+numpy = "^1.26"
 
 [build-system]
 requires = ["poetry-core"]

@@ -1,4 +1,5 @@
 import mne
+import numpy as np
 
 class MNE_Filter:
     def __init__(self, sfreq, l_freq, h_freq):
@@ -22,13 +23,15 @@ class MNE_Filter:
         """
         return x.T
 
-    def forward(self, x):
+    def __call__(self, x):
         """
         Forward pass for the MNE filter.
 
         :param x: Input array of shape (n_samples, n_features).
         :return: Filtered output of same shape as input.
         """
+        x = np.asarray(x, dtype=np.float64)
+
         x_t = self.transpose(x)
         x_f = mne.filter.filter_data(data=x_t,
                                      sfreq=self.sfreq,

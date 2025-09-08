@@ -32,7 +32,7 @@ def mse(X, X_dec):
 
 def infer(data, model, metrics):
     """
-    Test the model on the provided data and calculate the test loss, MAE, and MSE.
+    Test the model on the provided data and calculate the infer loss, MAE, and MSE.
 
     :param data: DataLoader for inference.
     :param model: The model to be tested.
@@ -67,7 +67,7 @@ def main(data_id, model, options):
 
     model = MNE_Filter(**model_params)
  
-    results = infer(data=data,
+    results = infer(data=data[0],
                     model=model,
                     metrics=metrics)
     
