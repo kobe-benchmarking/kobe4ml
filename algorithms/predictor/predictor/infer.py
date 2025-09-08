@@ -53,7 +53,7 @@ def infer(data, model, model_pth, criterion, metrics):
     total_mse = 0.0
     X_all, X_pred_all, attn_matrices = [], [], []
 
-    static_dir = os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'static'))
+    static_dir = os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'experiment', 'static', 'estims'))
     estims_path = utils.get_path(static_dir, filename="estims_predictor.npy")
 
     batches = len(data)
@@ -66,6 +66,7 @@ def infer(data, model, model_pth, criterion, metrics):
 
             X_pred, _ = utils.separate(src=X_pred, c=[0,1], t=[2])
             Xn, _ = utils.separate(src=Xn, c=[0,1], t=[2])
+            attn_matrix, _ = utils.separate(src=attn_matrix, c=[0,1], t=[2])
 
             infer_loss = criterion(X_pred, Xn)
             total_infer_loss += infer_loss.item()

@@ -22,7 +22,7 @@ def infer(data, model, metrics):
     """
     X, _ = data
     
-    static_dir = os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'static'))
+    static_dir = os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'experiment', 'static', 'estims'))
     estims_path = utils.get_path(static_dir, filename="estims_mne.npy")
 
     X_flt = model(X)

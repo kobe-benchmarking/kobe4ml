@@ -240,3 +240,17 @@ def load_np(path):
     :return: Loaded NumPy array.
     """
     return np.load(path)
+
+def separate(src, c, t):
+    """
+    Separates channels and time features from the source tensor.
+
+    :param src: Tensor of shape (batch_size, seq_len, num_feats).
+    :param c: Range of channel features.
+    :param t: Range of time features.
+    :return: Tuple of (channels, time) tensors.
+    """
+    channels = src[:, :, c]
+    time = src[:, :, t]
+
+    return channels, time

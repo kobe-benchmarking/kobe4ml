@@ -54,7 +54,7 @@ def infer(data, model, model_pth, criterion, metrics):
     total_f1 = 0.0
     attn_matrices = []
 
-    static_dir = os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'static'))
+    static_dir = os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'experiment', 'static', 'estims'))
     estims_path = utils.get_path(static_dir, filename="estims_classif.npy")
 
     batches = len(data)
@@ -64,6 +64,7 @@ def infer(data, model, model_pth, criterion, metrics):
             X, y = X.to(device), y.to(device)
 
             y_pred, attn_matrix = model(X)
+            attn_matrix, _ = utils.separate(src=attn_matrix, c=[0,1], t=[2])
 
             batch_size, seq_len, num_classes = y_pred.size()
             y_pred = y_pred.reshape(batch_size * seq_len, num_classes)

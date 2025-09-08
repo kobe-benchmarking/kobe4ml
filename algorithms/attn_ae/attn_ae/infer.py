@@ -53,7 +53,7 @@ def infer(data, model, model_pth, criterion, metrics):
     total_mse = 0.0
     X_all, X_dec_all, attn_matrices = [], [], []
 
-    static_dir = os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'static'))
+    static_dir = os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'experiment', 'static', 'estims'))
     estims_path = utils.get_path(static_dir, filename="estims_attn_ae.npy")
 
     batches = len(data)
@@ -66,6 +66,7 @@ def infer(data, model, model_pth, criterion, metrics):
 
             X_dec, _ = utils.separate(src=X_dec, c=[0,1], t=[2])
             X, _ = utils.separate(src=X, c=[0,1], t=[2])
+            attn_matrix, _ = utils.separate(src=attn_matrix, c=[0,1], t=[2])
 
             infer_loss = criterion(X_dec, X)
             total_infer_loss += infer_loss.item()
@@ -87,6 +88,7 @@ def infer(data, model, model_pth, criterion, metrics):
 
     rec_error = estimate.rec_error(X_all, X_dec_all)
     attn_error = estimate.attn_error(attn_matrices)
+
     errors = np.stack([rec_error, attn_error], axis=0)
 
     utils.save_np(data=errors, path=estims_path)
