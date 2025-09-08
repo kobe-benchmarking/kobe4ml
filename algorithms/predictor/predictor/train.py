@@ -69,12 +69,12 @@ def train(data, model, model_params, model_pth, criterion, epochs, patience, opt
         for _, (X, Xn, _) in enumerate(train_data):
             X, Xn = X.to(device), Xn.to(device)
 
-            X_dec, _ = model(X)
+            X_pred, _ = model(X)
 
-            X_dec, _ = utils.separate(src=X_dec, c=[0,1], t=[2])
+            X_pred, _ = utils.separate(src=X_pred, c=[0,1], t=[2])
             Xn, _ = utils.separate(src=Xn, c=[0,1], t=[2])
 
-            train_loss = criterion(X_dec, Xn)
+            train_loss = criterion(X_pred, Xn)
             optimizer.zero_grad()
             train_loss.backward()
             optimizer.step()
@@ -91,12 +91,12 @@ def train(data, model, model_params, model_pth, criterion, epochs, patience, opt
             for _, (X, Xn, _) in enumerate(val_data):
                 X, Xn = X.to(device), Xn.to(device)
 
-                X_dec, _ = model(X)
+                X_pred, _ = model(X)
 
-                X_dec, _ = utils.separate(src=X_dec, c=[0,1], t=[2])
+                X_pred, _ = utils.separate(src=X_pred, c=[0,1], t=[2])
                 Xn, _ = utils.separate(src=Xn, c=[0,1], t=[2])
 
-                val_loss = criterion(X_dec, Xn)
+                val_loss = criterion(X_pred, Xn)
                 total_val_loss += val_loss.item()
 
         avg_val_loss = total_val_loss / batches

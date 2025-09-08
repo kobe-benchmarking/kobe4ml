@@ -1,5 +1,6 @@
 import warnings
 import os
+import numpy as np
 
 from . import estimate
 from . import utils
@@ -21,8 +22,8 @@ def infer(data, model, metrics):
     """
     X, _ = data
     
-    root_dir = os.path.abspath(os.path.join(os.getcwd(), '..', '..'))
-    estims_path = utils.get_path(root_dir, "static", filename="estims.npy")
+    static_dir = os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'static'))
+    estims_path = utils.get_path(static_dir, filename="estims_mne.npy")
 
     X_flt = model(X)
 
