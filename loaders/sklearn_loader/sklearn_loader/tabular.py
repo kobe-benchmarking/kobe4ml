@@ -4,7 +4,7 @@ from . import utils
 
 logger = utils.get_logger(level='DEBUG')
 
-def get_stats(dir, name, process, done=False):
+def get_stats(dir, name, process, done=False, stats_from='train'):
     """
     Load structured .npz train data and metadata, compute stats (mean, std, median, IQR) per column,
     and save the stats as a JSON file.
@@ -13,6 +13,7 @@ def get_stats(dir, name, process, done=False):
     :param name: Dataset name prefix (e.g., 'bitbrain').
     :param process: Process type (e.g., 'train', 'val', 'infer').
     :param done: If True, skip the stats calculation.
+    :param stats_from: Specifies which dataset split to use as reference.
     :return: Dict of stats keyed by column name.
     """
     data_path = utils.get_path(dir, filename=f"{name}-{process}.npz")
@@ -22,7 +23,7 @@ def get_stats(dir, name, process, done=False):
     data = utils.load_npz(data_path)
     metadata = utils.load_json(meta_path)
 
-    if done:
+    if done or stats_from == process:
         logger.info(f"Skipping stats calculation for {data_path}.")
         return utils.load_json(stats_path)
 

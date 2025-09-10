@@ -115,7 +115,7 @@ def split_data(dir, name, train_size=0.8, infer_size=0.2, done=False):
     logger.info(f"Data split into train ({len(next(iter(train_data.values())))} samples), "
                 f"infer ({len(next(iter(infer_data.values())))} samples).")
 
-def extract_weights(dir, name, process, done=False):
+def extract_weights(dir, name, process, done=False, weights_from='train'):
     """
     Calculate class weights from the training structured .npz dataset to handle class imbalance, and save them to a JSON file. Supports multiple weight columns.
 
@@ -123,12 +123,13 @@ def extract_weights(dir, name, process, done=False):
     :param name: Name of the dataset (e.g., 'bitbrain').
     :param process: Process type (e.g., 'train', 'val', 'infer').
     :param done: If True, skip the weight extraction process.
+    :param weights_from: Specifies which dataset split to use as reference.
     """
     data_path = utils.get_path(dir, filename=f'{name}-train.npz')
     meta_path = utils.get_path(dir, filename=f'{name}.json')
     weights_path = utils.get_path(dir, filename=f'{name}-weights.json')
 
-    if done:
+    if done or weights_from == process:
         logger.info(f"Skipping weight extraction for {data_path}.")
         return utils.load_json(weights_path)
 

@@ -26,19 +26,19 @@ def main(dir, name, process, train_size, infer_size, norm_include, time_include,
                   done=splitted)
 
     for p in process_map.get(process, []):
-        if weights_from == p:
-            logger.info(f"Calculating class weights for {p} data.")
-            sh.extract_weights(dir=dir,
-                            name=name,
-                            process=p,
-                            done=weighted)
+        logger.info(f"Calculating class weights for {p} data.")
+        sh.extract_weights(dir=dir,
+                           name=name,
+                           process=p,
+                           done=weighted,
+                           weights_from=weights_from)
 
-        if stats_from == p:
-            logger.info(f"Calculating statistics for {p} data.")
-            stats = tl.get_stats(dir=dir,
+        logger.info(f"Calculating statistics for {p} data.")
+        stats = tl.get_stats(dir=dir,
                                 name=name,
                                 process=p,
-                                done=analyzed)
+                                done=analyzed,
+                                stats_from=stats_from)
 
         logger.info(f"Normalizing {p} data with standard normalization.")
         tl.standard_normalize(dir=dir,
