@@ -177,7 +177,7 @@ def extract_weights(dir, name, process, done=False, weights_from='train'):
     
     weights_path = utils.get_path(dir, filename=f'{name}-weights.json')
 
-    if done or weights_from == process:
+    if done or weights_from != process:
         logger.info(f"Skipping weight extraction for {data_path}.")
         return utils.load_json(weights_path)
 

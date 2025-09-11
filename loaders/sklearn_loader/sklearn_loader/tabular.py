@@ -23,7 +23,7 @@ def get_stats(dir, name, process, done=False, stats_from='train'):
     data = utils.load_npz(data_path)
     metadata = utils.load_json(meta_path)
 
-    if done or stats_from == process:
+    if done or stats_from != process:
         logger.info(f"Skipping stats calculation for {data_path}.")
         return utils.load_json(stats_path)
 

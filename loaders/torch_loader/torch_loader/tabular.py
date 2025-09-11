@@ -22,7 +22,7 @@ def get_stats(dir, name, process, done=False, stats_from='train'):
     meta_path = utils.get_path(dir, filename=f"{name}.json")
     stats_path = utils.get_path(dir, filename=f"{name}-stats.json")
 
-    if done or stats_from == process:
+    if done or stats_from != process:
         logger.info(f"Skipping stats calculation for {data_path}.")
         return utils.load_json(stats_path)
 
