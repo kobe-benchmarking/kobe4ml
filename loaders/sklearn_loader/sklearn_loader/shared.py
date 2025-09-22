@@ -138,8 +138,12 @@ def sort_data(dir, name, process, done):
     if not sort_cols or done:
         logger.info(f"No sort columns specified for {name}, skipping sorting.")
         return
+    
+    if sort_data.ndim == 1:
+        sort_indices = np.argsort(sort_data)
+    else:
+        sort_indices = np.lexsort(sort_data[:, ::-1].T)
 
-    sort_indices = np.lexsort([sort_data[col] for col in reversed(sort_cols)])
     sorted_data = {k: v[sort_indices] for k, v in data.items()}
 
     utils.save_npz(sorted_data, data_path)
