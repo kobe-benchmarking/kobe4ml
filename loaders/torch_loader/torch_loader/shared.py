@@ -176,8 +176,12 @@ def sort_data(dir, name, process, done):
     data_path = utils.get_path(dir, filename=f"{name}-{process}.npz")
     meta_path = utils.get_path(dir, filename=f"{name}.json")
 
+    print(meta_path)
+
     data = utils.load_npz(data_path)
     metadata = utils.load_json(meta_path)
+
+    print(metadata)
 
     cols = metadata['columns']
     sort_cols = metadata['sort']
