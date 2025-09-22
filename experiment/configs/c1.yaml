@@ -14,7 +14,7 @@ steps:
     type: prepare
 
     parameters:
-      save_url: models/lstm_ae.pth 
+      save_url: MODELS/lstm_ae.pth 
 
       model:
         num_feats: 2
@@ -43,7 +43,7 @@ steps:
         index_url: https://kobe-benchmarking.github.io/kobe4ml/
 
       name: bitbrain
-      location: ../DATASETS/bitbrain_conv_ml
+      location: DATASETS/bitbrain_conv_ml
       weight: majority
 
       parameters:
@@ -75,7 +75,7 @@ steps:
     type: work
 
     parameters:
-      model_url: models/lstm_ae.zip
+      model_url: MODELS/lstm_ae.zip
 
       process:
         batch_size: 512
@@ -87,7 +87,7 @@ steps:
         index_url: https://kobe-benchmarking.github.io/kobe4ml/
 
       name: bitbrain
-      location: ../DATASETS/bitbrain_conv_ml
+      location: DATASETS/bitbrain_conv_ml
       weight: majority
 
       parameters:

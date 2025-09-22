@@ -14,7 +14,7 @@ steps:
     type: work
 
     parameters:
-      model_url: models/mne_filter_params.json
+      model_url: MODELS/mne_filter_params.json
 
     data:
       loader:
@@ -22,7 +22,7 @@ steps:
         index_url: https://kobe-benchmarking.github.io/kobe4ml/
 
       name: bitbrain
-      location: datasets/bitbrain_conv_trad
+      location: DATASETS/bitbrain_conv_trad
       weight: majority
 
       parameters:
