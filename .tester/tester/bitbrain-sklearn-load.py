@@ -22,6 +22,10 @@ def main():
                   train_size=0.7,
                   test_size=0.3)
     
+    logger.info("Sorting data by the columns defined in metadata.")
+    sl.sort_data(dir=dir,
+                 name=name)
+    
     weights = sl.extract_weights(dir, name=name)
     logger.info(f"Training data class weights:\n{weights}")
 

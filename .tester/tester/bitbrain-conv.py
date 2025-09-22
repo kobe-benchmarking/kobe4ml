@@ -22,6 +22,7 @@ def bitbrain(dir):
     labels = ['majority']
     split = ['night']
     weights = ['majority']
+    sort = ['night', 'time']
     other = ['night', 'onset', 'duration', 'begsample', 'endsample', 'offset', 'ai_psg', 'HB_IMU_1', 'HB_IMU_2', 'HB_IMU_3', 'HB_IMU_4', 'HB_IMU_5', 'HB_IMU_6', 'HB_PULSE']
 
     for subject_folder in glob.glob(os.path.join(dir, 'sub-*')):
@@ -82,9 +83,10 @@ def bitbrain(dir):
     labels_npy = df[labels].values.astype('int32')
     split_npy = df[split].values.astype('int32')
     weights_npy = df[weights].values.astype('float32')
+    sort_npy = df[sort].values.astype('float32')
     other_npy = df[other].values.astype('float32')
 
-    return (features_npy, time_npy, labels_npy, split_npy, weights_npy, other_npy), (columns, features, time, labels, split, weights, other)
+    return (features_npy, time_npy, labels_npy, split_npy, weights_npy, sort_npy, other_npy), (columns, features, time, labels, split, weights, sort, other)
 
 def main():
     """

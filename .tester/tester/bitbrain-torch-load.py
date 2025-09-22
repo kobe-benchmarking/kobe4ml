@@ -23,6 +23,10 @@ def main():
                   val_size=0.2, 
                   test_size=0.2)
     
+    logger.info("Sorting data by the columns defined in metadata.")
+    tl.sort_data(dir=dir,
+                 name=name)
+    
     weights = tl.extract_weights(dir, name=name)
     logger.info(f"Training data class weights:\n{weights}")
 
