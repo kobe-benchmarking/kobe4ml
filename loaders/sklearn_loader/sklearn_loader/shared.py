@@ -132,18 +132,15 @@ def sort_data(dir, name, process, done):
     data = utils.load_npz(data_path)
     metadata = utils.load_json(meta_path)
 
-    cols = metadata['columns']
+    all_data = data['columns']
     sort_cols = metadata['sort']
 
     if not sort_cols or done:
         logger.info(f"No sort columns specified for {name}, skipping sorting.")
         return
 
-    keys = [data[col] for col in reversed(sort_cols)]
-    sort_indices = np.lexsort(keys)
-
-    for col in cols:
-        sorted_data[col] = data[col][sort_indices]
+    sort_indices = np.lexsort([all_data[col] for col in reversed(sort_cols)])
+    sorted_data = {k: v[sort_indices] for k, v in all_data.items()}
 
     utils.save_npz(sorted_data, data_path)
     logger.info(f"Sorted dataset '{name}-{process}' by {sort_cols} and saved to {data_path}.")
