@@ -43,7 +43,7 @@ steps:
         index_url: https://kobe-benchmarking.github.io/kobe4ml/
 
       name: bitbrain
-      location: datasets/bitbrain_conv_ml
+      location: ../DATASETS/bitbrain_conv_ml
       weight: majority
 
       parameters:
@@ -87,7 +87,7 @@ steps:
         index_url: https://kobe-benchmarking.github.io/kobe4ml/
 
       name: bitbrain
-      location: datasets/bitbrain_conv_ml
+      location: ../DATASETS/bitbrain_conv_ml
       weight: majority
 
       parameters:
