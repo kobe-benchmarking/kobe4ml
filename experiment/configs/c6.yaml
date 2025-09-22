@@ -31,11 +31,12 @@ steps:
         infer_size: 1
         norm_include: []
         time_include: False
-        shifted: True
-        splitted: True
-        weighted: True
-        analyzed: True
-        normalized: True
+        shifted: False
+        splitted: False
+        sorted: False
+        weighted: False
+        analyzed: False
+        normalized: False
         weights_from: infer
         stats_from: infer
 

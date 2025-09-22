@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "torch_loader"
-version = "0.48"
+version = "0.49"
 packages = [
     { include = "torch_loader" }
 ]

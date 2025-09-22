@@ -4,7 +4,7 @@ from . import shared as sh
 
 logger = utils.get_logger(level='INFO')
 
-def main(dir, name, process, train_size, val_size, infer_size, seq_len, norm_include, full_epoch, per_epoch, time_include, shifted, splitted, weighted, analyzed, normalized, weights_from, stats_from):
+def main(dir, name, process, train_size, val_size, infer_size, seq_len, norm_include, full_epoch, per_epoch, time_include, shifted, splitted, sorted, weighted, analyzed, normalized, weights_from, stats_from):
     """
     Main function to create torch loaders from the Bitbrain dataset, suitable for machine learning tasks.
     """
@@ -25,6 +25,12 @@ def main(dir, name, process, train_size, val_size, infer_size, seq_len, norm_inc
                   done=splitted)
 
     for p in process_map.get(process, []):
+        logger.info("Sorting data by the columns defined in the metadata.")
+        sh.sort_data(dir=dir,
+                     name=name,
+                     process=p,
+                     done=sorted)
+    
         logger.info(f"Calculating class weights for {p} data.")
         sh.extract_weights(dir=dir,
                            name=name,
@@ -34,10 +40,10 @@ def main(dir, name, process, train_size, val_size, infer_size, seq_len, norm_inc
         
         logger.info(f"Calculating statistics for {p} data.")
         stats = tl.get_stats(dir=dir,
-                                name=name,
-                                process=p,
-                                done=analyzed,
-                                stats_from=stats_from)
+                             name=name,
+                             process=p,
+                             done=analyzed,
+                             stats_from=stats_from)
 
         logger.info(f"Normalizing {p} data with standard normalization.")
         tl.standard_normalize(dir=dir,

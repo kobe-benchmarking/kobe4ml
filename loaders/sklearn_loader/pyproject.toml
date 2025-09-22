@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sklearn_loader"
-version = "0.11"
+version = "0.12"
 packages = [
     { include = "sklearn_loader" }
 ]

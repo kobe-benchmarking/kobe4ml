@@ -56,11 +56,12 @@ steps:
         full_epoch: 7680
         per_epoch: True
         time_include: False
-        shifted: True
-        splitted: True
-        weighted: True
-        analyzed: True
-        normalized: True
+        shifted: False
+        splitted: False
+        sorted: False
+        weighted: False
+        analyzed: False
+        normalized: False
         weights_from: train
         stats_from: train
 
@@ -99,11 +100,12 @@ steps:
         full_epoch: 7680
         per_epoch: True
         time_include: False
-        shifted: True
-        splitted: True
-        weighted: True
-        analyzed: True
-        normalized: True
+        shifted: False
+        splitted: False
+        sorted: False
+        weighted: False
+        analyzed: False
+        normalized: False
         weights_from: train
         stats_from: train
 

@@ -59,6 +59,7 @@ steps:
         time_include: False
         shifted: True
         splitted: True
+        sorted: True
         weighted: True
         analyzed: True
         normalized: True
@@ -102,6 +103,7 @@ steps:
         time_include: False
         shifted: True
         splitted: True
+        sorted: True
         weighted: True
         analyzed: True
         normalized: True

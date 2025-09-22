@@ -115,16 +115,17 @@ def split_data(dir, name, train_size=0.8, infer_size=0.2, done=False):
     logger.info(f"Data split into train ({len(next(iter(train_data.values())))} samples), "
                 f"infer ({len(next(iter(infer_data.values())))} samples).")
     
-def sort_data(dir, name):
+def sort_data(dir, name, process):
     """
     Sort a structured .npz dataset based on one or more columns specified in metadata['sort'].
 
     :param dir: Directory containing the dataset.
-    :param name: Base dataset name (e.g., 'bitbrain-train').
+    :param name: Base dataset name (e.g., 'bitbrain').
+    process: Process type (e.g., 'train', 'val', 'infer').
     """
     sorted_data = {}
 
-    data_path = utils.get_path(dir, filename=f"{name}.npz")
+    data_path = utils.get_path(dir, filename=f"{name}-{process}.npz")
     meta_path = utils.get_path(dir, filename=f"{name}.json")
 
     data = utils.load_npz(data_path)
@@ -144,7 +145,7 @@ def sort_data(dir, name):
         sorted_data[col] = data[col][sort_indices]
 
     utils.save_npz(sorted_data, data_path)
-    logger.info(f"Sorted dataset '{name}' by {sort_cols} and saved to {data_path}.")
+    logger.info(f"Sorted dataset '{name}-{process}' by {sort_cols} and saved to {data_path}.")
 
 def extract_weights(dir, name, process, done=False, weights_from='train'):
     """
