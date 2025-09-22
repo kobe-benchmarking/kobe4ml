@@ -92,10 +92,10 @@ def main():
     """
     Main function to load the Bitbrain dataset, convert it to numpy format, and save metadata as JSON.
     """
-    root = os.path.abspath(os.path.join(os.getcwd(), '..'))
+    root = os.path.abspath(os.path.join(os.getcwd(), '..', '..'))
 
-    in_dir = converter.get_dir(root, 'datasets', 'bitbrain_small')
-    out_dir = converter.get_dir(root, 'datasets', 'bitbrain_conv')
+    in_dir = converter.get_dir(root, 'DATASETS', 'bitbrain_small')
+    out_dir = converter.get_dir(root, 'DATASETS', 'bitbrain_conv')
 
     out_npz_path = converter.get_path(out_dir, filename='bitbrain.npz')
     out_json_path = converter.get_path(out_dir, filename='bitbrain.json')

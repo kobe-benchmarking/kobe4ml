@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "converter"
+version = "0.3"
+description = "Dataset converter to MANOLO format: .npy for data, .json for metadata."
+authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
+	        "Stasinos Konstantopoulos <konstant@iit.demokritos.gr>" ]
+readme = "README.md"
+packages = [
+    { include = "converter" }
+]
+
+[tool.poetry.dependencies]
+
+python = ">=3.9,<3.14"  
+numpy = "^1.26"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
