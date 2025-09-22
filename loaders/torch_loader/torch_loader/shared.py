@@ -162,13 +162,14 @@ def split_data(dir, name, train_size=0.75, val_size=0.25, infer_size=0, done=Fal
         f"val ({len(next(iter(val_data.values())))} samples), "
         f"infer ({len(next(iter(infer_data.values())))} samples).")
 
-def sort_data(dir, name, process):
+def sort_data(dir, name, process, done):
     """
     Sort a structured .npz dataset based on one or more columns specified in metadata['sort'].
 
     :param dir: Directory containing the dataset.
     :param name: Base dataset name (e.g., 'bitbrain').
     process: Process type (e.g., 'train', 'val', 'infer').
+    :param done: If True, skip the sorting process.
     """
     sorted_data = {}
 
@@ -181,7 +182,7 @@ def sort_data(dir, name, process):
     cols = metadata['columns']
     sort_cols = metadata['sort']
 
-    if not sort_cols:
+    if not sort_cols or done:
         logger.info(f"No sort columns specified for {name}, skipping sorting.")
         return
 
