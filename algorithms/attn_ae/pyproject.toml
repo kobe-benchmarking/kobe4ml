@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "attn_ae"
-version = "0.69"
+version = "0.70"
 packages = [
     { include = "attn_ae" }
 ]
@@ -10,7 +10,7 @@ authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.14"
+python = "^3.10"
 torch = "^2.7.0"
 fastapi = "^0.115.0"
 uvicorn = "^0.23.2"
