@@ -10,8 +10,8 @@
 # Check that the image exists:
 #   docker images
 #
-# Run container (maps host port 48031 → container port 8080):
-#   docker run -p 48031:8080 --name conv_lstm_ae conv_lstm_ae:latest
+# Run container (maps host port 48032 → container port 8080):
+#   docker run -p 48032:8080 --name conv_lstm_ae conv_lstm_ae:latest
 #
 # Verify container is running:
 #   docker ps -a
@@ -23,7 +23,7 @@
 #   docker rm conv_lstm_ae
 #
 # Access the API at:
-#   http://localhost:48031/docs
+#   http://localhost:48032/docs
 
 
 FROM python:3.10-slim

@@ -10,8 +10,8 @@
 # Check that the image exists:
 #   docker images
 #
-# Run container (maps host port 48031 → container port 8080):
-#   docker run -p 48031:8080 --name predictor predictor:latest
+# Run container (maps host port 48035 → container port 8080):
+#   docker run -p 48035:8080 --name predictor predictor:latest
 #
 # Verify container is running:
 #   docker ps -a
@@ -23,7 +23,7 @@
 #   docker rm predictor
 #
 # Access the API at:
-#   http://localhost:48031/docs
+#   http://localhost:48035/docs
 
 
 FROM python:3.10-slim
