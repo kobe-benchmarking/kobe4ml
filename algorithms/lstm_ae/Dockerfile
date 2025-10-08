@@ -12,6 +12,6 @@ RUN poetry install --no-interaction --no-ansi
 
 COPY lstm_ae ./lstm_ae
 
-EXPOSE 48031
+EXPOSE 8080
 
 CMD ["poetry", "run", "api"]

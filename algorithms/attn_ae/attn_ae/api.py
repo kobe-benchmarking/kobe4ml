@@ -55,4 +55,4 @@ def setup():
     """
     Entry point to run the FastAPI server.
     """
-    uvicorn.run("attn_ae.api:app", host="0.0.0.0", port=48033, reload=False)
+    uvicorn.run("attn_ae.api:app", host="0.0.0.0", port=8080, reload=True)

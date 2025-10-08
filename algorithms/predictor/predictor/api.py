@@ -55,4 +55,4 @@ def setup():
     """
     Entry point to run the FastAPI server.
     """
-    uvicorn.run("predictor.api:app", host="0.0.0.0", port=48035, reload=True)
+    uvicorn.run("predictor.api:app", host="0.0.0.0", port=8080, reload=True)
