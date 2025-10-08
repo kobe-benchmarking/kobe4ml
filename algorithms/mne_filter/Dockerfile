@@ -5,22 +5,22 @@
 #   4. Exposes API on port 8080
 #
 # Build image:
-#   docker build -t lstm_ae:latest .
+#   docker build -t mne_filter:latest .
 #
 # Check that the image exists:
 #   docker images
 #
 # Run container (maps host port 48031 → container port 8080):
-#   docker run -p 48031:8080 --name lstm_ae lstm_ae:latest
+#   docker run -p 48031:8080 --name mne_filter mne_filter:latest
 #
 # Verify container is running:
 #   docker ps -a
 #
 # Stop the container:
-#   docker stop lstm_ae
+#   docker stop mne_filter
 #
 # Remove the container:
-#   docker rm lstm_ae
+#   docker rm mne_filter
 #
 # Access the API at:
 #   http://localhost:48031/docs
@@ -31,7 +31,7 @@ FROM python:3.10-slim
 WORKDIR /app
 
 COPY pyproject.toml README.md ./
-COPY lstm_ae ./lstm_ae
+COPY mne_filter ./mne_filter
 
 RUN pip install --no-cache-dir poetry \
     && poetry config virtualenvs.create false \
