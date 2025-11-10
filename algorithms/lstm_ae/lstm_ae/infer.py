@@ -1,34 +1,17 @@
 import torch
 import zipfile
 import os
+import numpy as np
 
+from . import estimate
 from . import utils
 from .model import *
+from .metrics import *
 
 logger = utils.get_logger(level='CRITICAL')
 
 device = utils.detect_device()
 logger.info(f'Device is {device}')
-
-def mae(X, X_dec):
-    """
-    Compute Mean Absolute Error (MAE) manually.
-
-    :param X: Original input tensor.
-    :param X_dec: Reconstructed output tensor.
-    :return: MAE value.
-    """
-    return torch.mean(torch.abs(X - X_dec)).item()
-
-def mse(X, X_dec):
-    """
-    Compute Mean Squared Error (MSE) manually.
-
-    :param X: Original input tensor.
-    :param X_dec: Reconstructed output tensor.
-    :return: MSE value.
-    """
-    return torch.mean((X - X_dec) ** 2).item()
 
 def unzip_model(path):
     """
@@ -68,6 +51,10 @@ def infer(data, model, model_pth, criterion, metrics):
     total_infer_loss = 0.0
     total_mae = 0.0
     total_mse = 0.0
+    X_all, X_dec_all = [], []
+
+    static_dir = os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'experiment', 'static', 'estims'))
+    estims_path = utils.get_path(static_dir, filename="estims_lstm_ae.npy")
 
     batches = len(data)
 
@@ -83,9 +70,19 @@ def infer(data, model, model_pth, criterion, metrics):
             total_mae += mae(X, X_dec)
             total_mse += mse(X, X_dec)
 
+            X_all.append(X.detach().cpu().numpy())
+            X_dec_all.append(X_dec.detach().cpu().numpy())
+
     avg_infer_loss = total_infer_loss / batches
     avg_mae = total_mae / batches
     avg_mse = total_mse / batches
+
+    X_all = np.concatenate(X_all, axis=0)
+    X_dec_all = np.concatenate(X_dec_all, axis=0)
+
+    error = estimate.rec_error(X_all, X_dec_all)
+    utils.save_np(data=error, path=estims_path)
+    logger.info(f"Saved per-sample errors to {estims_path}.")
 
     all_metrics = {
         'infer_loss': avg_infer_loss,

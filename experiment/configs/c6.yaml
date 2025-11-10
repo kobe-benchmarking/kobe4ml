@@ -1,0 +1,45 @@
+metadata:
+  parent_id: dcoss
+  id: dcoss_06
+  version: v1
+  name: MNE-Filtering
+  description: This run applies MNE filtering to the BitBrain time series dataset.   
+
+implementation:
+  package: mne_filter   
+  url: http://127.0.0.1:48036/run       
+
+steps:
+  - id: dcoss_06_01
+    type: work
+
+    parameters:
+      model_url: MODELS/mne_filter_params.json
+
+    data:
+      loader:
+        package: sklearn_loader          
+        index_url: https://kobe-benchmarking.github.io/kobe4ml/
+
+      name: bitbrain
+      location: DATASETS/bitbrain_conv_trad
+      weight: majority
+
+      parameters:
+        process: work
+        train_size: null
+        infer_size: 1
+        norm_include: []
+        time_include: False
+        shifted: False
+        splitted: False
+        sorted: False
+        weighted: False
+        analyzed: False
+        normalized: False
+        weights_from: infer
+        stats_from: infer
+
+    metrics:
+      - mae
+      - mse

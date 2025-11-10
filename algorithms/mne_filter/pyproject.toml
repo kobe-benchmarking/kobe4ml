@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "mne_filter"
+version = "0.15"
+packages = [
+    { include = "mne_filter" }
+]
+description = "MNE Filtering"
+authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
+	        "Stasinos Konstantopoulos <konstant@iit.demokritos.gr>" ]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+torch = "^2.7.0"      
+fastapi = "^0.115.0"
+uvicorn = "^0.23.2"
+mne = "^1.7"
+numpy = "^1.26"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+api = "mne_filter.api:setup"

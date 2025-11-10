@@ -1,34 +1,17 @@
 import torch
 import zipfile
 import os
+import numpy as np
 
+from . import estimate
 from . import utils
 from .model import *
+from .metrics import *
 
 logger = utils.get_logger(level='CRITICAL')
 
 device = utils.detect_device()
 logger.info(f'Device is {device}')
-
-def mae(X, X_dec):
-    """
-    Compute Mean Absolute Error (MAE) manually.
-
-    :param X: Original input tensor.
-    :param X_dec: Reconstructed output tensor.
-    :return: MAE value.
-    """
-    return torch.mean(torch.abs(X - X_dec)).item()
-
-def mse(X, X_dec):
-    """
-    Compute Mean Squared Error (MSE) manually.
-
-    :param X: Original input tensor.
-    :param X_dec: Reconstructed output tensor.
-    :return: MSE value.
-    """
-    return torch.mean((X - X_dec) ** 2).item()
 
 def unzip_model(path):
     """
@@ -68,6 +51,10 @@ def infer(data, model, model_pth, criterion, metrics):
     total_infer_loss = 0.0
     total_mae = 0.0
     total_mse = 0.0
+    X_all, X_pred_all, attn_matrices = [], [], []
+
+    static_dir = os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'experiment', 'static', 'estims'))
+    estims_path = utils.get_path(static_dir, filename="estims_predictor.npy")
 
     batches = len(data)
 
@@ -75,20 +62,36 @@ def infer(data, model, model_pth, criterion, metrics):
         for _, (X, Xn, _) in enumerate(data):
             X, Xn = X.to(device), Xn.to(device)
 
-            X_dec, _ = model(X)
+            X_pred, attn_matrix = model(X)
 
-            X_dec, _ = utils.separate(src=X_dec, c=[0,1], t=[2])
+            X_pred, _ = utils.separate(src=X_pred, c=[0,1], t=[2])
             Xn, _ = utils.separate(src=Xn, c=[0,1], t=[2])
+            attn_matrix, _ = utils.separate(src=attn_matrix, c=[0,1], t=[2])
 
-            infer_loss = criterion(X_dec, Xn)
+            infer_loss = criterion(X_pred, Xn)
             total_infer_loss += infer_loss.item()
 
-            total_mae += mae(Xn, X_dec)
-            total_mse += mse(Xn, X_dec)
+            total_mae += mae(Xn, X_pred)
+            total_mse += mse(Xn, X_pred)
 
+            X_all.append(Xn.detach().cpu().numpy())
+            X_pred_all.append(X_pred.detach().cpu().numpy())
+            attn_matrices.append(attn_matrix.detach().cpu().numpy())
+    
     avg_infer_loss = total_infer_loss / batches
     avg_mae = total_mae / batches
     avg_mse = total_mse / batches
+
+    X_all = np.concatenate(X_all, axis=0)
+    X_pred_all = np.concatenate(X_pred_all, axis=0)
+    attn_matrices = np.concatenate(attn_matrices, axis=0)
+
+    attn_error = estimate.attn_error(attn_matrices)
+    pred_error = estimate.pred_error(X_all, X_pred_all)
+    errors = np.stack([pred_error, attn_error], axis=0)
+
+    utils.save_np(data=errors, path=estims_path)
+    logger.info(f"Saved per-sample errors to {estims_path}.")
 
     all_metrics = {
         'infer_loss': avg_infer_loss,

@@ -1,44 +1,17 @@
 import torch
 import zipfile
 import os
-from sklearn.metrics import precision_score, recall_score, f1_score as sk_f1
+import numpy as np
 
+from .import estimate
 from . import utils
 from .model import *
+from .metrics import *
 
 logger = utils.get_logger(level='CRITICAL')
 
 device = utils.detect_device()
 logger.info(f'Device is {device}')
-
-def precision(y, y_pred):
-    """
-    Compute precision using scikit-learn.
-    y: ground-truth tensor (shape: N,)
-    y_pred: logits or probabilities (shape: N x num_classes)
-    """
-    y_true = y.detach().cpu().numpy()
-    y_hat = torch.argmax(y_pred, dim=1).detach().cpu().numpy()
-
-    return precision_score(y_true, y_hat, average="macro", zero_division=0)
-
-def recall(y, y_pred):
-    """
-    Compute recall using scikit-learn.
-    """
-    y_true = y.detach().cpu().numpy()
-    y_hat = torch.argmax(y_pred, dim=1).detach().cpu().numpy()
-
-    return recall_score(y_true, y_hat, average="macro", zero_division=0)
-
-def f1_score(y, y_pred):
-    """
-    Compute F1 score using scikit-learn.
-    """
-    y_true = y.detach().cpu().numpy()
-    y_hat = torch.argmax(y_pred, dim=1).detach().cpu().numpy()
-
-    return sk_f1(y_true, y_hat, average="macro", zero_division=0)
 
 def unzip_model(path):
     """
@@ -79,6 +52,10 @@ def infer(data, model, model_pth, criterion, metrics):
     total_precision = 0.0
     total_recall = 0.0
     total_f1 = 0.0
+    attn_matrices = []
+
+    static_dir = os.path.abspath(os.path.join(os.getcwd(), '..', '..', 'experiment', 'static', 'estims'))
+    estims_path = utils.get_path(static_dir, filename="estims_classif.npy")
 
     batches = len(data)
 
@@ -86,29 +63,41 @@ def infer(data, model, model_pth, criterion, metrics):
         for _, (X, _, y) in enumerate(data):
             X, y = X.to(device), y.to(device)
 
-            y_pred, _ = model(X)
+            y_pred, attn_matrix = model(X)
+            attn_matrix, _ = utils.separate(src=attn_matrix, c=[0,1], t=[2])
 
             batch_size, seq_len, num_classes = y_pred.size()
             y_pred = y_pred.reshape(batch_size * seq_len, num_classes)
             y = y.reshape(batch_size * seq_len)
 
             infer_loss = criterion(y_pred, y)
-
             total_infer_loss += infer_loss.item()
-            total_precision += precision(y, y_pred)
-            total_recall += recall(y, y_pred)
-            total_f1 += f1_score(y, y_pred)
+
+            y_np = y.detach().cpu().numpy()
+            y_pred_np = y_pred.detach().cpu().numpy()
+
+            total_precision += precision(y_np, y_pred_np)
+            total_recall += recall(y_np, y_pred_np)
+            total_f1 += f1(y_np, y_pred_np)
+
+            attn_matrices.append(attn_matrix.detach().cpu().numpy())
 
     avg_infer_loss = total_infer_loss / batches
     avg_precision = total_precision / batches
     avg_recall = total_recall / batches
     avg_f1 = total_f1 / batches
 
+    attn_matrices = np.concatenate(attn_matrices, axis=0)
+
+    attn_error = estimate.attn_error(attn_matrices)
+    utils.save_np(data=attn_error, path=estims_path)
+    logger.info(f"Saved per-sample errors to {estims_path}.")
+
     all_metrics = {
         'infer_loss': avg_infer_loss,
         'precision': avg_precision,
         'recall': avg_recall,
-        'f1_score': avg_f1
+        'f1': avg_f1
     }
 
     filtered_metrics = {metric: all_metrics[metric] for metric in metrics if metric in all_metrics}

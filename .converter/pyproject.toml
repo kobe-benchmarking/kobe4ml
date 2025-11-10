@@ -1,23 +1,19 @@
 [tool.poetry]
-name = "mne"
-version = "0.1"
-packages = [
-    { include = "mne" }
-]
-description = "MNE Filtering"
+name = "converter"
+version = "0.3"
+description = "Dataset converter to MANOLO format: .npy for data, .json for metadata."
 authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
 	        "Stasinos Konstantopoulos <konstant@iit.demokritos.gr>" ]
 readme = "README.md"
+packages = [
+    { include = "converter" }
+]
 
 [tool.poetry.dependencies]
+
 python = ">=3.9,<3.14"  
-torch = "^2.7.0"      
-fastapi = "^0.115.0"
-uvicorn = "^0.23.2"
+numpy = "^1.26"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-api = "mne.api:setup"

@@ -112,6 +112,7 @@ def load_params(step):
     root_dir = os.path.abspath(os.path.join(os.getcwd(), '..'))
 
     step_id = step["id"]
+    step_type = step["type"]
     params = step['parameters']
     data = step['data']
     metrics = step['metrics']
@@ -128,13 +129,13 @@ def load_params(step):
     data_id_params_path = utils.get_path(root_dir, "models", filename=f"{step_id}_data_id.pkl")
     utils.save_pickle(data_id_params, data_id_params_path)
 
-    model_pth = resolve_path(root_dir, save_url)
-    model_zip = resolve_path(root_dir, model_url)
+    save_url = resolve_path(root_dir, save_url)
+    model_url = resolve_path(root_dir, model_url)
 
-    if save_url:
-        model_params = {"model_params": model_params, "model_pth": model_pth}
-    elif model_url:
-        model_params = model_zip
+    if step_type == 'prepare':
+        model_params = {"model_params": model_params, "model_pth": save_url}
+    else:
+        model_params = model_url
 
     model_path = utils.get_path(root_dir, "models", filename=f"{step_id}_model.pkl")
     utils.save_pickle(model_params, model_path)

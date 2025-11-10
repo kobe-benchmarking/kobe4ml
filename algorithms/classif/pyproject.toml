@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "classif"
-version = "0.26"
+version = "0.31"
 packages = [
     { include = "classif" }
 ]
@@ -10,7 +10,7 @@ authors = [ "Natalia Koliou <nataliakoliou@iit.demokritos.gr>",
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.14"    
+python = "^3.10"    
 torch = "^2.7.0" 
 scikit-learn = "^1.3.0"
 fastapi = "^0.115.0"

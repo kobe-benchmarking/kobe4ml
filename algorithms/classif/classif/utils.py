@@ -2,6 +2,7 @@ import os
 import json
 import logging
 import torch
+import numpy as np
 import torch.nn as nn
 import torch.optim as optim
 import torch.optim.lr_scheduler as sched
@@ -221,3 +222,35 @@ def load_pickle(path):
     """
     with open(path, "rb") as f:
         return pickle.load(f)
+    
+def save_np(data, path):
+    """
+    Save a NumPy array to a .npy file.
+
+    :param data: NumPy array to save.
+    :param path: Full path to save the array (should end with .npy).
+    """
+    np.save(path, data)
+
+def load_np(path):
+    """
+    Load a NumPy array from a .npy file.
+
+    :param path: Full path to the .npy file.
+    :return: Loaded NumPy array.
+    """
+    return np.load(path)
+
+def separate(src, c, t):
+    """
+    Separates channels and time features from the source tensor.
+
+    :param src: Tensor of shape (batch_size, seq_len, num_feats).
+    :param c: Range of channel features.
+    :param t: Range of time features.
+    :return: Tuple of (channels, time) tensors.
+    """
+    channels = src[:, :, c]
+    time = src[:, :, t]
+
+    return channels, time

@@ -14,7 +14,7 @@ steps:
     type: prepare
 
     parameters:
-      save_url: models/attn_ae.pth 
+      save_url: MODELS/attn_ae.pth 
 
       model:
         seq_len: 240
@@ -44,14 +44,14 @@ steps:
         index_url: https://kobe-benchmarking.github.io/kobe4ml/
 
       name: bitbrain
-      location: datasets/bitbrain_conv
+      location: DATASETS/bitbrain_conv_ml
       weight: majority
 
       parameters:
         process: prepare
         train_size: 0.65
         val_size: 0.15
-        test_size: 0.20
+        infer_size: 0.20
         seq_len: 240
         norm_include: ['HB_1', 'HB_2', 'time']
         full_epoch: 7680
@@ -59,9 +59,12 @@ steps:
         time_include: True
         shifted: True
         splitted: True
+        sorted: True
         weighted: True
         analyzed: True
         normalized: True
+        weights_from: train
+        stats_from: train
 
     metrics:
       - epochs
@@ -73,7 +76,7 @@ steps:
     type: work
 
     parameters:
-      model_url: models/attn_ae.zip
+      model_url: MODELS/attn_ae.zip
 
       process:
         batch_size: 512
@@ -85,14 +88,14 @@ steps:
         index_url: https://kobe-benchmarking.github.io/kobe4ml/
 
       name: bitbrain
-      location: datasets/bitbrain_conv
+      location: DATASETS/bitbrain_conv_ml
       weight: majority
 
       parameters:
         process: work
         train_size: 0.65
         val_size: 0.15
-        test_size: 0.20
+        infer_size: 0.20
         seq_len: 240
         norm_include: ['HB_1', 'HB_2', 'time']
         full_epoch: 7680
@@ -100,9 +103,12 @@ steps:
         time_include: True
         shifted: True
         splitted: True
+        sorted: True
         weighted: True
         analyzed: True
         normalized: True
+        weights_from: train
+        stats_from: train
 
     metrics:
       - infer_loss

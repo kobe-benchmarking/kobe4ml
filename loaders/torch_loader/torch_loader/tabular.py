@@ -6,21 +6,23 @@ from . import utils
 
 logger = utils.get_logger(level='DEBUG')
 
-def get_stats(dir, name, done=False):
+def get_stats(dir, name, process, done=False, stats_from='train'):
     """
-    Load structured .npz train data and metadata, compute stats (mean, std, median, IQR) per column,
+    Load structured .npz data and metadata, compute stats (mean, std, median, IQR) per column,
     and save the stats as a JSON file.
 
-    :param dir: Directory containing {name}-train.npz and {name}.json.
+    :param dir: Directory containing {name}-{process}.npz and {name}.json.
     :param name: Dataset name prefix (e.g., 'bitbrain').
+    :param process: Process type (e.g., 'train', 'val', 'infer').
     :param done: If True, skip the stats calculation.
+    :param stats_from: Specifies which dataset split to use as reference.
     :return: Dict of stats keyed by column name.
     """
-    data_path = utils.get_path(dir, filename=f"{name}-train.npz")
+    data_path = utils.get_path(dir, filename=f"{name}-{process}.npz")
     meta_path = utils.get_path(dir, filename=f"{name}.json")
     stats_path = utils.get_path(dir, filename=f"{name}-stats.json")
 
-    if done:
+    if done or stats_from != process:
         logger.info(f"Skipping stats calculation for {data_path}.")
         return utils.load_json(stats_path)
 
@@ -61,7 +63,7 @@ def robust_normalize(dir, name, process, include, stats, done=False):
 
     :param dir: Directory containing the dataset.
     :param name: Dataset base name (e.g., 'bitbrain').
-    :param process: Process type (e.g., 'train', 'val', 'test').
+    :param process: Process type (e.g., 'train', 'val', 'infer').
     :param include: List of column names to include in normalization.
     :param stats: Dict of precomputed stats (median, iqr) keyed by column name.
     :param done: If True, skip the normalization process.
@@ -99,7 +101,7 @@ def standard_normalize(dir, name, process, include, stats, done=False):
 
     :param dir: Directory containing the dataset.
     :param name: Dataset base name (e.g., 'bitbrain').
-    :param process: Process type (e.g., 'train', 'val', 'test').
+    :param process: Process type (e.g., 'train', 'val', 'infer').
     :param include: List of column names to include in normalization.
     :param stats: Dict of precomputed stats (mean, std) keyed by column name.
     :param done: If True, skip the normalization process.
